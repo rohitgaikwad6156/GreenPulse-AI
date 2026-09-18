@@ -1,0 +1,21 @@
+{
+  "scenario_label": "DEMO VALIDATION SCENARIO",
+  "source_note": "DEMO / SYNTHETIC DATA. Invented values solely for testing the validation workflow; no Pune or PCMC measurements.",
+  "intervention": "DEMO tree canopy intervention",
+  "pre_period": "DEMO pre-implementation season",
+  "post_period": "DEMO post-implementation season",
+  "observations": [
+    {"grid_id": "DEMO-T1", "group": "treated", "period": "pre", "lst_c": 39.0, "ndvi": 0.12},
+    {"grid_id": "DEMO-T1", "group": "treated", "period": "post", "lst_c": 36.0, "ndvi": 0.22},
+    {"grid_id": "DEMO-T2", "group": "treated", "period": "pre", "lst_c": 38.0, "ndvi": 0.15},
+    {"grid_id": "DEMO-T2", "group": "treated", "period": "post", "lst_c": 35.5, "ndvi": 0.23},
+    {"grid_id": "DEMO-C1", "group": "control", "period": "pre", "lst_c": 37.0, "ndvi": 0.11},
+    {"grid_id": "DEMO-C1", "group": "control", "period": "post", "lst_c": 36.5, "ndvi": 0.12},
+    {"grid_id": "DEMO-C2", "group": "control", "period": "pre", "lst_c": 38.0, "ndvi": 0.10},
+    {"grid_id": "DEMO-C2", "group": "control", "period": "post", "lst_c": 37.5, "ndvi": 0.11}
+  ],
+  "predictions": [
+    {"grid_id": "DEMO-T1", "predicted_delta_lst_c": -2.0},
+    {"grid_id": "DEMO-T2", "predicted_delta_lst_c": -1.7}
+  ]
+}

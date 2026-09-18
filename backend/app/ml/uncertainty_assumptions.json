@@ -1,0 +1,22 @@
+{
+  "label": "CONFIGURABLE MVP UNCERTAINTY ASSUMPTIONS — NOT EMPIRICALLY CALIBRATED FOR PUNE",
+  "intervention_cv": {
+    "cool_roof": 0.08,
+    "tree_canopy": 0.20,
+    "green_roof": 0.15,
+    "cool_pavement": 0.10
+  },
+  "combined_cv_rule": "root_sum_squares_of_selected_cvs",
+  "normal_multiplier_for_approx_90_percent": 1.645,
+  "confidence_thresholds_sigma_total_c": {
+    "high_below": 0.3,
+    "medium_at_most": 0.6
+  },
+  "prediction_horizon": {
+    "cool_roof": "After retrofit under comparable March–May daytime satellite-overpass conditions; coating aging is not modeled.",
+    "tree_canopy": "After the requested canopy cover has been established under comparable March–May daytime satellite-overpass conditions; growth time and survival are not modeled.",
+    "tree_canopy_and_cool_roof": "After roof retrofit and establishment of the requested canopy under comparable March–May daytime satellite-overpass conditions; no calendar-year claim is made.",
+    "green_roof": "Future intervention only; prediction horizon is not implemented.",
+    "cool_pavement": "Future intervention only; prediction horizon is not implemented."
+  }
+}

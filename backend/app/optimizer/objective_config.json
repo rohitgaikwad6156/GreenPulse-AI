@@ -1,0 +1,13 @@
+{
+  "label": "CONFIGURABLE MVP OBJECTIVE ASSUMPTIONS",
+  "weights": {
+    "cooling": 1.0,
+    "green_cover": 0.5,
+    "co_benefit": 0.2
+  },
+  "normalization": {
+    "cooling_reference_method": "maximum_positive_per_block_in_candidate_catalog",
+    "green_reference_method": "maximum_positive_per_block_in_candidate_catalog",
+    "co_benefit_reference": 10.0
+  }
+}
