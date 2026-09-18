@@ -104,6 +104,7 @@ surviving restart. No real model, raster, or ward boundary is in GitHub now.
 | Render out of memory | Inspect logs and choose adequate RAM or slim imports. |
 | Vercel build fails | Root Directory is `frontend`; Vite build is `npm run build`; output is `dist`. |
 | Refreshing a dashboard route gives 404 | Confirm `frontend/vercel.json` is in the deployed commit. |
+| Build log shows `npm run dev`, `VITE ready`, and `localhost:5173` | The development server is running as Vercel's Build Command and will not finish. Set Build Command to `npm run build`, then start a new deployment. The repository's `frontend/vercel.json` also pins this command. |
 | Frontend calls local machine | Set Production `VITE_API_BASE_URL` to the real Render HTTPS origin and redeploy. |
 | Browser CORS error | Render `GREENPULSE_CORS_ORIGINS` exactly matches the browser origin, with no path or trailing slash. |
 | Health request initially slow | A free Render service may be waking from idle. |
