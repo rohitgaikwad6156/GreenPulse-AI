@@ -92,5 +92,6 @@ No measured temperature, model metric, or intervention outcome is included in th
 - [Climate Action Optimizer UI](docs/climate_action_optimizer_ui.md): budget and resource controls, optional normalized-benefit priorities, integer portfolio details, and cost-versus-cooling visualization when location-specific evidence is available.
 - [Post-implementation validation](docs/post_implementation_validation.md): paired treated/control LST DiD, optional NDVI change, treated-cell prediction residuals, and an explicitly synthetic demo workflow.
 - [Full system testing](docs/full_system_testing.md): automated Python and frontend build checks plus a manual map-to-validation checklist, with explicit synthetic-fixture and real-data gates.
+- [Deploy on Render and Vercel](docs/deployment_vercel_render.md): project-specific dashboard settings, cloud environment variables, routing, verification, and current data limitations.
 
 Neither pipeline substitutes synthetic climate values for missing source data. Their tests use only temporary, labelled artificial fixtures.
