@@ -145,16 +145,16 @@ class PriorityWeights(StrictRequest):
 
 
 class OptimizeRequest(StrictRequest):
-    location: str = Field(min_length=1, max_length=120)
+    location_id: str = Field(min_length=1, max_length=120)
     budget_inr: float = Field(ge=0, le=1_000_000_000_000)
     maintenance_cap_inr_per_year: float = Field(ge=0, le=1_000_000_000_000)
-    available_ground_m2: float = Field(ge=0, le=100_000_000)
-    available_roof_m2: float = Field(ge=0, le=100_000_000)
     priority_weights: PriorityWeights | None = None
 
 
 class OptimizeResponse(BaseModel):
     location: str
+    location_name: str
+    catalog_version: str
     status: Literal["optimal"]
     interpretation: str
     selected_actions: list[dict[str, Any]]
@@ -166,9 +166,29 @@ class OptimizeResponse(BaseModel):
     objective_value: float
     modeled_cooling_estimate_c: float
     cooling_estimate_note: str
+    interaction_warning: str
+    verified_capacity: dict[str, Any]
     normalization: dict[str, Any]
     weights: dict[str, float]
     catalog_label: str
+
+
+class OptimizerLocation(BaseModel):
+    location_id: str
+    name: str
+    crs: Literal["EPSG:32643"]
+    eligible_ground_m2: float
+    eligible_roof_m2: float
+    available_interventions: int
+    planning_available: bool
+    capacity_status: str
+
+
+class OptimizerLocationsResponse(BaseModel):
+    catalog_version: str
+    locations: list[OptimizerLocation]
+    total: int
+    blockers: list[str]
 
 
 class DidObservation(StrictRequest):
@@ -214,6 +234,54 @@ class DidResponse(BaseModel):
     source_note: str | None = None
     interpretation: str
     limitations: list[str]
+
+
+class ValidationDatasetItem(BaseModel):
+    dataset_id: str
+    dataset_version: str
+    location_id: str
+    intervention_id: str
+    evidence_label: str
+    season: str
+    treated_cells: int
+    control_cells: int
+
+
+class ValidationDatasetsResponse(BaseModel):
+    datasets: list[ValidationDatasetItem]
+    total: int
+    validation_status: Literal["AVAILABLE", "BLOCKED"]
+    blocker: str | None
+
+
+class ProvenanceValidationResponse(BaseModel):
+    report_schema_version: str
+    report_id: str
+    validation_status: Literal["READY_FOR_HUMAN_REVIEW", "BLOCKED"]
+    evidence_label: str
+    dataset_id: str
+    dataset_version: str
+    location_id: str
+    intervention_id: str
+    provenance: dict[str, Any]
+    sample_size: dict[str, int]
+    period_group_means_c: dict[str, dict[str, float]]
+    treated_change_c: float
+    control_change_c: float
+    difference_in_differences_c: float
+    realized_cooling_c: float
+    uncertainty: dict[str, Any]
+    parallel_trends: dict[str, Any]
+    control_diagnostics: dict[str, Any]
+    spatial_autocorrelation: dict[str, Any]
+    prediction_comparison: list[dict[str, Any]]
+    performance: dict[str, Any] | None
+    calibration_proposal: dict[str, Any] | None
+    approval: dict[str, Any]
+    limitations: list[str]
+    report_content_sha256: str
+
+    model_config = ConfigDict(extra="allow")
 
 
 class MethodologyResponse(BaseModel):

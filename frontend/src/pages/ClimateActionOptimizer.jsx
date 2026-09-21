@@ -2,20 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, BarChart3, Leaf, SlidersHorizontal, Wallet } from "lucide-react";
 import { CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from "recharts";
 import PageIntro from "../components/PageIntro.jsx";
-import { getOptimizerConfig, optimizePortfolio } from "../services/api.js";
+import { getOptimizerConfig, getOptimizerLocations, optimizePortfolio } from "../services/api.js";
+import { buildOptimizerPayload } from "../utils/optimizerPlanning.js";
 
 const integer = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
 const decimal = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 });
 const money = (value) => `₹${integer.format(value)}`;
 const area = (value) => `${decimal.format(value)} m²`;
 const cooling = (value) => `${decimal.format(value)} °C`;
-
-function numeric(value, label, limit) {
-  if (value === "" || !Number.isFinite(Number(value)) || Number(value) < 0 || Number(value) > limit) {
-    throw new Error(`${label} must be between 0 and ${integer.format(limit)}.`);
-  }
-  return Number(value);
-}
 
 function ConstraintRow({ label, used, limit, formatter }) {
   const percentage = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
@@ -52,10 +46,9 @@ function ChartTip({ active, payload }) {
 
 export default function ClimateActionOptimizer() {
   const [location, setLocation] = useState("");
+  const [locationCatalog, setLocationCatalog] = useState(null);
   const [budget, setBudget] = useState("");
   const [maintenance, setMaintenance] = useState("");
-  const [ground, setGround] = useState("");
-  const [roof, setRoof] = useState("");
   const [weights, setWeights] = useState(null);
   const [configError, setConfigError] = useState("");
   const [runEnabled, setRunEnabled] = useState(false);
@@ -68,8 +61,12 @@ export default function ClimateActionOptimizer() {
 
   useEffect(() => {
     const controller = new AbortController();
-    getOptimizerConfig(controller.signal)
-      .then((config) => setWeights(config.weights))
+    Promise.all([getOptimizerConfig(controller.signal), getOptimizerLocations(controller.signal)])
+      .then(([config, locations]) => {
+        setWeights(config.weights);
+        setLocationCatalog(locations);
+        if (locations.locations.length === 1) setLocation(locations.locations[0].location_id);
+      })
       .catch((requestError) => {
         if (requestError.name !== "CanceledError") setConfigError("Optimizer settings are unavailable. Check the backend connection.");
       });
@@ -80,18 +77,10 @@ export default function ClimateActionOptimizer() {
     if (!runEnabled || !weights) return undefined;
     let payload;
     try {
-      if (!location.trim()) throw new Error("Enter the exact ward or planning-area ID used by the intervention catalog.");
-      if (weights.cooling + weights.green_cover + weights.co_benefit <= 0) {
-        throw new Error("At least one policy priority must be above zero.");
-      }
-      payload = {
-        location: location.trim(),
-        budget_inr: numeric(budget, "Capital budget (INR)", 1_000_000_000_000),
-        maintenance_cap_inr_per_year: numeric(maintenance, "Annual maintenance limit (INR)", 1_000_000_000_000),
-        available_ground_m2: numeric(ground, "Available ground area (m²)", 100_000_000),
-        available_roof_m2: numeric(roof, "Available roof area (m²)", 100_000_000),
-        priority_weights: weights,
-      };
+      payload = buildOptimizerPayload({
+        locationId: location.trim(), budget, maintenance, weights,
+        loadedLocations: locationCatalog?.locations,
+      });
     } catch (validationError) {
       setStatus("error"); setError(validationError.message); setPlan(null);
       return undefined;
@@ -123,7 +112,9 @@ export default function ClimateActionOptimizer() {
       }
     }, 400);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [runEnabled, runTick, location, budget, maintenance, ground, roof, weights]);
+  }, [runEnabled, runTick, location, locationCatalog, budget, maintenance, weights]);
+
+  const selectedLocation = locationCatalog?.locations.find((item) => item.location_id === location);
 
   const sliderMax = Math.max(10_000_000, Math.ceil((Number(budget) || 0) / 1_000_000) * 1_000_000);
   const greenGain = plan?.selected_actions.reduce((sum, action) => sum + action.green_cover_gain_m2, 0) ?? 0;
@@ -148,10 +139,21 @@ export default function ClimateActionOptimizer() {
           <h2 className="text-sm font-semibold text-[#294532]">Planning constraints</h2></div>
         <p className="mt-2 text-xs leading-5 text-[#718276]">Use verified limits for one ward or planning area. Amounts are Indian rupees; ₹10 lakh = ₹1,000,000.</p>
         <form className="mt-6 space-y-5" onSubmit={(event) => { event.preventDefault(); setRunEnabled(true); setRunTick((tick) => tick + 1); }}>
-          <label className="block text-sm font-medium text-[#294532]">Ward or planning-area ID
-            <input value={location} onChange={(event) => setLocation(event.target.value)} placeholder="Exact catalog location ID"
-              maxLength={120} className="mt-2 w-full rounded-xl border border-[#dce7dc] px-3 py-2.5 text-sm outline-none focus:border-[#5a9a6c]" />
+          <label className="block text-sm font-medium text-[#294532]">Verified ward or planning area
+            <select value={location} onChange={(event) => setLocation(event.target.value)}
+              disabled={!locationCatalog?.locations.length}
+              className="mt-2 w-full rounded-xl border border-[#dce7dc] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#5a9a6c] disabled:cursor-not-allowed disabled:bg-[#f3f5f2]">
+              <option value="">{locationCatalog?.locations.length ? "Select a loaded location" : "No evidence-complete locations loaded"}</option>
+              {locationCatalog?.locations.map((item) => <option key={item.location_id} value={item.location_id}>
+                {item.name} ({item.location_id})
+              </option>)}
+            </select>
           </label>
+          {selectedLocation && <div className="rounded-xl bg-[#f5f9f4] p-3 text-xs leading-5 text-[#617566]">
+            <p className="font-semibold text-[#294532]">Verified spatial capacities</p>
+            <p>Ground {area(selectedLocation.eligible_ground_m2)} · Roof {area(selectedLocation.eligible_roof_m2)} · {selectedLocation.available_interventions} supported interventions</p>
+            <p>CRS {selectedLocation.crs}; {selectedLocation.capacity_status.replaceAll("_", " ")}</p>
+          </div>}
           <div>
             <label htmlFor="capital-budget" className="block text-sm font-medium text-[#294532]">Capital budget (INR)</label>
             <input id="capital-budget" type="number" min="0" max="1000000000000" step="1000" value={budget}
@@ -168,18 +170,6 @@ export default function ClimateActionOptimizer() {
               onChange={(event) => setMaintenance(event.target.value)} placeholder="Verified annual limit"
               className="mt-2 w-full rounded-xl border border-[#dce7dc] px-3 py-2.5 text-sm outline-none focus:border-[#5a9a6c]" />
           </label>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-            <label className="block text-sm font-medium text-[#294532]">Available ground (m²)
-              <input type="number" min="0" max="100000000" step="0.01" value={ground}
-                onChange={(event) => setGround(event.target.value)} placeholder="Verified plantable area"
-                className="mt-2 w-full rounded-xl border border-[#dce7dc] px-3 py-2.5 text-sm outline-none focus:border-[#5a9a6c]" />
-            </label>
-            <label className="block text-sm font-medium text-[#294532]">Available roof (m²)
-              <input type="number" min="0" max="100000000" step="0.01" value={roof}
-                onChange={(event) => setRoof(event.target.value)} placeholder="Verified eligible roof"
-                className="mt-2 w-full rounded-xl border border-[#dce7dc] px-3 py-2.5 text-sm outline-none focus:border-[#5a9a6c]" />
-            </label>
-          </div>
           <div className="border-t border-[#e8eee7] pt-5">
             <h3 className="text-sm font-semibold text-[#294532]">Policy priorities</h3>
             <p className="mt-1 text-xs leading-5 text-[#718276]">These weights rank normalized benefits. They do not change intervention science or make cooling causal.</p>
@@ -189,19 +179,23 @@ export default function ClimateActionOptimizer() {
               <PrioritySlider label="Co-benefits" value={weights.co_benefit} onChange={(value) => setWeights({ ...weights, co_benefit: value })} />
             </div> : <p className="mt-3 text-xs text-[#718276]">Loading objective settings…</p>}
           </div>
-          <button type="submit" disabled={!weights || status === "loading"}
+          <button type="submit" disabled={!weights || !location || status === "loading"}
             className="w-full rounded-xl bg-[#397a50] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#2d6842] disabled:cursor-not-allowed disabled:opacity-50">
             {status === "loading" ? "Solving portfolio…" : "Optimize action portfolio"}
           </button>
         </form>
         {configError && <p role="alert" className="mt-4 text-sm text-[#94652e]">{configError}</p>}
+        {locationCatalog?.total === 0 && <div role="status" className="mt-4 rounded-xl border border-[#eadfca] bg-[#fcf8f0] p-4 text-xs leading-5 text-[#856834]">
+          <p className="font-semibold">Planning is evidence-gated</p>
+          {locationCatalog.blockers.map((blocker) => <p key={blocker} className="mt-1">{blocker}</p>)}
+        </div>}
       </section>
 
       <div className="space-y-5">
         {status === "idle" && <section className="rounded-2xl border border-[#e4ebe3] bg-white p-8 text-center">
           <Wallet className="mx-auto text-[#79a984]" size={30} aria-hidden="true" />
           <h2 className="mt-4 text-base font-semibold text-[#294532]">No portfolio requested</h2>
-          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[#718276]">Enter one location and verified limits, then run the optimizer. Recommendations appear only when the catalog contains modeled benefits and feasible capacities for that location.</p>
+          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[#718276]">Select a loaded location and enter verified financial limits. Recommendations appear only when the catalog passes cost, capacity, model, version, checksum, and provenance gates.</p>
         </section>}
         {status === "loading" && <section role="status" className="rounded-2xl border border-[#e4ebe3] bg-white p-8 text-sm text-[#617566]">Updating the integer action portfolio for these constraints…</section>}
         {status === "error" && <section role="alert" className="flex gap-3 rounded-2xl border border-[#eadfca] bg-[#fcf8f0] p-5 text-sm leading-6 text-[#856834]">
@@ -210,7 +204,7 @@ export default function ClimateActionOptimizer() {
         {status === "success" && plan && <>
           <section className="rounded-2xl border border-[#e4ebe3] bg-white p-5 sm:p-6">
             <div className="flex items-start justify-between gap-3">
-              <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[#5c8465]">{plan.location}</p>
+              <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[#5c8465]">{plan.location_name} · {plan.location}</p>
                 <h2 className="mt-1 text-lg font-semibold text-[#294532]">Recommended Climate Action Portfolio</h2></div>
               <Leaf size={23} className="text-[#397a50]" aria-hidden="true" />
             </div>
@@ -232,6 +226,8 @@ export default function ClimateActionOptimizer() {
                     <div><dt className="text-[#7b8c7e]">Modeled cooling proxy</dt><dd className="mt-0.5 font-medium text-[#294532]">{cooling(action.modeled_cooling_proxy_c)}</dd></div>
                     <div><dt className="text-[#7b8c7e]">Green cover gain</dt><dd className="mt-0.5 font-medium text-[#294532]">{area(action.green_cover_gain_m2)}</dd></div>
                     <div><dt className="text-[#7b8c7e]">Time horizon</dt><dd className="mt-0.5 font-medium text-[#294532]">{action.time_horizon || "Not supplied in catalog"}</dd></div>
+                    <div><dt className="text-[#7b8c7e]">Evidence</dt><dd className="mt-0.5 font-medium text-[#294532]">{action.evidence_status} · {action.source_ids.join(", ")}</dd></div>
+                    <div><dt className="text-[#7b8c7e]">Uncertainty</dt><dd className="mt-0.5 font-medium text-[#294532]">{action.uncertainty?.status?.replaceAll("_", " ") || "Not supplied"}</dd></div>
                   </dl>
                 </article>)}
               </div>}
@@ -249,8 +245,8 @@ export default function ClimateActionOptimizer() {
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <ConstraintRow label="Capital" used={plan.capital_cost_inr} limit={Number(budget)} formatter={money} />
               <ConstraintRow label="Annual maintenance" used={plan.annual_maintenance_inr} limit={Number(maintenance)} formatter={money} />
-              <ConstraintRow label="Ground" used={plan.ground_used_m2} limit={Number(ground)} formatter={area} />
-              <ConstraintRow label="Roof" used={plan.roof_used_m2} limit={Number(roof)} formatter={area} />
+              <ConstraintRow label="Ground" used={plan.ground_used_m2} limit={plan.verified_capacity.eligible_ground_m2} formatter={area} />
+              <ConstraintRow label="Roof" used={plan.roof_used_m2} limit={plan.verified_capacity.eligible_roof_m2} formatter={area} />
             </div>
             <p className="mt-4 text-xs leading-5 text-[#718276]">Each quantity is an integer and also respects its catalog maximum feasible units. Active normalized weights: cooling {plan.weights.cooling}, greening {plan.weights.green_cover}, co-benefits {plan.weights.co_benefit}.</p>
           </section>
@@ -273,11 +269,12 @@ export default function ClimateActionOptimizer() {
               </ResponsiveContainer>
             </div> : <p className="mt-5 text-xs text-[#718276]">No selected actions to chart at this budget.</p>}
             <p className="mt-3 text-xs leading-5 text-[#718276]">{plan.cooling_estimate_note}</p>
+            <p className="mt-2 text-xs font-medium leading-5 text-[#94652e]">{plan.interaction_warning}</p>
           </section>
         </>}
         <section className="rounded-2xl border border-[#dce9dd] bg-[#edf5ec] p-5 text-xs leading-5 text-[#607d66]">
           <h2 className="text-sm font-semibold text-[#294532]">Evidence and scope</h2>
-          <p className="mt-2">Current catalog costs are DEMO COST ASSUMPTIONS, not verified PMC/PCMC prices. Its cooling and site-capacity fields remain empty. The solver will not recommend actions until those fields are completed for a named location.</p>
+          <p className="mt-2">The demo CSV is not connected to this screen. Only versioned locations with verified spatial capacity, traceable costs and maintenance, supported benefits, source-file checksums, and current model provenance can appear in the selector.</p>
           <p className="mt-2">A solved plan is optimal under the modeled objective, assumptions and constraints. Summed marginal LST cooling is a planning proxy, not a ward-average LST forecast or pedestrian air temperature benefit.</p>
         </section>
       </div>

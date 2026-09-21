@@ -14,13 +14,13 @@ dependencies in the existing virtual environment:
 .\.venv\Scripts\python.exe -m pip install -r backend\requirements-test.txt
 ```
 
-Then run both the Python suite and frontend production build:
+Then run the Python suite, frontend unit tests, and production build:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\test_full_system.ps1
 ```
 
-Expected final message: `GreenPulse automated checks passed: Python tests and frontend build.`
+Expected final message: `GreenPulse automated checks passed: Python tests, frontend unit tests, and frontend build.`
 The script exits with an error if either command fails. The build checks that
 the React application compiles; the manual checklist below checks interaction
 and presentation.
@@ -35,8 +35,10 @@ and presentation.
 | Saved XGBoost artifact and matching grid metadata | `tests/test_xgboost_lst.py`, `tests/test_system_integration.py` |
 | Zero, tree, roof, and combined XGBoost scenarios | `tests/test_tree_canopy.py`, `tests/test_cool_roof.py`, `tests/test_system_integration.py` |
 | Approximate uncertainty and missing spatial RMSE rejection | `tests/test_uncertainty.py`, `tests/test_system_integration.py` |
-| Integer MILP portfolio, four limits, invalid actions | `tests/test_milp_optimizer.py`, `tests/test_system_integration.py` |
-| Paired treated/control DiD, NDVI, residual MAE/RMSE | `tests/test_validation_did.py`, `tests/test_system_integration.py` |
+| Location catalog hashes/expiry/model identity and integer MILP constraints | `tests/test_location_intervention_catalog.py`, `tests/test_milp_optimizer.py`, `tests/test_system_integration.py` |
+| Loaded-location optimizer request gate | `frontend/src/utils/optimizerPlanning.test.js` |
+| Provenance import, multi-pre-period DiD, season/pair/duplicate gates, parallel trends, spillover, uncertainty, residuals and calibration approval | `tests/test_validation_workflow.py`, `tests/test_validation_did.py`, `tests/test_system_integration.py` |
+| Point-sensor provenance and missing/sparse/stale/temporal-mismatch states; separate exposure/vulnerability gates | `tests/test_research_layers.py`, `frontend/src/utils/researchStatus.test.js` |
 | HTTP endpoints, schema validation, map selection and missing artifact errors | `tests/test_api.py`, `tests/test_heat_map_api.py`, `tests/test_system_integration.py` |
 
 The HTTP integration fixture trains an XGBoost model on synthetic rows,
@@ -67,19 +69,20 @@ state as a successful climate result.
   breakdown, call `POST /api/explain` in Swagger with the selected `grid_id`.
   Check the baseline plus local °C contributions reconstructs the prediction.
   Confirm the result describes attribution, not causation. The dedicated Root
-  Cause Analysis page is still a placeholder.
+  Cause Analysis page accepts a query/input grid ID and shows the documented
+  404, 422, 503, no-data, and connection-error states when evidence is absent.
 - [ ] **Simulation:** Open Scenario Simulator for that cell. Set tree and roof
   sliders to zero; scenario LST should match baseline. Try each intervention
   and their combination. Inspect signed ΔLST, nonnegative cooling magnitude,
   90% approximate range, assumptions, and map comparison. Do not present
   modeled cooling as measured cooling.
-- [ ] **Optimization:** Enter the verified ward location, budget, yearly
-  maintenance cap, available ground, and roof area. If benefits/capacities are
-  incomplete, check for an explicit unavailable state. With a completed,
+- [ ] **Optimization:** Select a loaded verified ward/planning area, then enter
+  budget and yearly maintenance cap. Confirm ground/roof capacities are read-only
+  catalog values. If evidence is incomplete, check for an explicit unavailable state. With a completed,
   location-specific catalog, check every displayed quantity is an integer,
   all four limits hold, unused budget is nonnegative, and budget changes cause
   a new solve. Treat total cooling as a planning proxy.
-- [ ] **Validation:** Open Validation. If using the bundled example, confirm
+- [ ] **Validation:** Confirm the imported-dataset selector reports BLOCKED when no real dataset exists. If using the bundled example, confirm
   the **DEMO VALIDATION SCENARIO** label. Enter paired treated/control pre/post
   observations only when their provenance is known. Verify DiD arithmetic,
   ΔNDVI, and prediction residuals. Check the page states the causal limits.

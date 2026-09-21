@@ -50,21 +50,20 @@ class CombinedScenarioRequest(TreeCanopyRequest, CoolRoofRequest):
 
 
 class ClimatePlanRequest(BaseModel):
-    location: str = Field(min_length=1)
+    location_id: str = Field(min_length=1)
     budget_inr: float = Field(ge=0)
     maintenance_cap_inr_per_year: float = Field(ge=0)
-    available_ground_m2: float = Field(ge=0)
-    available_roof_m2: float = Field(ge=0)
 
 
 @app.post("/api/optimizer/plan")
 def climate_action_plan(request: ClimatePlanRequest) -> dict:
     """Optimize discrete actions after location-specific benefits/capacities exist."""
-    from .optimizer.milp_optimizer import OptimizerDataUnavailableError, optimize_catalog
+    from .optimizer.milp_optimizer import OptimizerDataUnavailableError, optimize_location_catalog
 
-    catalog = Path(__file__).resolve().parents[2] / "data" / "processed" / "interventions.csv"
+    catalog = Path(__file__).resolve().parents[2] / "data" / "interventions" / "location_catalog.json"
     try:
-        return optimize_catalog(catalog, **request.model_dump())
+        return optimize_location_catalog(
+            catalog, project_root=Path(__file__).resolve().parents[2], **request.model_dump())
     except OptimizerDataUnavailableError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ValueError as exc:

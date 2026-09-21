@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://greenpulse.local/schemas/point-sensor-manifest-1.0.json",
+  "title": "GreenPulse verified point-sensor manifest",
+  "type": "object",
+  "required": ["schema_version", "dataset_id", "dataset_version", "evidence_status", "observations_sha256", "source", "variables", "freshness_threshold_hours", "temporal_match_tolerance_minutes", "minimum_station_count_for_context", "stations"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "dataset_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+    "dataset_version": {"type": "string", "minLength": 1},
+    "evidence_status": {"const": "verified_point_observations"},
+    "observations_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "variables": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"enum": ["air_temperature_c", "relative_humidity_pct", "aqi"]}
+    },
+    "freshness_threshold_hours": {"type": "number", "minimum": 0},
+    "temporal_match_tolerance_minutes": {"type": "number", "minimum": 0},
+    "minimum_station_count_for_context": {"type": "integer", "minimum": 1},
+    "source": {
+      "type": "object",
+      "required": ["organization", "product", "url_or_identifier", "license", "access_date"]
+    },
+    "stations": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["station_id", "provider_station_id", "latitude", "longitude", "measurement_height_m", "instrument", "calibration_reference"]
+      }
+    }
+  },
+  "additionalProperties": true
+}

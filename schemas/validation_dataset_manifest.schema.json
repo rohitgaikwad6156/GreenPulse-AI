@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://greenpulse.local/schemas/validation-dataset-manifest-1.0.json",
+  "title": "GreenPulse intervention validation dataset",
+  "type": "object",
+  "required": ["schema_version", "dataset_id", "dataset_version", "evidence_label", "location_id", "intervention_id", "target", "crs", "season", "season_start_mm_dd", "season_end_mm_dd", "qa_policy", "observations_sha256", "source", "periods", "overpass_tolerance_minutes", "control_selection", "spillover_distance_m", "spatial_autocorrelation_distance_m", "parallel_trends_max_abs_slope_difference_c_per_period", "predictions"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "dataset_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+    "dataset_version": {"type": "string", "minLength": 1},
+    "evidence_label": {"enum": ["REAL INTERVENTION OBSERVATIONS", "SYNTHETIC TEST FIXTURE"]},
+    "location_id": {"type": "string", "minLength": 1},
+    "intervention_id": {"type": "string", "minLength": 1},
+    "target": {"const": "lst_c"},
+    "crs": {"const": "EPSG:32643"},
+    "season": {"type": "string", "minLength": 1},
+    "season_start_mm_dd": {"type": "string", "pattern": "^[0-1][0-9]-[0-3][0-9]$"},
+    "season_end_mm_dd": {"type": "string", "pattern": "^[0-1][0-9]-[0-3][0-9]$"},
+    "qa_policy": {"type": "string", "minLength": 1},
+    "observations_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "overpass_tolerance_minutes": {"type": "integer", "minimum": 0},
+    "spillover_distance_m": {"type": "number", "minimum": 0},
+    "spatial_autocorrelation_distance_m": {"type": "number", "minimum": 0},
+    "parallel_trends_max_abs_slope_difference_c_per_period": {"type": "number", "minimum": 0},
+    "source": {
+      "type": "object",
+      "required": ["organization", "product", "url_or_identifier", "license", "access_date"]
+    },
+    "periods": {
+      "type": "array", "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["period_id", "phase", "acquisition_date", "scene_id", "scene_checksum_sha256", "season", "overpass_time_local", "qa_criteria"],
+        "properties": {"phase": {"enum": ["pre", "post"]}}
+      }
+    },
+    "control_selection": {
+      "type": "object",
+      "required": ["method", "eligibility_rule"]
+    },
+    "predictions": {"type": "array"},
+    "prediction_model": {"type": ["object", "null"]}
+  },
+  "additionalProperties": true
+}

@@ -23,9 +23,11 @@ class ApiTests(unittest.TestCase):
             "/api/health": "get", "/api/model/metrics": "get", "/api/wards": "get",
             "/api/grid": "get", "/api/ward/{ward_id}": "get", "/api/predict": "post",
             "/api/explain": "post", "/api/simulate": "post", "/api/optimize": "post",
-            "/api/optimizer/config": "get",
+            "/api/optimizer/config": "get", "/api/optimizer/locations": "get",
             "/api/validation/did": "post", "/api/methodology": "get",
-            "/api/validation/demo": "get",
+            "/api/validation/demo": "get", "/api/validation/datasets": "get",
+            "/api/validation/analyze/{dataset_id}": "post",
+            "/api/research/status": "get", "/api/research/sensors/nearby": "get",
         }
         for path, method in expected.items():
             self.assertIn(path, spec["paths"])
@@ -45,16 +47,14 @@ class ApiTests(unittest.TestCase):
         ):
             with self.assertRaises(ValidationError):
                 SimulateRequest(**invalid)
-        for invalid in ({"budget_inr": -1}, {"available_roof_m2": 100_000_001}):
-            valid = {"location": "ARTIFICIAL TEST AREA", "budget_inr": 100,
-                     "maintenance_cap_inr_per_year": 10, "available_ground_m2": 10,
-                     "available_roof_m2": 10}
+        for invalid in ({"budget_inr": -1}, {"location_id": ""}):
+            valid = {"location_id": "ARTIFICIAL TEST AREA", "budget_inr": 100,
+                     "maintenance_cap_inr_per_year": 10}
             valid.update(invalid)
             with self.assertRaises(ValidationError):
                 OptimizeRequest(**valid)
-        valid = {"location": "ARTIFICIAL TEST AREA", "budget_inr": 100,
-                 "maintenance_cap_inr_per_year": 10, "available_ground_m2": 10,
-                 "available_roof_m2": 10}
+        valid = {"location_id": "ARTIFICIAL TEST AREA", "budget_inr": 100,
+                 "maintenance_cap_inr_per_year": 10}
         for weights in ({"cooling": 0, "green_cover": 0, "co_benefit": 0},
                         {"cooling": -1, "green_cover": 1, "co_benefit": 0}):
             with self.assertRaises(ValidationError):
@@ -118,6 +118,29 @@ class ApiTests(unittest.TestCase):
         self.assertIn("LST", result["target"])
         self.assertFalse(result["data_status"]["real_ml_grid_available"])
         self.assertFalse(result["data_status"]["trained_model_available"])
+        self.assertFalse(result["data_status"]["optimizer_location_available"])
+        self.assertFalse(result["data_status"]["real_validation_dataset_available"])
+
+    def test_optimizer_exposes_no_unverified_production_location(self):
+        result = routes.get_optimizer_locations()
+        self.assertEqual(result["locations"], [])
+        self.assertEqual(result["total"], 0)
+        self.assertTrue(result["blockers"])
+
+    def test_real_validation_registry_is_blocked_without_genuine_data(self):
+        result = routes.get_validation_datasets()
+        self.assertEqual(result["datasets"], [])
+        self.assertEqual(result["validation_status"], "BLOCKED")
+        with self.assertRaises(HTTPException) as context:
+            routes.post_validation_analysis("missing-dataset")
+        self.assertEqual(context.exception.status_code, 404)
+
+    def test_research_status_keeps_point_and_context_layers_separate(self):
+        result = routes.get_research_status()
+        self.assertEqual(result["sensors"]["status"], "missing")
+        self.assertFalse(result["sensors"]["wall_to_wall_interpolation"])
+        self.assertTrue(result["context_layers"]["heat_hazard_score_separate"])
+        self.assertFalse(result["context_layers"]["composite_risk_available"])
 
 
 if __name__ == "__main__":

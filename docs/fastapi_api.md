@@ -26,9 +26,14 @@ The first command installs the existing real-data/ML stack (including FastAPI, P
 | `POST /api/predict` | XGBoost LST prediction for saved `grid_id` | 503 until matching trained model and grid exist |
 | `POST /api/explain` | local and global TreeSHAP report | 503 until matching trained model and grid exist |
 | `POST /api/simulate` | tree, roof or joint what-if result with uncertainty | 503 until matching model/grid/spatial RMSE exist |
-| `POST /api/optimize` | discrete MILP plan | 503 until location-specific benefit and capacity fields exist |
+| `GET /api/optimizer/locations` | evidence-complete planning locations and verified spatial capacities | empty list until a location passes every evidence gate |
+| `POST /api/optimize` | location-specific discrete MILP plan | 503 until the selected location has complete evidence |
 | `POST /api/validation/did` | descriptive paired-cell LST DiD, optional NDVI change and prediction residuals | 200 for valid input; provenance is not verified |
 | `GET /api/validation/demo` | explicitly labelled synthetic validation fixture | 200; DEMO / SYNTHETIC DATA only |
+| `GET /api/validation/datasets` | imported, provenance-complete real intervention datasets | `BLOCKED` with an empty list until genuine evidence is imported |
+| `POST /api/validation/analyze/{dataset_id}` | versioned multi-period DiD report with diagnostics, uncertainty and calibration proposal gate | 404 for unknown dataset; 503 for invalid evidence |
+| `GET /api/research/status` | point-sensor and separate exposure/vulnerability availability | explicit missing/sparse/stale/mismatch states; no composite risk score |
+| `GET /api/research/sensors/nearby` | nearest verified point observation by distance/time | proximity context only; never interpolation or calibrated LST confidence |
 | `GET /api/methodology` | pipeline, scientific limits, artifact-presence flags | 200 |
 
 All POST bodies and successful responses have Pydantic schemas visible in Swagger. Invalid field values return HTTP 422, missing real artifacts return HTTP 503, and unknown real IDs return HTTP 404. Server errors are not converted to invented observations or plan outputs.
@@ -38,7 +43,7 @@ All POST bodies and successful responses have Pydantic schemas visible in Swagge
 - `/api/predict`: `{"grid_id":"<real saved grid ID>"}`.
 - `/api/explain`: `{"grid_id":"<real saved grid ID>","sample_size":2000}`. Sample size is 2–5000. SHAP values are model contributions in °C; they do not prove causation.
 - `/api/simulate`: `grid_id`, `scenario_type` (`tree_canopy`, `cool_roof`, or `combined`), and fields for the selected intervention. Trees use `canopy_increase_percentage_points` (0–40) and `feasible_ground_area_m2` (0–900). Roofs use `retrofit_fraction` (0–1) and `eligible_roof_area_m2` (0–900). The present cool-roof MVP implementation additionally limits retrofit to 0.5 of eligible roof. A combined request needs all four fields, and total stated ground plus roof area must fit in one 900 m² cell.
-- `/api/optimize`: `location`, `budget_inr`, `maintenance_cap_inr_per_year`, `available_ground_m2`, `available_roof_m2`. ₹10 lakh is ₹1,000,000. The generous 100,000,000 m² API area ceiling is an input guard, **not** proof that a ward has that much eligible space. The catalog must match the requested location.
+- `/api/optimize`: `location_id`, `budget_inr`, `maintenance_cap_inr_per_year`, plus optional priority weights. ₹10 lakh is ₹1,000,000. Ground and roof capacity are loaded from checksum-verified spatial evidence in the location catalog and cannot be supplied by the request.
 - `/api/validation/did`: `intervention`, `pre_period`, `post_period`, and `observations`. Each observation has `grid_id`, `group` (`treated` or `control`), `period` (`pre` or `post`), observed `lst_c`, and optional `ndvi`. Each cell needs both periods and one group. Optional `predictions` supply one predicted ΔLST per treated cell; the response then includes control-adjusted residuals, MAE, and RMSE. `source_note` and `scenario_label` record input provenance without claiming verification.
 
 ### Basic smoke checks
@@ -56,7 +61,7 @@ Expect health status `ok`, methodology with artifact flags, and passing tests. I
 
 ## Difference-in-Differences and interpretation
 
-The DID route calculates `(treated post − treated pre) − (control post − control pre)` in LST °C from user-supplied values. The endpoint cannot verify observation provenance or establish causal effects. A defensible study needs real pre/post observations, comparable season and satellite overpass conditions, a plausible parallel-trends argument, attention to confounding and spillover, and uncertainty analysis. LST remains distinct from pedestrian air temperature.
+The legacy DID route calculates `(treated post − treated pre) − (control post − control pre)` from typed values and remains unverified. The imported-dataset workflow validates scene IDs/checksums, acquisition dates, season, overpass tolerance, QA, complete grid-ID panels, reference-grid coordinates, model provenance, and file hashes. It reports multiple-pre-period slopes, control/spillover diagnostics, residual spatial autocorrelation, an explicitly limited Welch interval, and prediction residuals. Passing diagnostics does not establish causality. LST remains distinct from pedestrian air temperature.
 
 ## Common errors
 

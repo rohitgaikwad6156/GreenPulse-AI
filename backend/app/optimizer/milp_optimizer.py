@@ -161,6 +161,9 @@ def optimize_actions(
             "maximum_feasible_units": _nonnegative_integer(
                 action["maximum_feasible_units"], f"{action_id}.maximum_feasible_units"),
             "time_horizon": str(action.get("time_horizon", "")).strip() or None,
+            "evidence_status": str(action.get("evidence_status", "")).strip() or None,
+            "source_ids": list(action.get("source_ids", [])),
+            "uncertainty": action.get("uncertainty"),
         }
         if item["block_size"] <= 0 or item["capital_cost_inr"] <= 0:
             raise ValueError(f"{action_id}: block size and capital cost must be positive")
@@ -218,6 +221,9 @@ def optimize_actions(
                 "modeled_cooling_proxy_c": item["predicted_cooling_benefit_c"] * int(quantity),
                 "green_cover_gain_m2": item["green_cover_gain_m2"] * int(quantity),
                 "time_horizon": item["time_horizon"],
+                "evidence_status": item["evidence_status"],
+                "source_ids": item["source_ids"],
+                "uncertainty": item["uncertainty"],
                 "utility": float(unit_utility * quantity),
             })
     return {
@@ -236,6 +242,10 @@ def optimize_actions(
             "Sum of per-block modeled marginal LST cooling is a linear planning proxy; "
             "it is not a forecast of ward-average or pedestrian air temperature. "
             "Interactions, overlap, and spatial spillover require later validation."),
+        "interaction_warning": (
+            "Cooling is summed as a linear planning proxy. Interventions may overlap, "
+            "interact, or compete for the same physical space; the total is not a joint "
+            "causal or observed cooling estimate."),
         "normalization": {
             "cooling_reference_c_per_block": cooling_ref,
             "green_reference_m2_per_block": green_ref,
@@ -250,3 +260,56 @@ def optimize_actions(
 def optimize_catalog(catalog_path: Path, **kwargs) -> dict:
     """Load a saved catalog and solve only if benefit and capacity fields exist."""
     return optimize_actions(load_catalog(catalog_path), **kwargs)
+
+
+def optimize_location_catalog(catalog_path: Path, *, location_id: str,
+                              budget_inr: float,
+                              maintenance_cap_inr_per_year: float,
+                              priority_weights: dict[str, float] | None = None,
+                              project_root: Path | None = None) -> dict:
+    """Solve from one verified location; spatial capacities are never caller supplied."""
+    from backend.app.optimizer.location_catalog import CatalogEvidenceError, actions_for_location
+
+    try:
+        location, rows = actions_for_location(
+            catalog_path, location_id, project_root=project_root)
+    except CatalogEvidenceError as exc:
+        raise OptimizerDataUnavailableError(str(exc)) from exc
+    actions = []
+    for row in rows:
+        actions.append({
+            **row,
+            "catalog_label": (
+                f"location catalog {location_id}; evidence {row['evidence_status']}"),
+            "location": location_id,
+            "predicted_cooling_benefit_c": row["modeled_marginal_cooling_c"],
+            "time_horizon": row["horizon"],
+        })
+    capacity = location["capacity"]
+    result = optimize_actions(
+        actions,
+        budget_inr=budget_inr,
+        maintenance_cap_inr_per_year=maintenance_cap_inr_per_year,
+        available_ground_m2=capacity["eligible_ground_m2"],
+        available_roof_m2=capacity["eligible_roof_m2"],
+        location=location_id,
+        priority_weights=priority_weights,
+    )
+    result["location_name"] = location["name"]
+    result["catalog_version"] = load_location_catalog_version(catalog_path)
+    result["verified_capacity"] = {
+        "eligible_ground_m2": capacity["eligible_ground_m2"],
+        "eligible_roof_m2": capacity["eligible_roof_m2"],
+        "status": capacity["status"],
+        "source_ids": location["capacity_source_ids"],
+    }
+    return result
+
+
+def load_location_catalog_version(path: Path) -> str:
+    """Read the already validated catalog version for result provenance."""
+    try:
+        value = json.loads(Path(path).read_text(encoding="utf-8"))["catalog_version"]
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise OptimizerDataUnavailableError("Cannot read location catalog version") from exc
+    return str(value)

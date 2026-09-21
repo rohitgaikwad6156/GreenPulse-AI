@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "catalog_version": "2026-09-21.1",
+  "generated_at": "2026-09-21T00:00:00+05:30",
+  "model_dataset_version": null,
+  "model_checksum_sha256": null,
+  "sources": [],
+  "locations": [],
+  "blockers": [
+    "No PMC/PCMC planning area currently has the complete combination of verified boundary and spatial capacity, authoritative or audited capital and maintenance costs, traceable co-benefit scoring, and location-specific modeled marginal cooling.",
+    "The real 30 m ML grid and matching trained model are not locally present, so tree-canopy and cool-roof marginal benefits cannot be generated from the validated scenario workflow.",
+    "data/processed/interventions.csv is a labelled demo artifact and is not used by the optimizer API."
+  ]
+}

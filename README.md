@@ -2,7 +2,20 @@
 
 An AI-powered Urban Climate Decision-Support System.
 
-The project contains a basic FastAPI backend, a React dashboard shell, a clearly labelled synthetic demo dataset, feature-engineering utilities, local real-data Landsat/Sentinel-2/urban-morphology pipelines, and a validated ML-table assembler. The dashboard has seven working routes and placeholder states. No real satellite layers, ML results, simulation outputs, or environmental measurements are currently present in this workspace.
+The repository implements the FastAPI, React, real-data intake, geospatial processing, spatial-validation, XGBoost, TreeSHAP, intervention-simulation, location-specific MILP, post-implementation validation, and optional research-layer workflows. The dashboard has eight working routes with explicit unavailable and connection-error states; it does not substitute demo values when production evidence is absent.
+
+## Acceptance status
+
+The final acceptance review is [documented here](docs/final_acceptance_review.md). Current status is intentionally split by evidence level:
+
+| Readiness level | Status | Meaning |
+| --- | --- | --- |
+| Software-complete | **PASS** | The complete Python suite, frontend tests/build, API/OpenAPI checks, and desktop/mobile browser smoke checks pass. |
+| Data-complete | **BLOCKED** | WorldCover, OSM roads, and WorldPop are verified locally, and an official PCMC municipal outline is staged. Verified PMC/PCMC ward boundaries, Landsat/Sentinel scenes, OSM green spaces, the peri-urban reference, and the assembled 30 m grid are still absent. |
+| Model-validated | **BLOCKED** | No real ML grid or trained XGBoost model exists, so no Pune/PCMC spatial-CV metrics, SHAP values, calibrated Heat Hazard Score, or model-backed scenario results can be reported. |
+| Field-validated | **BLOCKED** | No genuine pre/post intervention dataset or verified point-sensor dataset is locally available. |
+
+Overall project outcome is **PARTIAL**: the software contract is executable and evidence-gated, but the required real-data, model-validation, and field-validation evidence is incomplete.
 
 ## Requirements
 
@@ -62,13 +75,13 @@ npm run build
 
 ## Project layout
 
-- `frontend/`: React, Vite, Tailwind CSS, and seven dashboard routes
+- `frontend/`: React, Vite, Tailwind CSS, and eight dashboard routes
 - `backend/app/`: API, geospatial processing, ML, simulation, optimization, and validation modules
 - `data/`: raw, processed, boundary, and clearly labeled demo data
 - `models/`: trained model artifacts in later steps
 - `notebooks/`, `scripts/`, `tests/`, `docs/`: future analysis and project materials
 
-No measured temperature, model metric, or intervention outcome is included in this shell. The dashboard requests backend data and shows explicit unavailable states when real artifacts are absent.
+No measured temperature, model metric, or intervention outcome is currently available. Verified WorldCover, OSM roads, and WorldPop source files are present, plus a staged official PCMC outline that is not a ward layer and is not yet combined with PMC. The dashboard requests production artifacts and shows explicit unavailable states when they are absent.
 
 ## Real satellite pipelines
 
@@ -87,14 +100,15 @@ No measured temperature, model metric, or intervention outcome is included in th
 - [Tree canopy what-if simulator](docs/tree_canopy_simulator.md): a 0–40-point canopy slider that transforms model inputs, checks feasible area, and re-runs XGBoost for a clearly labelled LST scenario estimate.
 - [Cool-roof and combined what-if simulator](docs/cool_roof_simulator.md): a 0–50% eligible-roof retrofit slider, area-weighted albedo change, optional calibrated NDBI surrogate, and a joint tree-plus-roof XGBoost re-prediction.
 - [Approximate prediction uncertainty](docs/prediction_uncertainty.md): spatial-CV RMSE plus configurable intervention CV assumptions, an explicitly approximate cooling range, and MVP confidence/horizon labels on scenario results.
-- [Discrete intervention catalog](docs/intervention_catalog.md): six integer-sized actions with openly labelled demo costs and unknown cooling/feasibility fields, ready for later evidence and MILP work.
-- [MILP climate action optimizer](docs/milp_optimizer.md): integer intervention blocks with normalized benefits, configurable objective weights, four resource limits, and explicit refusal to plan while cooling or capacity evidence is missing.
+- [Discrete intervention catalog](docs/intervention_catalog.md): a legacy, explicitly labelled demo catalog kept outside the production optimizer path.
+- [Location-specific MILP climate action optimizer](docs/milp_optimizer.md): versioned, checksum-verified evidence catalogs; loaded-location selection; integer blocks; financial, space, and intervention-capacity constraints; and explicit refusal to plan while real evidence is incomplete.
 - [Complete FastAPI API](docs/fastapi_api.md): validated frontend-facing endpoints for real grids, wards, model metrics, prediction, TreeSHAP, what-if simulation, MILP planning, DID, and methodology.
 - [Interactive Pune / PCMC heat map](docs/interactive_heat_map.md): React Leaflet ward and viewport grid layers, real-model LST colors, selection details, and explicit no-data states.
 - [Scenario Simulator UI](docs/scenario_simulator_ui.md): tree and cool-roof controls connected to `POST /api/simulate`, model result and uncertainty display, and selected-cell map comparison.
 - [Climate Action Optimizer UI](docs/climate_action_optimizer_ui.md): budget and resource controls, optional normalized-benefit priorities, integer portfolio details, and cost-versus-cooling visualization when location-specific evidence is available.
-- [Post-implementation validation](docs/post_implementation_validation.md): paired treated/control LST DiD, optional NDVI change, treated-cell prediction residuals, and an explicitly synthetic demo workflow.
+- [Post-implementation validation](docs/post_implementation_validation.md): provenance-checked multi-pre-period DiD, control/spillover/spatial diagnostics, uncertainty, prediction residuals, versioned calibration proposals, and explicit human approval gates.
+- [Optional research layers](docs/research_layers.md): provenance-preserving air-temperature/humidity/AQI points, explicit peak-summer scope, separate exposure and vulnerability layers, and a hard gate against unsupported composite risk scores.
 - [Full system testing](docs/full_system_testing.md): automated Python and frontend build checks plus a manual map-to-validation checklist, with explicit synthetic-fixture and real-data gates.
 - [Deploy on Render and Vercel](docs/deployment_vercel_render.md): project-specific dashboard settings, cloud environment variables, routing, verification, and current data limitations.
 
-Neither pipeline substitutes synthetic climate values for missing source data. Their tests use only temporary, labelled artificial fixtures.
+No production pipeline substitutes synthetic climate values for missing source data. Automated tests use only temporary, labelled artificial fixtures; the separately labelled demo files are never a production API fallback.

@@ -11,6 +11,7 @@ import {
   Map,
   Menu,
   PanelLeftClose,
+  RadioTower,
   SlidersHorizontal,
   Sprout,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const navigation = [
   { label: "Scenario Simulator", path: "/scenario-simulator", icon: SlidersHorizontal },
   { label: "Climate Action Optimizer", path: "/climate-action-optimizer", icon: Sprout },
   { label: "Validation", path: "/validation", icon: Activity },
+  { label: "Research Layers", path: "/research-layers", icon: RadioTower },
   { label: "Methodology", path: "/methodology", icon: BookOpenText },
 ];
 

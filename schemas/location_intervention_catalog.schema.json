@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://greenpulse.local/schemas/location-intervention-catalog-1.0.json",
+  "title": "GreenPulse location intervention catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_version", "generated_at", "model_dataset_version", "model_checksum_sha256", "sources", "locations", "blockers"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "catalog_version": {"type": "string", "minLength": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "model_dataset_version": {"type": ["string", "null"]},
+    "model_checksum_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "blockers": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "organization", "title", "url_or_identifier", "license", "access_date", "valid_until", "evidence_type", "checksum_sha256", "local_path"],
+        "properties": {
+          "source_id": {"type": "string", "minLength": 1},
+          "organization": {"type": "string", "minLength": 1},
+          "title": {"type": "string", "minLength": 1},
+          "url_or_identifier": {"type": "string", "minLength": 1},
+          "license": {"type": "string", "minLength": 1},
+          "access_date": {"type": "string", "format": "date"},
+          "valid_until": {"type": "string", "format": "date"},
+          "evidence_type": {"enum": ["municipal_tender", "schedule_of_rates", "published_study", "audited_user_input", "validated_model", "verified_spatial_capacity"]},
+          "checksum_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "local_path": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": true
+      }
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["location_id", "name", "crs", "capacity_source_ids", "capacity", "actions"],
+        "properties": {
+          "location_id": {"type": "string", "minLength": 1},
+          "name": {"type": "string", "minLength": 1},
+          "crs": {"const": "EPSG:32643"},
+          "capacity_source_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "capacity": {
+            "type": "object",
+            "required": ["status", "eligible_ground_m2", "eligible_roof_m2"],
+            "properties": {
+              "status": {"const": "verified_spatial_inputs"},
+              "eligible_ground_m2": {"type": "number", "minimum": 0},
+              "eligible_roof_m2": {"type": "number", "minimum": 0}
+            }
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["availability", "intervention_id"],
+              "properties": {
+                "availability": {"enum": ["available", "unavailable"]},
+                "unavailable_reason": {"type": "string", "minLength": 1},
+                "location_id": {"type": "string"},
+                "intervention_id": {"type": "string", "minLength": 1},
+                "name": {"type": "string"},
+                "unit_type": {"type": "string"},
+                "block_size": {"type": "number", "exclusiveMinimum": 0},
+                "capital_cost_inr": {"type": "integer", "exclusiveMinimum": 0},
+                "annual_maintenance_inr": {"type": "integer", "minimum": 0},
+                "ground_area_required_m2": {"type": "number", "minimum": 0},
+                "roof_area_required_m2": {"type": "number", "minimum": 0},
+                "maximum_feasible_units": {"type": "integer", "minimum": 0},
+                "modeled_marginal_cooling_c": {"type": "number", "minimum": 0},
+                "green_cover_gain_m2": {"type": "number", "minimum": 0},
+                "co_benefit_score_0_5": {"type": "number", "minimum": 0, "maximum": 5},
+                "horizon": {"type": "string"},
+                "uncertainty": {"type": "object"},
+                "source_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+                "field_source_ids": {"type": "object"},
+                "evidence_status": {"enum": ["verified", "audited"]},
+                "model_dataset_version": {"type": ["string", "null"]},
+                "model_checksum_sha256": {"type": ["string", "null"]}
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}

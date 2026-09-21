@@ -1,6 +1,6 @@
 # Step 21: discrete climate intervention catalog
 
-GreenPulse AI is **An AI-powered Urban Climate Decision-Support System**. This catalog prepares six integer-sized intervention actions for a later MILP step. It does **not** optimize or recommend actions yet. The GreenPulse research PDF describes the intervention and MILP planning concept; its example costs and cooling outputs are not treated as verified Pune results.
+GreenPulse AI is **An AI-powered Urban Climate Decision-Support System**. This legacy demo catalog prepares six integer-sized intervention actions for software examples. It does **not** optimize or recommend actions and is no longer read by the optimizer API. The production contract is documented in [milp_optimizer.md](milp_optimizer.md) and stored at [`data/interventions/location_catalog.json`](../data/interventions/location_catalog.json).
 
 ## Files
 

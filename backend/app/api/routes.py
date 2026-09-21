@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, Query
 
 from backend.app.api import services
 from backend.app.schemas.api import (
     DidRequest, DidResponse, ExplainRequest, ExplainResponse, GridIdRequest,
     GridResponse, MethodologyResponse, MetricsResponse, OptimizeRequest,
-    OptimizeResponse, PredictResponse, SimulateRequest, SimulateResponse,
-    WardResponse, WardsResponse,
+    OptimizeResponse, OptimizerLocationsResponse, PredictResponse, SimulateRequest, SimulateResponse,
+    ProvenanceValidationResponse, ValidationDatasetsResponse, WardResponse, WardsResponse,
 )
 
 
@@ -133,9 +134,10 @@ def post_simulate(request: SimulateRequest) -> dict:
 @router.post("/optimize", response_model=OptimizeResponse)
 def post_optimize(request: OptimizeRequest) -> dict:
     """Solve an integer-block plan only with completed location-specific inputs."""
-    from backend.app.optimizer.milp_optimizer import OptimizerDataUnavailableError, optimize_catalog
+    from backend.app.optimizer.milp_optimizer import OptimizerDataUnavailableError, optimize_location_catalog
     try:
-        return optimize_catalog(services.CATALOG, **request.model_dump())
+        return optimize_location_catalog(
+            services.CATALOG, project_root=services.ROOT, **request.model_dump())
     except OptimizerDataUnavailableError as exc:
         raise _unavailable(exc) from exc
     except ValueError as exc:
@@ -151,6 +153,17 @@ def get_optimizer_config() -> dict:
     try:
         return load_objective_config()
     except ValueError as exc:
+        raise _unavailable(exc) from exc
+
+
+@router.get("/optimizer/locations", response_model=OptimizerLocationsResponse,
+            tags=["Climate action optimizer"])
+def get_optimizer_locations() -> dict:
+    """List only evidence-complete locations that the optimizer can solve."""
+    from backend.app.optimizer.location_catalog import CatalogEvidenceError, list_planning_locations
+    try:
+        return list_planning_locations(services.CATALOG, project_root=services.ROOT)
+    except CatalogEvidenceError as exc:
         raise _unavailable(exc) from exc
 
 
@@ -172,6 +185,59 @@ def get_validation_demo() -> dict:
         return load_demo_scenario()
     except (OSError, ValueError) as exc:
         raise _unavailable(exc) from exc
+
+
+@router.get("/validation/datasets", response_model=ValidationDatasetsResponse)
+def get_validation_datasets() -> dict:
+    """List only locally imported datasets explicitly labelled as real observations."""
+    from backend.app.validation.workflow import list_imported_datasets
+    return list_imported_datasets(services.VALIDATION_IMPORTS)
+
+
+@router.post("/validation/analyze/{dataset_id}", response_model=ProvenanceValidationResponse)
+def post_validation_analysis(dataset_id: str) -> dict:
+    """Build a provenance-aware, versioned report from one imported dataset."""
+    if (not dataset_id or len(dataset_id) > 120
+            or any(ch not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
+                   for ch in dataset_id)):
+        raise HTTPException(status_code=422, detail="dataset_id contains unsupported characters")
+    from backend.app.validation.workflow import ValidationEvidenceError, analyze_validation_dataset
+    dataset = services.VALIDATION_IMPORTS / dataset_id
+    if not dataset.is_dir():
+        raise HTTPException(status_code=404, detail=f"Imported validation dataset was not found: {dataset_id}")
+    try:
+        return analyze_validation_dataset(
+            dataset, output_path=services.VALIDATION_REPORTS / f"{dataset_id}.json")
+    except ValidationEvidenceError as exc:
+        raise _unavailable(exc) from exc
+
+
+@router.get("/research/status", tags=["Research layers"])
+def get_research_status() -> dict:
+    """Report point-sensor and separate exposure/vulnerability evidence status."""
+    from backend.app.research.layers import research_layer_status
+    from backend.app.research.sensors import SensorEvidenceError, sensor_status
+    try:
+        return {"sensors": sensor_status(services.SENSOR_IMPORTS, services.SOURCE_MANIFEST),
+                "context_layers": research_layer_status(services.RESEARCH_LAYERS)}
+    except (SensorEvidenceError, OSError, ValueError) as exc:
+        raise _unavailable(exc) from exc
+
+
+@router.get("/research/sensors/nearby", tags=["Research layers"])
+def get_nearby_sensor_context(
+    latitude: float = Query(ge=-90, le=90), longitude: float = Query(ge=-180, le=180),
+    timestamp_utc: str = Query(min_length=1, max_length=50),
+) -> dict:
+    """Return nearest point observation and time offset without interpolation."""
+    from backend.app.research.sensors import nearby_sensor_context
+    try:
+        timestamp = datetime.fromisoformat(timestamp_utc.replace("Z", "+00:00"))
+        if timestamp.tzinfo is None:
+            raise ValueError("timestamp_utc must include a timezone")
+        return nearby_sensor_context(services.SENSOR_IMPORTS, latitude, longitude, timestamp)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.get("/methodology", response_model=MethodologyResponse)

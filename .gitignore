@@ -3,6 +3,7 @@
 *.py[cod]
 .pytest_cache/
 .coverage
+/tmp/
 .env
 .env.*
 !.env.example
@@ -14,6 +15,14 @@ data/boundaries/source/*
 data/processed/*
 !data/processed/.gitkeep
 !data/processed/interventions.csv
+data/validation/imported/*
+!data/validation/imported/.gitkeep
+data/validation/reports/*
+!data/validation/reports/.gitkeep
+data/validation/approvals/*
+!data/validation/approvals/.gitkeep
+data/research/sensors/*
+!data/research/sensors/.gitkeep
 data/interim/*
 !data/interim/.gitkeep
 models/*

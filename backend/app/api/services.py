@@ -13,7 +13,12 @@ GRID = ROOT / "data" / "processed" / "greenpulse_ml_grid.parquet"
 GRID_METADATA = ROOT / "data" / "processed" / "metadata.json"
 MODEL = ROOT / "models" / "xgboost_lst.joblib"
 MODEL_METADATA = ROOT / "models" / "model_metadata.json"
-CATALOG = ROOT / "data" / "processed" / "interventions.csv"
+CATALOG = ROOT / "data" / "interventions" / "location_catalog.json"
+VALIDATION_IMPORTS = ROOT / "data" / "validation" / "imported"
+VALIDATION_REPORTS = ROOT / "data" / "validation" / "reports"
+SENSOR_IMPORTS = ROOT / "data" / "research" / "sensors"
+RESEARCH_LAYERS = ROOT / "data" / "research" / "research_layers.json"
+SOURCE_MANIFEST = ROOT / "data" / "source_manifest.json"
 
 
 class DataUnavailableError(RuntimeError):
@@ -179,6 +184,16 @@ def predict_grid_cell(grid_id: str) -> dict:
 
 
 def methodology() -> dict:
+    optimizer_location_available = False
+    if CATALOG.is_file():
+        try:
+            from backend.app.optimizer.location_catalog import list_planning_locations
+            optimizer_location_available = bool(
+                list_planning_locations(CATALOG, project_root=ROOT)["total"])
+        except RuntimeError:
+            optimizer_location_available = False
+    from backend.app.validation.workflow import list_imported_datasets
+    real_validation_available = bool(list_imported_datasets(VALIDATION_IMPORTS)["total"])
     return {
         "system": "GreenPulse AI — An AI-powered Urban Climate Decision-Support System",
         "target": "continuous Landsat land surface temperature (LST) in °C",
@@ -196,5 +211,7 @@ def methodology() -> dict:
                         "The optimization is optimal only under its modeled objective, assumptions and constraints."],
         "data_status": {"real_ml_grid_available": GRID.is_file() and GRID_METADATA.is_file(),
                         "trained_model_available": MODEL.is_file() and MODEL_METADATA.is_file(),
-                        "intervention_catalog_available": CATALOG.is_file()},
+                        "intervention_catalog_available": CATALOG.is_file(),
+                        "optimizer_location_available": optimizer_location_available,
+                        "real_validation_dataset_available": real_validation_available},
     }

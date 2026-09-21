@@ -105,7 +105,7 @@ const equations = [
   {
     name: "Difference-in-Differences · follow-up",
     formula: "DiD = (T_treated,post − T_treated,pre) − (T_control,post − T_control,pre)",
-    explanation: "Uses group means of paired observed LST. Signed realized cooling is −DiD; ΔNDVI is NDVI_post − NDVI_pre. A DiD value alone is not causal proof.",
+    explanation: "Imported validation uses complete treated/control grid panels, multiple pre-periods, scene/season/QA provenance, control and spillover diagnostics, and limited sample uncertainty. A DiD value or passed pre-trend diagnostic is not causal proof.",
   },
 ];
 
@@ -118,6 +118,7 @@ const limitations = [
   ["Tree growth latency", "A canopy slider represents an assumed future feature state. Saplings need time, space, water, and survival; immediate mature-canopy cooling is not established."],
   ["Intervention coefficient uncertainty", "NDVI-per-canopy and roof-albedo response are configurable MVP assumptions needing local calibration. The nominal uncertainty range has untested coverage."],
   ["Sparse ground sensors", "Ground stations may be too sparse or mismatched in height and time to validate every cell. No citywide air-temperature truth is inferred."],
+  ["Research physics and automation", "CFD, 3D canyon physics, tree-species growth/survival, continuous IoT ingestion, and automatic retraining remain future scope."],
   ["SHAP attribution ≠ causation", "SHAP divides a model prediction. Correlated NDVI/canopy and NDBI/built features can shift individual attributions without changing physical mechanisms."],
   ["MILP optimality depends on assumptions", "Integer optimality applies only to candidate benefits, costs, capacity, weights, and linear constraints entered. The summed cooling is a planning proxy."],
 ];
@@ -126,8 +127,8 @@ const questions = [
   ["Why predict LST instead of a 0–100 score?", "LST in °C is an observable continuous target. The Heat Hazard Score is a separate display transformation after prediction, not an ML training label."],
   ["Why spatial blocks instead of a random split?", "Nearby cells share surface patterns and even thermal source pixels. Five held-out folds of about 5 km blocks test transfer to distinct places more honestly; tuning stays inside training folds."],
   ["Do the sliders predict guaranteed cooling?", "No. The what-if engine changes features using documented assumptions and re-runs the fitted model. Its cooling and range are sensitivity estimates until calibrated against intervention follow-up."],
-  ["Is the action plan the best real-world plan?", "Only under the modeled objective, available integer actions, site capacities, budget, maintenance, and space constraints. The current catalog has demo costs and lacks verified benefits/capacities."],
-  ["How do you check results after installation?", "Compare the same treated and control cells before and after, calculate descriptive DiD and NDVI change, then report treated-cell residuals against predicted ΔLST. Parallel trends and other confounders still need assessment."],
+  ["Is the action plan the best real-world plan?", "Only under the modeled objective, evidence-complete integer actions, verified location capacities, budget, maintenance, and space constraints. The demo CSV is not used; locations remain unavailable until every evidence gate passes."],
+  ["How do you check results after installation?", "Import checksum-verified treated/control grid panels with at least two pre periods, matching season/overpass/QA provenance, then review parallel trends, spillover, spatial autocorrelation, uncertainty, and residuals. Calibration proposals require a separate human approval record."],
 ];
 
 const references = [
@@ -187,7 +188,7 @@ export default function Methodology() {
           : <div className="mt-4 flex flex-wrap gap-2 text-xs">
             <span className="rounded-full border border-[#cddfcf] bg-white px-3 py-1.5 text-[#31543b]">Real ML grid: {files.real_ml_grid_available ? "file present" : "not available"}</span>
             <span className="rounded-full border border-[#cddfcf] bg-white px-3 py-1.5 text-[#31543b]">Trained model: {files.trained_model_available ? "file present" : "not available"}</span>
-            <span className="rounded-full border border-[#cddfcf] bg-white px-3 py-1.5 text-[#31543b]">Catalog: {files.intervention_catalog_available ? "demo costs; benefit/feasibility incomplete" : "not available"}</span>
+            <span className="rounded-full border border-[#cddfcf] bg-white px-3 py-1.5 text-[#31543b]">Planning catalog: {!files.intervention_catalog_available ? "not available" : files.optimizer_location_available ? "evidence-complete location available" : "loaded; no evidence-complete locations"}</span>
           </div>}
     </section>
 

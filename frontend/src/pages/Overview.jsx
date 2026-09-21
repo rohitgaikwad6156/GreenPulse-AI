@@ -6,7 +6,7 @@ import PageIntro from "../components/PageIntro.jsx";
 const summaryCards = [
   { label: "Observed LST", detail: "Satellite layer not connected", icon: Layers3 },
   { label: "Model status", detail: "No model has been trained", icon: Database },
-  { label: "Action plans", detail: "Optimizer not connected", icon: ShieldCheck },
+  { label: "Action plans", detail: "Evidence-gated by location", icon: ShieldCheck },
   { label: "Heat Hazard Score", detail: "Awaiting observed LST and documented peri-urban reference", icon: ThermometerSun },
 ];
 

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "temporal_scope": {
+    "season_group": "peak_summer",
+    "start": "2025-03-01",
+    "end": "2025-05-31",
+    "multi_season_supported": false
+  },
+  "layers": [
+    {
+      "layer_id": "population_exposure",
+      "layer_type": "exposure",
+      "status": "source_verified_processing_blocked",
+      "intended_source": "WorldPop population counts validated through the source manifest",
+      "source": {
+        "organization": "WorldPop / University of Southampton",
+        "product": "Global 2015-2030 R2024B 2025 India v1 100m unconstrained population counts",
+        "license": "CC BY 4.0",
+        "units": "people per pixel",
+        "local_path": "data/raw/worldpop/india_population_counts.tif",
+        "checksum": "sha256:2bf73858a5ea5594a769f2cd7724899653eb5d8701c8362a3b81ee2eccf9f17e"
+      },
+      "blocker": "The source is verified, but the 30 m exposure layer cannot be built until the real municipal reference grid and boundaries exist.",
+      "interpretation": "Population exposure context only; not vulnerability and not a health-risk score."
+    },
+    {
+      "layer_id": "social_vulnerability",
+      "layer_type": "vulnerability",
+      "status": "missing",
+      "intended_source": "Authoritative, licensed, current small-area social indicators with documented boundaries and denominators",
+      "blocker": "No verified PMC/PCMC social-indicator dataset is locally available.",
+      "interpretation": "Must remain separate from population exposure and Heat Hazard Score."
+    }
+  ],
+  "future_scope": [
+    "CFD and 3D urban-canyon physics",
+    "tree-species growth, survival, irrigation, and canopy maturation models",
+    "continuous IoT streaming and automatic model retraining"
+  ]
+}

@@ -1,35 +1,30 @@
-# Step 22 — MILP climate action optimizer
+# Location-specific climate action optimizer
 
-GreenPulse AI is an AI-powered Urban Climate Decision-Support System. This step adds the discrete-action optimizer. It does not create a Pune or PCMC action plan: the current [catalog](../data/processed/interventions.csv) intentionally has blank cooling benefit and maximum feasible units. Its costs are **DEMO COST ASSUMPTIONS**, not verified municipal costs.
+The optimizer reads [`data/interventions/location_catalog.json`](../data/interventions/location_catalog.json), not the demo CSV. The committed catalog is schema version `1.0` and currently contains no enabled planning location because the repository does not contain the complete real evidence needed for one. This is an intentional evidence gate, not a demo fallback.
 
-## Inputs and units
+## Location catalog contract
 
-The API accepts `location` (exact ward/site identifier), `budget_inr` (capital INR), `maintenance_cap_inr_per_year` (annual INR), `available_ground_m2`, and `available_roof_m2`. ₹10 lakh is **₹1,000,000**. Every candidate action must have the same `location`, per-block cost, annual maintenance, ground and roof area, modeled marginal cooling in °C, green-cover gain in m², a 0–5 catalog co-benefit score, and a verified nonnegative integer `maximum_feasible_units`. Blank benefit or capacity fields make the request unavailable; zero is accepted only if it is a documented modeled value.
+The machine-readable schema is [`schemas/location_intervention_catalog.schema.json`](../schemas/location_intervention_catalog.schema.json). A location must name its planning-area ID and name, use `EPSG:32643`, identify verified capacity sources, and store eligible ground and roof area calculated from spatial inputs. Each available action must include:
 
-The editable [objective configuration](../backend/app/optimizer/objective_config.json) holds prototype weights α=1, β=0.5, γ=0.2. `C_ref` and `G_ref` are the maximum positive **per-block** cooling and green gain among the submitted candidates. A dimension with all zero benefits contributes zero. The co-benefit divisor is 10 as specified for this step. The Step 21 catalog uses scores from 0 to 5, so its normalized co-benefit reaches at most 0.5. Changing the candidate set can change the two maximum-based references and hence the ranking; record the candidates and configuration for reproducibility.
+- positive block size and integer capital/annual-maintenance INR;
+- ground and roof use per block and an integer maximum feasible unit count;
+- modeled marginal LST cooling per block, green-cover gain, 0–5 co-benefit score, horizon, and uncertainty status/description;
+- `verified` or `audited` evidence status and source IDs;
+- matching location ID, model dataset version, and model artifact SHA-256 where tree/cool-roof benefits use the model workflow.
 
-For block i, `u_i = α(C_i/C_ref) + β(G_i/G_ref) + γ(B_i/10)`. SciPy minimizes `-u·x` with `x_i` constrained to nonnegative integers and `x_i ≤ U_i`. Four upper-bound rows restrict total capital, annual maintenance, ground area, and roof area. The result includes selected integer quantities, resource totals, unused budget, normalized objective, and a *linear modeled cooling proxy*. A returned optimal status means **“Optimal under the modeled objective, assumptions and constraints.”** It does not certify the best real-world climate plan.
+Sources record organization, title, URL or identifier, license, access date, required validity end date, evidence type, local evidence path, and SHA-256. Each action maps every evidence-bearing field to source IDs. Runtime validation checks each local file and rejects expired, tampered, missing, mixed-location, duplicated, over-capacity, or model-mismatched evidence. Cost evidence must be a municipal tender, schedule of rates, published study, or audited user input. Capacity must cite verified spatial evidence. Cooling must cite a validated model or published study. Unsupported actions use `availability: "unavailable"` with a reason and do not enter the solver.
 
-Summing marginal cooling in °C across blocks is a simplified planning proxy, not a ward-average LST forecast. Adjacent interventions can overlap or interact; planting takes time and roof performance can age. Interventions may have different horizons. Ground/roof eligibility, verified costs, maintenance, and benefits must be gathered or calibrated per location before municipal use. LST is not pedestrian air temperature.
+Tree-canopy and cool-roof rows may use the validated scenario pipeline only when the real grid/model are present, model and dataset hashes match, the scenario stays within training support, selected cells belong to the same location, intervention amount maps exactly to the catalog block, and the aggregation method/horizon is documented in a hashed evidence artifact. A single-cell scenario is not silently generalized to a ward. The current missing real artifacts therefore block generation of those rows.
 
-## Files and test
-
-- [MILP solver](../backend/app/optimizer/milp_optimizer.py)
-- [Objective configuration](../backend/app/optimizer/objective_config.json)
-- [Endpoint](../backend/app/main.py): `POST /api/optimizer/plan`
-- [Tests](../tests/test_milp_optimizer.py): **ARTIFICIAL / SYNTHETIC TEST FIXTURE** only
-
-From the project root in Windows PowerShell:
+## Commands and API
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r backend\requirements-optimizer.txt
-.\.venv\Scripts\python.exe -m unittest tests.test_milp_optimizer -v
+.\.venv\Scripts\python.exe scripts\validate_intervention_catalog.py
+.\.venv\Scripts\python.exe -m unittest tests.test_location_intervention_catalog tests.test_milp_optimizer -v
 ```
 
-Expected: six tests pass. They cover the integer portfolio, four resource limits, budget conversion, invalid inputs, location matching, and refusal to optimize the incomplete real catalog. The fixture's cooling values are artificial test values, not Pune predictions.
+Validation returns exit code `0` only when at least one location is evidence-complete, `3` when the catalog is structurally valid but has no enabled location, and `2` for invalid evidence.
 
-To inspect the endpoint with the current catalog, start FastAPI as in the README, open `http://127.0.0.1:8000/docs`, and expand `POST /api/optimizer/plan`. Supply an actual ward identifier and planning limits. Expected now: HTTP 503 describing the missing `predicted_cooling_benefit_c`. This is intentional. Supplying a budget, even ₹10 lakh, cannot create missing intervention science.
+`GET /api/optimizer/locations` returns only evidence-complete selectable locations and verified capacities. `POST /api/optimize` accepts `location_id`, capital budget, annual maintenance cap, and optional objective weights. Ground/roof limits come from the catalog and cannot be overridden by the caller.
 
-Common errors: `ModuleNotFoundError: scipy` means install the optimizer requirements in the project virtual environment; a 503 missing-benefit/capacity/location error means complete and document the ward-specific catalog; HTTP 422 means an invalid input such as a negative budget or mismatched location.
-
-SciPy solver reference: [scipy.optimize.milp](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.milp.html).
+The MILP preserves integer quantities plus capital, annual maintenance, ground, roof, and per-intervention maximum-unit constraints. Its cooling total is the sum of marginal effects as a linear planning proxy. Physical overlap, interactions, competition for space, aging, and spillover are not jointly simulated; the API and UI always return this warning. “Optimal” means optimal only under the catalog evidence, objective, and constraints—not a causal or observed cooling guarantee.

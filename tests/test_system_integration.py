@@ -4,7 +4,6 @@ The values here are fixtures for software behavior. They are not Pune/PCMC
 observations, measured cooling, or real spatial-validation performance.
 """
 
-import csv
 import hashlib
 import json
 import tempfile
@@ -132,25 +131,75 @@ def _synthetic_artifacts(root: Path) -> dict[str, Path]:
             ]]},
         }],
     }), encoding="utf-8")
-    catalog = processed / "interventions.csv"
+    evidence = root / "data" / "interventions" / "evidence"
+    evidence.mkdir(parents=True)
+    source_specs = {
+        "ARTIFICIAL-COST": ("audited_user_input", b"ARTIFICIAL TEST COST EVIDENCE"),
+        "ARTIFICIAL-CAPACITY": ("verified_spatial_capacity", b"ARTIFICIAL TEST CAPACITY EVIDENCE"),
+        "ARTIFICIAL-MODEL": ("validated_model", model_path.read_bytes()),
+    }
+    sources = []
+    for source_id, (evidence_type, payload) in source_specs.items():
+        path = evidence / f"{source_id}.bin"
+        path.write_bytes(payload)
+        sources.append({
+            "source_id": source_id, "organization": "ARTIFICIAL TEST ORGANIZATION",
+            "title": "ARTIFICIAL TEST EVIDENCE", "url_or_identifier": "test://fixture",
+            "license": "TEST ONLY", "access_date": "2026-01-01",
+            "valid_until": "2027-12-31", "evidence_type": evidence_type,
+            "checksum_sha256": hashlib.sha256(payload).hexdigest(),
+            "local_path": str(path.relative_to(root)).replace("\\", "/"),
+        })
+    catalog = root / "data" / "interventions" / "location_catalog.json"
     actions = [
-        {"intervention_id": "tree", "name": "ARTIFICIAL tree block", "unit_type": "tree",
+        {"availability": "available", "location_id": LOCATION,
+         "intervention_id": "street_trees", "name": "ARTIFICIAL tree block", "unit_type": "tree",
          "block_size": 1, "capital_cost_inr": 100, "annual_maintenance_inr": 10,
          "ground_area_required_m2": 5, "roof_area_required_m2": 0,
-         "predicted_cooling_benefit_c": 0.2, "green_cover_gain_m2": 5,
-         "co_benefit_score_0_5": 4, "maximum_feasible_units": 3},
-        {"intervention_id": "roof", "name": "ARTIFICIAL roof block", "unit_type": "m2",
+         "modeled_marginal_cooling_c": 0.2, "green_cover_gain_m2": 5,
+         "co_benefit_score_0_5": 4, "maximum_feasible_units": 2,
+         "horizon": "ARTIFICIAL TEST HORIZON",
+         "uncertainty": {"status": "uncalibrated_proxy", "description": "ARTIFICIAL TEST"},
+         "source_ids": list(source_specs), "evidence_status": "audited",
+         "field_source_ids": {"capital_cost": ["ARTIFICIAL-COST"],
+             "annual_maintenance": ["ARTIFICIAL-COST"], "block_and_area": ["ARTIFICIAL-CAPACITY"],
+             "maximum_feasible_units": ["ARTIFICIAL-CAPACITY"],
+             "modeled_marginal_cooling": ["ARTIFICIAL-MODEL"],
+             "green_cover_gain": ["ARTIFICIAL-CAPACITY"], "co_benefit": ["ARTIFICIAL-COST"],
+             "horizon": ["ARTIFICIAL-MODEL"], "uncertainty": ["ARTIFICIAL-MODEL"]},
+         "model_dataset_version": "ARTIFICIAL-MODEL-V1",
+         "model_checksum_sha256": hashlib.sha256(model_path.read_bytes()).hexdigest()},
+        {"availability": "available", "location_id": LOCATION,
+         "intervention_id": "cool_roofs", "name": "ARTIFICIAL roof block", "unit_type": "m2",
          "block_size": 50, "capital_cost_inr": 150, "annual_maintenance_inr": 5,
          "ground_area_required_m2": 0, "roof_area_required_m2": 50,
-         "predicted_cooling_benefit_c": 0.3, "green_cover_gain_m2": 0,
-         "co_benefit_score_0_5": 2, "maximum_feasible_units": 2},
+         "modeled_marginal_cooling_c": 0.3, "green_cover_gain_m2": 0,
+         "co_benefit_score_0_5": 2, "maximum_feasible_units": 1,
+         "horizon": "ARTIFICIAL TEST HORIZON",
+         "uncertainty": {"status": "uncalibrated_proxy", "description": "ARTIFICIAL TEST"},
+         "source_ids": list(source_specs), "evidence_status": "audited",
+         "field_source_ids": {"capital_cost": ["ARTIFICIAL-COST"],
+             "annual_maintenance": ["ARTIFICIAL-COST"], "block_and_area": ["ARTIFICIAL-CAPACITY"],
+             "maximum_feasible_units": ["ARTIFICIAL-CAPACITY"],
+             "modeled_marginal_cooling": ["ARTIFICIAL-MODEL"],
+             "green_cover_gain": ["ARTIFICIAL-CAPACITY"], "co_benefit": ["ARTIFICIAL-COST"],
+             "horizon": ["ARTIFICIAL-MODEL"], "uncertainty": ["ARTIFICIAL-MODEL"]},
+         "model_dataset_version": "ARTIFICIAL-MODEL-V1",
+         "model_checksum_sha256": hashlib.sha256(model_path.read_bytes()).hexdigest()},
     ]
-    with catalog.open("w", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=["catalog_label", "location", *actions[0].keys()])
-        writer.writeheader()
-        for action in actions:
-            writer.writerow({"catalog_label": "ARTIFICIAL / SYNTHETIC TEST CATALOG",
-                             "location": LOCATION, **action})
+    catalog.write_text(json.dumps({
+        "schema_version": "1.0", "catalog_version": "ARTIFICIAL-CATALOG-V1",
+        "generated_at": "2026-01-02T00:00:00+00:00",
+        "model_dataset_version": "ARTIFICIAL-MODEL-V1",
+        "model_checksum_sha256": hashlib.sha256(model_path.read_bytes()).hexdigest(),
+        "sources": sources, "locations": [{
+            "location_id": LOCATION, "name": LOCATION, "crs": "EPSG:32643",
+            "capacity_source_ids": ["ARTIFICIAL-CAPACITY"],
+            "capacity": {"status": "verified_spatial_inputs",
+                         "eligible_ground_m2": 10, "eligible_roof_m2": 50},
+            "actions": actions,
+        }], "blockers": [],
+    }), encoding="utf-8")
     return {"root": root, "grid": grid, "grid_meta": grid_meta, "model": model_path,
             "model_meta": model_meta, "boundary": boundary, "catalog": catalog}
 
@@ -266,17 +315,19 @@ class FullSystemHttpTests(unittest.TestCase):
         self.assertIn("outside observed training support", ood.json()["detail"])
 
     def test_optimizer_constraints_and_http_validation(self):
-        limits = {"location": LOCATION, "budget_inr": 250,
-                  "maintenance_cap_inr_per_year": 15,
-                  "available_ground_m2": 10, "available_roof_m2": 50}
+        locations = self.client.get("/api/optimizer/locations")
+        self.assertEqual(locations.status_code, 200, locations.text)
+        self.assertEqual(locations.json()["locations"][0]["location_id"], LOCATION)
+        limits = {"location_id": LOCATION, "budget_inr": 250,
+                  "maintenance_cap_inr_per_year": 15}
         response = self.client.post("/api/optimize", json=limits)
         self.assertEqual(response.status_code, 200, response.text)
         plan = response.json()
         self.assertEqual(plan["status"], "optimal")
         self.assertLessEqual(plan["capital_cost_inr"], limits["budget_inr"])
         self.assertLessEqual(plan["annual_maintenance_inr"], limits["maintenance_cap_inr_per_year"])
-        self.assertLessEqual(plan["ground_used_m2"], limits["available_ground_m2"])
-        self.assertLessEqual(plan["roof_used_m2"], limits["available_roof_m2"])
+        self.assertLessEqual(plan["ground_used_m2"], plan["verified_capacity"]["eligible_ground_m2"])
+        self.assertLessEqual(plan["roof_used_m2"], plan["verified_capacity"]["eligible_roof_m2"])
         self.assertTrue(all(isinstance(item["quantity"], int) and item["quantity"] >= 0
                             for item in plan["selected_actions"]))
         self.assertAlmostEqual(plan["unused_budget_inr"],

@@ -118,13 +118,12 @@ class MilpOptimizerTests(unittest.TestCase):
 
     def test_api_reports_unavailable_catalog_instead_of_fabricated_plan(self):
         request = ClimatePlanRequest(
-            location="PMC/PCMC ward pending verification", budget_inr=1_000_000,
-            maintenance_cap_inr_per_year=100_000,
-            available_ground_m2=1000, available_roof_m2=1000)
+            location_id="PMC/PCMC ward pending verification", budget_inr=1_000_000,
+            maintenance_cap_inr_per_year=100_000)
         with self.assertRaises(HTTPException) as context:
             climate_action_plan(request)
         self.assertEqual(context.exception.status_code, 503)
-        self.assertIn("predicted_cooling_benefit_c", context.exception.detail)
+        self.assertIn("No evidence-complete", context.exception.detail)
 
 
 if __name__ == "__main__":

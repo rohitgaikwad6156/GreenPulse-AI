@@ -16,6 +16,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Python test suite failed with exit code $LASTEXITCODE." }
     Push-Location $frontend
     try {
+        & npm.cmd test
+        if ($LASTEXITCODE -ne 0) { throw "Frontend unit tests failed with exit code $LASTEXITCODE." }
         & npm.cmd run build
         if ($LASTEXITCODE -ne 0) { throw "Frontend production build failed with exit code $LASTEXITCODE." }
     }
@@ -23,4 +25,4 @@ try {
 }
 finally { Pop-Location }
 
-Write-Host "GreenPulse automated checks passed: Python tests and frontend build."
+Write-Host "GreenPulse automated checks passed: Python tests, frontend unit tests, and frontend build."

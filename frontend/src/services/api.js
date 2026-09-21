@@ -82,6 +82,12 @@ export async function getOptimizerConfig(signal) {
   return response.data;
 }
 
+export async function getOptimizerLocations(signal) {
+  requireApiBaseUrl();
+  const response = await api.get("/api/optimizer/locations", { signal });
+  return response.data;
+}
+
 export async function optimizePortfolio(payload, signal) {
   requireApiBaseUrl();
   const response = await api.post("/api/optimize", payload, { signal, timeout: 30000 });
@@ -94,6 +100,19 @@ export async function getValidationDemo(signal) {
   return response.data;
 }
 
+export async function getValidationDatasets(signal) {
+  requireApiBaseUrl();
+  const response = await api.get("/api/validation/datasets", { signal });
+  return response.data;
+}
+
+export async function analyzeValidationDataset(datasetId, signal) {
+  requireApiBaseUrl();
+  const response = await api.post(`/api/validation/analyze/${encodeURIComponent(datasetId)}`, {},
+    { signal, timeout: 120000 });
+  return response.data;
+}
+
 export async function calculateValidation(payload, signal) {
   requireApiBaseUrl();
   const response = await api.post("/api/validation/did", payload, { signal, timeout: 30000 });
@@ -103,5 +122,17 @@ export async function calculateValidation(payload, signal) {
 export async function getMethodology(signal) {
   requireApiBaseUrl();
   const response = await api.get("/api/methodology", { signal });
+  return response.data;
+}
+
+export async function getResearchStatus(signal) {
+  requireApiBaseUrl();
+  const response = await api.get("/api/research/status", { signal });
+  return response.data;
+}
+
+export async function getNearbySensorContext(params, signal) {
+  requireApiBaseUrl();
+  const response = await api.get("/api/research/sensors/nearby", { params, signal });
   return response.data;
 }
