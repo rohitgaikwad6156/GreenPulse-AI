@@ -82,6 +82,7 @@ class SpatialCvTests(unittest.TestCase):
             self.assertEqual(report["row_count"], len(x))
             self.assertEqual(report["unique_blocks"], 12)
             self.assertFalse(report["block_overlap_between_train_and_validation"])
+            self.assertTrue(report["source_dataset_checksum"].startswith("sha256:"))
             self.assertTrue((root / "cv" / "spatial_cv_folds.png").is_file())
             self.assertEqual(pq.read_table(root / "cv" / "spatial_cv_blocks.parquet").num_rows, 12)
             self.assertEqual(json.loads((root / "cv" / "spatial_cv_metadata.json").read_text())["n_folds"], 5)

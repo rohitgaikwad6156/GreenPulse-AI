@@ -44,7 +44,7 @@ The script reads only `x` and `y` from the ML Parquet, checks its row count and 
 
 - `data/processed/spatial_cv_blocks.parquet`: **one row per populated 5 km block**, with numeric block coordinates, `block_id`, `validation_fold`, and retained-cell count. It does not duplicate the entire ML table.
 - `data/processed/spatial_cv_folds.png`: UTM map where every square is coloured by its held-out fold. Empty blocks are left blank. The image is a validation-design map, not a heat map.
-- `data/processed/spatial_cv_metadata.json`: source table path, EPSG:32643, block size, frozen x/y minima, exact formula, row count, unique block count, per-fold counts, and the no-overlap QA result.
+- `data/processed/spatial_cv_metadata.json`: source table path and SHA-256 checksum, EPSG:32643, block size, frozen x/y minima, exact formula, row count, unique block count, per-fold counts, and the no-overlap QA result. Loading a mapping after the Parquet bytes change is rejected.
 
 The real ML Parquet does not yet exist in this workspace, so **no real Pune fold map has been generated**. Unit tests render only an explicitly artificial grid in a temporary directory.
 

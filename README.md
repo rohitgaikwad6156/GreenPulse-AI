@@ -72,14 +72,17 @@ No measured temperature, model metric, or intervention outcome is included in th
 
 ## Real satellite pipelines
 
+- [Real-data intake contract](docs/data_intake_contract.md): authoritative required/optional/future source inventory plus provenance, date, CRS, checksum, and local-file validation before processing.
 - [Landsat LST processing](docs/landsat_lst_pipeline.md): measured March–May land surface temperature target on the PMC/PCMC 30 m grid.
 - [Sentinel-2 NDVI/NDBI processing](docs/sentinel2_indices_pipeline.md): cloud-masked optical features aligned exactly to that LST grid. It requires the real LST raster, verified municipal boundary, and extracted L2A SAFE scenes.
 - [WorldCover, OSM, and WorldPop morphology processing](docs/urban_morphology_pipeline.md): real tree-cover and built-up fractions, road density, nearest green-space distance, and population density on the same 30 m grid. It requires the real LST reference and source datasets.
+- [Real-data acquisition status](docs/real_data_acquisition.md): reproducible official-source discovery/download commands, selected 2025 scenes, municipal-boundary importer, and exact credential/manual blockers.
 - [Final ML-grid assembly](docs/ml_dataset_pipeline.md): validates all aligned rasters and official ward polygons, applies missing-data QA, computes focal optical context, and writes a real-data Parquet table with metadata and correlation diagnostics. It requires all upstream real layers.
 - [Spatial block cross-validation](docs/spatial_cv_pipeline.md): assigns 5 km blocks to five held-out folds, checks block exclusivity, and creates a fold map from the real ML table. It trains no model.
 - [Baseline LST regression](docs/baseline_models.md): compares Linear Regression, Decision Tree, and Random Forest using those same saved folds. Real metrics require the upstream Parquet and fold map.
 - [Main XGBoost LST model](docs/xgboost_lst_pipeline.md): nested spatial Optuna tuning, held-out comparison with the three baselines, and final model persistence after real source data exist.
 - [TreeSHAP LST explanations](docs/shap_explainability.md): sampled global importance, one-cell °C contributions, correlations, grouped summaries, and plot-ready JSON from a matching real saved model.
+- [Root Cause Analysis UI](docs/root_cause_analysis_ui.md): grid-cell selection, local/global SHAP charts, additivity verification, functional groups, feature units, provenance, and explicit API failure states.
 - [Heat Hazard Score](docs/heat_hazard_score.md): a separate 0–100 display index derived from predicted LST and documented observed summer LST references; no score-target training.
 - [Tree canopy what-if simulator](docs/tree_canopy_simulator.md): a 0–40-point canopy slider that transforms model inputs, checks feasible area, and re-runs XGBoost for a clearly labelled LST scenario estimate.
 - [Cool-roof and combined what-if simulator](docs/cool_roof_simulator.md): a 0–50% eligible-roof retrofit slider, area-weighted albedo change, optional calibrated NDBI surrogate, and a joint tree-plus-roof XGBoost re-prediction.

@@ -23,6 +23,7 @@ class UncertaintyTests(unittest.TestCase):
             "green_roof": 0.15, "cool_pavement": 0.10})
         self.assertEqual(self.config["normal_multiplier_for_approx_90_percent"], 1.645)
         self.assertIn("NOT EMPIRICALLY CALIBRATED", self.config["label"])
+        self.assertEqual(self.config["provenance"]["coverage_validation"], "not_empirically_validated")
 
     def test_exact_formula_for_artificial_tree_fixture(self):
         # ARTIFICIAL TEST FIXTURE: these are arithmetic checks, not Pune measurements.
@@ -32,6 +33,8 @@ class UncertaintyTests(unittest.TestCase):
         self.assertAlmostEqual(result["lower_bound_c"], 1.5 - 1.645 * 0.5)
         self.assertAlmostEqual(result["upper_bound_c"], 1.5 + 1.645 * 0.5)
         self.assertEqual(result["confidence_category"], "Medium")
+        self.assertFalse(result["coverage_calibrated"])
+        self.assertIn("coverage is not calibrated", result["interval_label"])
         self.assertIn("canopy cover has been established", result["prediction_horizon"])
 
     def test_zero_clamp_and_confidence_threshold_edges(self):

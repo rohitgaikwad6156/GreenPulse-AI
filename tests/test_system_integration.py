@@ -100,8 +100,14 @@ def _synthetic_artifacts(root: Path) -> dict[str, Path]:
     model_meta.write_text(json.dumps({
         "feature_list": FEATURES,
         "dataset_version": "sha256:" + hashlib.sha256(grid.read_bytes()).hexdigest(),
+        "model_artifact_sha256": "sha256:" + hashlib.sha256(model_path.read_bytes()).hexdigest(),
         "dataset_rows": count, "dataset_date_range": "ARTIFICIAL TEST PERIOD",
         "target": "lst_c", "objective": "reg:squarederror",
+        "training_feature_distributions": {name: {
+            "count": count, "min": float(np.min(values[name])),
+            "p01": float(np.quantile(values[name], 0.01)),
+            "p99": float(np.quantile(values[name], 0.99)), "max": float(np.max(values[name]))}
+            for name in FEATURES},
         "crs": "EPSG:32643", "resolution_m": 30,
         "spatial_validation_method": "ARTIFICIAL TEST FIXTURE: five 5 km spatial GroupKFold folds",
         "outer_folds": 5,
@@ -230,9 +236,9 @@ class FullSystemHttpTests(unittest.TestCase):
 
         for scenario_type, fields in (
             ("tree_canopy", {"canopy_increase_percentage_points": 10, "feasible_ground_area_m2": 90}),
-            ("cool_roof", {"retrofit_fraction": 0.5, "eligible_roof_area_m2": 180}),
+            ("cool_roof", {"retrofit_fraction": 0.1, "eligible_roof_area_m2": 180}),
             ("combined", {"canopy_increase_percentage_points": 10, "feasible_ground_area_m2": 90,
-                          "retrofit_fraction": 0.5, "eligible_roof_area_m2": 180}),
+                          "retrofit_fraction": 0.1, "eligible_roof_area_m2": 180}),
         ):
             with self.subTest(scenario_type=scenario_type):
                 response = self.client.post("/api/simulate", json={
@@ -252,6 +258,12 @@ class FullSystemHttpTests(unittest.TestCase):
                 if scenario_type in {"cool_roof", "combined"}:
                     self.assertGreater(result["modified_features"]["albedo"]["scenario"],
                                        result["modified_features"]["albedo"]["baseline"])
+        ood = self.client.post("/api/simulate", json={
+            "grid_id": CELL_ID, "scenario_type": "cool_roof",
+            "retrofit_fraction": 0.5, "eligible_roof_area_m2": 180,
+        })
+        self.assertEqual(ood.status_code, 422)
+        self.assertIn("outside observed training support", ood.json()["detail"])
 
     def test_optimizer_constraints_and_http_validation(self):
         limits = {"location": LOCATION, "budget_inr": 250,

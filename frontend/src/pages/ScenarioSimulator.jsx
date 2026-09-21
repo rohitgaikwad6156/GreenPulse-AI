@@ -96,21 +96,22 @@ export default function ScenarioSimulator() {
     event.preventDefault();
     setResult(null);
     setError("");
-    if (!gridId.trim() || (increase > 0 && feasibleArea === "") || (retrofit > 0 && eligibleRoofArea === "")) {
-      setError("Enter a real grid ID and verified area for each selected intervention.");
+    if (!gridId.trim()) {
+      setError("Enter a real grid ID.");
       return;
     }
     if (increase === 0 && retrofit === 0) {
       setError("Move at least one intervention slider above zero.");
       return;
     }
-    const ground = increase > 0 ? Number(feasibleArea) : 0;
-    const roof = retrofit > 0 ? Number(eligibleRoofArea) : 0;
-    if (!Number.isFinite(ground) || !Number.isFinite(roof) || ground < 0 || roof < 0
-      || ground > 900 || roof > 900 || ground + roof > 900
-      || (increase > 0 && ground < (900 * increase) / 100)
-      || (retrofit > 0 && roof <= 0)) {
-      setError("Check verified areas: each is 0–900 m², together they fit one cell, and planting ground covers the requested canopy increase.");
+    const ground = feasibleArea === "" ? null : Number(feasibleArea);
+    const roof = eligibleRoofArea === "" ? null : Number(eligibleRoofArea);
+    if ((ground !== null && (!Number.isFinite(ground) || ground < 0 || ground > 900))
+      || (roof !== null && (!Number.isFinite(roof) || roof < 0 || roof > 900))
+      || (ground !== null && roof !== null && ground + roof > 900)
+      || (increase > 0 && ground !== null && ground < (900 * increase) / 100)
+      || (retrofit > 0 && roof !== null && roof <= 0)) {
+      setError("Check entered capacities: each is 0–900 m², together they fit one cell, and planting ground covers the requested canopy increase.");
       return;
     }
     const token = ++requestToken.current;
@@ -121,8 +122,10 @@ export default function ScenarioSimulator() {
       const payload = {
         grid_id: gridId.trim(),
         scenario_type: increase > 0 && retrofit > 0 ? "combined" : increase > 0 ? "tree_canopy" : "cool_roof",
-        ...(increase > 0 ? { canopy_increase_percentage_points: increase, feasible_ground_area_m2: ground } : {}),
-        ...(retrofit > 0 ? { retrofit_fraction: retrofit / 100, eligible_roof_area_m2: roof } : {}),
+        ...(increase > 0 ? { canopy_increase_percentage_points: increase,
+          ...(ground === null ? {} : { feasible_ground_area_m2: ground }) } : {}),
+        ...(retrofit > 0 ? { retrofit_fraction: retrofit / 100,
+          ...(roof === null ? {} : { eligible_roof_area_m2: roof }) } : {}),
       };
       const response = await simulateScenario(payload);
       if (token !== requestToken.current) return;
@@ -180,7 +183,7 @@ export default function ScenarioSimulator() {
               />
             </label>
             <label className="block text-sm font-medium text-[#294532]">
-              Verified available planting ground (m²)
+              Available planting ground (m², optional when verified spatial capacity exists)
               <input
                 type="number"
                 min="0"
@@ -188,10 +191,10 @@ export default function ScenarioSimulator() {
                 step="0.01"
                 value={feasibleArea}
                 onChange={(event) => { setFeasibleArea(event.target.value); invalidateScenario(); }}
-                placeholder="Enter area from a verified land assessment"
+                placeholder="Leave blank to use verified spatial capacity"
                 className="mt-2 w-full rounded-xl border border-[#dce7dc] bg-white px-3 py-2.5 text-sm text-[#294532] outline-none focus:border-[#5a9a6c]"
               />
-              <span className="mt-1 block text-xs font-normal leading-5 text-[#7b8c7e]">Available ground excludes existing canopy. It cannot be inferred safely from built percentage alone.</span>
+              <span className="mt-1 block text-xs font-normal leading-5 text-[#7b8c7e]">Entered capacity is labelled user-supplied. If blank, the API uses a documented verified capacity column when available; built percentage alone is never treated as plantable ground.</span>
             </label>
             <div>
               <div className="flex items-center justify-between text-sm font-medium text-[#294532]">
@@ -217,7 +220,7 @@ export default function ScenarioSimulator() {
             <div className="border-t border-[#edf1ec] pt-6">
               <div className="flex items-center gap-2 text-[#397a50]"><Building2 size={17} aria-hidden="true" /><h3 className="text-sm font-semibold text-[#294532]">Cool roof retrofit</h3></div>
               <label className="mt-4 block text-sm font-medium text-[#294532]">
-                Verified eligible roof area (m²)
+                Eligible roof area (m², optional when verified spatial capacity exists)
                 <input
                   type="number"
                   min="0"
@@ -225,10 +228,10 @@ export default function ScenarioSimulator() {
                   step="0.01"
                   value={eligibleRoofArea}
                   onChange={(event) => { setEligibleRoofArea(event.target.value); invalidateScenario(); }}
-                  placeholder="Enter area from a verified roof assessment"
+                  placeholder="Leave blank to use verified spatial capacity"
                   className="mt-2 w-full rounded-xl border border-[#dce7dc] bg-white px-3 py-2.5 text-sm text-[#294532] outline-none focus:border-[#5a9a6c]"
                 />
-                <span className="mt-1 block text-xs font-normal leading-5 text-[#7b8c7e]">Only this roof area is eligible; non-roof ground remains unchanged.</span>
+                <span className="mt-1 block text-xs font-normal leading-5 text-[#7b8c7e]">Entered capacity is labelled user-supplied. A blank value requires a verified per-cell roof-capacity field; non-roof ground remains unchanged.</span>
               </label>
               <div className="mt-5 flex items-center justify-between text-sm font-medium text-[#294532]">
                 <label htmlFor="roof-retrofit">Retrofit share of eligible roof</label>
@@ -273,6 +276,11 @@ export default function ScenarioSimulator() {
           {result && (
             <div className="mt-8 border-t border-[#e4ebe3] pt-6">
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#5c8465]">Model what-if estimate · not observed cooling</p>
+              {result.training_support?.is_ood && <div role="alert" className="mt-4 rounded-xl border border-[#e8c99f] bg-[#fff7e8] p-4 text-xs leading-5 text-[#805d2e]">
+                <p className="font-semibold">Out-of-distribution warning</p><p className="mt-1">The vector remains inside observed training extrema but one or more modified features fall outside the training p01–p99 range. Treat this model sensitivity result with additional caution.</p>
+                <ul className="mt-2 list-disc pl-5">{result.training_support.warnings.map((warning) => <li key={warning.feature}>{warning.feature}: {warning.scenario_value.toFixed(4)}; typical range {warning.typical_training_range[0].toFixed(4)}–{warning.typical_training_range[1].toFixed(4)}</li>)}</ul>
+              </div>}
+              {result.training_support?.is_ood === false && <p className="mt-3 inline-flex rounded-full bg-[#e8f4eb] px-3 py-1 text-[11px] font-semibold text-[#2e7548]">Scenario vector is within the model’s training p01–p99 ranges</p>}
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {[
                   ["Baseline LST", result.baseline_lst_c],
@@ -318,21 +326,29 @@ export default function ScenarioSimulator() {
               {result.changed_ndbi && <p className="mt-2 text-xs text-[#617566]">Empirical NDBI adjustment: {result.changed_ndbi.baseline.toFixed(3)} → {result.changed_ndbi.scenario.toFixed(3)}</p>}
               {result.uncertainty && (
                 <section className="mt-6 rounded-xl border border-[#dce9dd] bg-[#f3f8f2] p-4">
-                  <h3 className="text-sm font-semibold text-[#294532]">Approximate 90% cooling range</h3>
+                  <h3 className="text-sm font-semibold text-[#294532]">Uncalibrated model-sensitivity range</h3>
                   <p className="mt-2 text-2xl font-semibold text-[#2f6240]">
                     {formatTemperature(result.uncertainty.lower_bound_c)} to {formatTemperature(result.uncertainty.upper_bound_c)}
                   </p>
-                  <p className="mt-2 text-xs text-[#617566]">Mean: {formatTemperature(result.uncertainty.mean_cooling_c)} · MVP confidence display: {result.uncertainty.confidence_category}</p>
+                  <p className="mt-2 text-xs text-[#617566]">Model-estimated cooling magnitude: {formatTemperature(result.uncertainty.mean_cooling_c)} · MVP communication category: {result.uncertainty.confidence_category}</p>
                   <p className="mt-3 text-xs leading-5 text-[#617566]">{result.uncertainty.prediction_horizon}</p>
-                  <p className="mt-2 text-xs leading-5 text-[#617566]">{result.uncertainty.interval_label}. {result.uncertainty.assumptions.limitations}</p>
+                  <p className="mt-2 text-xs font-semibold leading-5 text-[#795b32]">{result.uncertainty.interval_label}. This is not a coverage-calibrated interval.</p>
+                  <p className="mt-2 text-xs leading-5 text-[#617566]">{result.uncertainty.assumptions.limitations}</p>
                   <details className="mt-3 text-xs text-[#617566]">
                     <summary className="cursor-pointer font-semibold">Show uncertainty assumptions</summary>
                     <p className="mt-2">Model spatial CV RMSE: {formatTemperature(result.uncertainty.sigma_model_c)} · Parameter σ: {formatTemperature(result.uncertainty.sigma_param_c)} · Total σ: {formatTemperature(result.uncertainty.sigma_total_c)}</p>
                     <p className="mt-2">Configured intervention CV: {Object.entries(result.uncertainty.assumptions.selected_cv_coefficients).map(([name, value]) => `${name} ${value}`).join(", ")}</p>
                     <p className="mt-2">{result.uncertainty.assumptions.label}</p>
+                    <p className="mt-2"><strong>Uncertainty provenance:</strong> {result.uncertainty.provenance.parameter_source}</p>
+                    <p className="mt-2"><strong>Horizon provenance:</strong> {result.uncertainty.provenance.growth_horizon_source}</p>
+                    <p className="mt-2"><strong>Survival:</strong> {result.uncertainty.provenance.survival_source}</p>
                   </details>
                 </section>
               )}
+              {result.feasibility && <section className="mt-6 rounded-xl border border-[#e4ebe3] bg-[#f8faf7] p-4 text-xs leading-5 text-[#617566]">
+                <h3 className="text-sm font-semibold text-[#294532]">Feasibility evidence</h3>
+                {Object.entries(result.feasibility).map(([name, evidence]) => <p key={name} className="mt-2"><strong>{name.replaceAll("_", " ")}:</strong> {evidence.value_m2.toFixed(1)} m² · {evidence.source_type.replaceAll("_", " ")}. {evidence.source || evidence.verified_source || "No independent spatial verification recorded by the API."}{evidence.method ? ` Method: ${evidence.method}.` : ""}</p>)}
+              </section>}
               <h3 className="mt-6 text-sm font-semibold text-[#294532]">Modified model features</h3>
               <ul className="mt-2 space-y-2 text-xs text-[#617566]">
                 {Object.entries(result.modified_features).map(([name, values]) => (
@@ -344,6 +360,8 @@ export default function ScenarioSimulator() {
                 {result.assumptions.tree_canopy && <p className="mt-2"><strong>Tree canopy:</strong> {result.assumptions.tree_canopy.label} NDVI change per canopy point: {result.assumptions.tree_canopy.ndvi_per_canopy_percentage_point}.</p>}
                 {result.assumptions.cool_roof && <p className="mt-2"><strong>Cool roof:</strong> {result.assumptions.cool_roof.label} Existing roof albedo: {result.assumptions.cool_roof.existing_roof_albedo}; cool roof albedo: {result.assumptions.cool_roof.cool_roof_albedo}; empirical NDBI coefficient: {result.assumptions.cool_roof.k_roof_ndbi_per_retrofit_fraction}.</p>}
                 {result.assumptions.label && <p className="mt-2">{result.assumptions.label}</p>}
+                {(result.assumptions.tree_canopy?.provenance || result.assumptions.provenance) && <p className="mt-2"><strong>Canopy evidence:</strong> {(result.assumptions.tree_canopy?.provenance || result.assumptions.provenance).canopy_to_ndvi}</p>}
+                {(result.assumptions.cool_roof?.provenance || result.assumptions.provenance)?.roof_albedo && <p className="mt-2"><strong>Roof evidence:</strong> {(result.assumptions.cool_roof?.provenance || result.assumptions.provenance).roof_albedo}</p>}
                 {result.assumptions.combined_note && <p className="mt-2">{result.assumptions.combined_note}</p>}
                 {result.assumptions.limitations && <p className="mt-2">{result.assumptions.limitations}</p>}
               </section>
@@ -354,12 +372,12 @@ export default function ScenarioSimulator() {
           <section className="rounded-2xl border border-[#dce9dd] bg-[#edf5ec] p-5">
             <div className="flex items-center gap-2 text-[#397a50]"><Leaf size={18} aria-hidden="true" /><h2 className="text-sm font-semibold">MVP assumption</h2></div>
             <p className="mt-3 text-xs leading-5 text-[#607d66]">{config?.assumption_label || "Loading backend assumptions"}</p>
-            {config && <p className="mt-3 text-xs leading-5 text-[#607d66]">NDVI changes by {config.ndvi_per_canopy_percentage_point} per canopy percentage point before clipping. This coefficient needs local calibration.</p>}
+            {config && <><p className="mt-3 text-xs font-semibold uppercase tracking-wide text-[#80653b]">Evidence status: {config.evidence_status.replaceAll("_", " ")}</p><p className="mt-2 text-xs leading-5 text-[#607d66]">NDVI changes by {config.ndvi_per_canopy_percentage_point} per canopy percentage point before clipping. {config.provenance.canopy_to_ndvi}</p><p className="mt-2 text-xs leading-5 text-[#607d66]">Growth horizon: {config.provenance.growth_horizon}. Survival: {config.provenance.survival}.</p></>}
           </section>
           <section className="rounded-2xl border border-[#dce9dd] bg-[#edf5ec] p-5">
             <div className="flex items-center gap-2 text-[#397a50]"><Building2 size={18} aria-hidden="true" /><h2 className="text-sm font-semibold">Cool roof assumption</h2></div>
             <p className="mt-3 text-xs leading-5 text-[#607d66]">{roofConfig?.assumption_label || "Loading backend assumptions"}</p>
-            {roofConfig && <p className="mt-3 text-xs leading-5 text-[#607d66]">Assumed existing roof albedo {roofConfig.existing_roof_albedo}; cool roof albedo {roofConfig.cool_roof_albedo}. Empirical NDBI coefficient {roofConfig.k_roof_ndbi_per_retrofit_fraction} (zero means unchanged). These are not measured Pune roof values.</p>}
+            {roofConfig && <><p className="mt-3 text-xs font-semibold uppercase tracking-wide text-[#80653b]">Evidence status: {roofConfig.evidence_status.replaceAll("_", " ")}</p><p className="mt-2 text-xs leading-5 text-[#607d66]">Assumed existing roof albedo {roofConfig.existing_roof_albedo}; cool roof albedo {roofConfig.cool_roof_albedo}. Empirical NDBI coefficient {roofConfig.k_roof_ndbi_per_retrofit_fraction} (zero means unchanged). {roofConfig.provenance.roof_albedo}</p></>}
           </section>
           <section className="rounded-2xl border border-[#e4ebe3] bg-white p-5">
             <h2 className="text-sm font-semibold text-[#294532]">Interpretation</h2>

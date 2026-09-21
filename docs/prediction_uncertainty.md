@@ -16,7 +16,7 @@ All cooling and uncertainty values are in °C. The range is a **nominal, normal-
 
 ## Editable assumptions
 
-All intervention coefficients and display thresholds are visible in [`backend/app/ml/uncertainty_assumptions.json`](../backend/app/ml/uncertainty_assumptions.json):
+All intervention coefficients, display thresholds, evidence status, version, horizon/survival provenance, and coverage-validation status are visible in [`backend/app/ml/uncertainty_assumptions.json`](../backend/app/ml/uncertainty_assumptions.json):
 
 | Intervention | MVP CV assumption |
 | --- | ---: |
@@ -33,7 +33,7 @@ The JSON also declares the multiplier `1.645`, confidence thresholds, and predic
 - **Medium:** 0.3–0.6 °C, including both endpoints.
 - **Low:** greater than 0.6 °C.
 
-These are **MVP communication thresholds**, not probabilities or validated reliability grades. A tree scenario's horizon says *after the requested canopy is established*. No numeric growth year or survival rate is asserted; neither has been modeled. A roof scenario's horizon is after retrofit under comparable March–May daytime satellite overpass conditions. LST is not pedestrian air temperature.
+These are **MVP communication thresholds**, not probabilities or validated reliability grades. The API emits `coverage_calibrated: false`, and the UI calls the output an uncalibrated model-sensitivity range. Coverage-calibrated wording is reserved for a future configuration backed by empirical coverage validation. A tree scenario's horizon says *after the requested canopy is established*. No numeric growth year or survival rate is asserted; neither has been modeled. A roof scenario's horizon is after retrofit under comparable March–May daytime satellite overpass conditions. LST is not pedestrian air temperature.
 
 ## Files and API behavior
 

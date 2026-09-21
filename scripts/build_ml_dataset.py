@@ -32,6 +32,8 @@ def main() -> int:
     print(f"Severe pairwise feature correlations: {len(report['severe_pairwise_correlations_abs_r_ge_0_85'])}")
     print(f"Features with VIF > 5: {len(report['severe_vif_gt_5'])}")
     print(f"Correlation plot: {args.output.with_name('greenpulse_ml_correlations.png')}")
+    print(f"Complete-case coverage map: {args.output.with_name('greenpulse_ml_coverage.png')}")
+    print(f"Complete-case retention: {report['complete_case_retention_percent']:.2f}%")
     return 0
 
 

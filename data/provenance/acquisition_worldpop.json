@@ -1,0 +1,14 @@
+{
+  "source_organization": "WorldPop / University of Southampton",
+  "source_url": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2024B/2025/IND/v1/100m/unconstrained/ind_pop_2025_UC_100m_R2024B_v1.tif",
+  "product": "Global 2015-2030 R2024B 2025 India v1 100m unconstrained population counts",
+  "license": "CC BY 4.0",
+  "units": "people per pixel",
+  "file": {
+    "path": "data/raw/worldpop/india_population_counts.tif",
+    "url": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2024B/2025/IND/v1/100m/unconstrained/ind_pop_2025_UC_100m_R2024B_v1.tif",
+    "bytes": 1717389991,
+    "checksum": "sha256:2bf73858a5ea5594a769f2cd7724899653eb5d8701c8362a3b81ee2eccf9f17e",
+    "reused": false
+  }
+}

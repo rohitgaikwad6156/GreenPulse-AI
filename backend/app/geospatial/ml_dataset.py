@@ -212,6 +212,23 @@ def _correlation_plot(correlations: dict, names: list[str], path: Path) -> None:
     plt.close(fig)
 
 
+def _coverage_plot(status: np.ndarray, path: Path) -> None:
+    """Save the complete-case selection footprint without filling missing data."""
+    from matplotlib.colors import BoundaryNorm, ListedColormap
+    shown = np.ma.masked_equal(status, 0)
+    colors = ["#2f855a", "#c53030", "#dd6b20", "#805ad5"]
+    labels = ["retained", "missing LST", "missing predictor", "ward unassigned/ambiguous"]
+    cmap = ListedColormap(colors)
+    norm = BoundaryNorm([0.5, 1.5, 2.5, 3.5, 4.5], cmap.N)
+    fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
+    image = ax.imshow(shown, cmap=cmap, norm=norm, interpolation="nearest")
+    colorbar = fig.colorbar(image, ax=ax, ticks=[1, 2, 3, 4], shrink=0.75)
+    colorbar.ax.set_yticklabels(labels)
+    ax.set(title="GreenPulse complete-case coverage", xlabel="30 m grid column", ylabel="30 m grid row")
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
 def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_path: Path,
                      albedo_path: Path | None = None, csv_sample_rows: int = 200,
                      chunk_rows: int = 128) -> dict:
@@ -246,6 +263,7 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
     feature_sum = np.zeros(len(feature_names), dtype=np.float64)
     feature_products = np.zeros((len(feature_names), len(feature_names)), dtype=np.float64)
     row_count = 0
+    coverage_status = np.zeros((height, width), dtype=np.uint8)
     csv_rows: list[dict] = []
     sources = {}
     lst_period = None
@@ -332,6 +350,11 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                         rejected["missing_required_feature"] += int(np.count_nonzero(target_ok & ~features_ok))
                         rejected["unassigned_or_ambiguous_ward"] += int(np.count_nonzero(target_ok & features_ok & ~ward_ok))
                         keep = target_ok & features_ok & ward_ok
+                        status = coverage_status[start:stop]
+                        status[local_inside & ~target_ok] = 2
+                        status[target_ok & ~features_ok] = 3
+                        status[target_ok & features_ok & ~ward_ok] = 4
+                        status[keep] = 1
                         row, col = np.nonzero(keep)
                         if not row.size:
                             continue
@@ -361,6 +384,17 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                 if row_count == 0:
                     raise ValueError("No complete real-data grid cells remain after QA and missing-data filters")
                 correlations, pairs, vif = _correlation_from_sums(feature_names, row_count, feature_sum, feature_products)
+                if int(np.count_nonzero(coverage_status == 1)) != row_count:
+                    raise ValueError("Complete-case coverage and Parquet row count disagree")
+                ward_retention = {}
+                for index, ward in enumerate(wards, 1):
+                    total = int(np.count_nonzero(inside & (ward_index == index)))
+                    retained = int(np.count_nonzero((coverage_status == 1) & (ward_index == index)))
+                    ward_retention[ward.ward_id] = {
+                        "ward_name": ward.ward_name, "municipal_grid_cells": total,
+                        "retained_complete_cases": retained,
+                        "retention_percent": (100.0 * retained / total) if total else 0.0,
+                    }
                 report = {
                     "system": "GreenPulse AI — An AI-powered Urban Climate Decision-Support System",
                     "target": "continuous observed land surface temperature, lst_c, degrees Celsius",
@@ -377,6 +411,10 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                     "rejected_cells_sequential": rejected,
                     "ambiguous_ward_cells": int(np.count_nonzero(inside & (ward_count > 1))),
                     "unassigned_ward_cells": int(np.count_nonzero(inside & (ward_index == 0))),
+                    "duplicate_grid_ids": 0,
+                    "complete_case_retention_percent": float(100.0 * row_count / int(inside.sum())),
+                    "complete_case_retention_by_ward": ward_retention,
+                    "coverage_map": str(output_path.with_name("greenpulse_ml_coverage.png")),
                     "features": feature_names,
                     "correlation_method": "Pearson on complete-case rows; descriptive only",
                     "feature_correlations": correlations,
@@ -390,6 +428,7 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                 os.replace(temporary_path, output_path)
     metadata_path.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     _correlation_plot(correlations, feature_names, output_path.with_name("greenpulse_ml_correlations.png"))
+    _coverage_plot(coverage_status, output_path.with_name("greenpulse_ml_coverage.png"))
     if csv_sample_rows and csv_rows:
         sample_path = output_path.with_name("greenpulse_ml_grid_sample.csv")
         with sample_path.open("w", newline="", encoding="utf-8") as stream:

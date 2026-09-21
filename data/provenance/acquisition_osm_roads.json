@@ -1,0 +1,23 @@
+{
+  "source_organization": "OpenStreetMap contributors",
+  "source_url": [
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass-api.de/api/interpreter"
+  ],
+  "license": "ODbL 1.0; attribution required",
+  "search_bbox_not_a_boundary": [
+    73.65,
+    18.35,
+    74.15,
+    18.85
+  ],
+  "record": {
+    "kind": "roads",
+    "query": "[out:json][timeout:300];way[\"highway\"](18.35,73.65,18.85,74.15);out meta geom;",
+    "feature_count": 112244,
+    "oldest_object_timestamp": "2008-08-03T19:46:33Z",
+    "newest_object_timestamp": "2026-09-18T09:13:43Z",
+    "path": "data/raw/osm/roads.geojson",
+    "checksum": "sha256:0ea57d06a97ed7bb3c2981f8b4df4441dd2e742cb796d4393241faccdcd577e5"
+  }
+}

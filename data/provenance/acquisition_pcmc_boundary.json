@@ -1,0 +1,28 @@
+{
+  "source_organization": "Pimpri Chinchwad Municipal Corporation",
+  "source_url": "https://smartgisda.pcmcindia.gov.in/geoserver/citylayers4/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=citylayers4:boundary&outputFormat=application/json&srsName=EPSG:4326",
+  "service": "Official PCMC Smart GIS WFS citylayers4:boundary",
+  "license": "No redistribution license is stated by the WFS; retain for verification and obtain written terms before redistribution",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:EPSG::4326"
+    }
+  },
+  "feature_count": 1,
+  "geometry_type": "MultiPolygon",
+  "bounds": [
+    73.71038858,
+    18.5640123,
+    73.93392629,
+    18.72112922
+  ],
+  "file": {
+    "path": "data/boundaries/source/pcmc_boundary_official.geojson",
+    "url": "https://smartgisda.pcmcindia.gov.in/geoserver/citylayers4/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=citylayers4:boundary&outputFormat=application/json&srsName=EPSG:4326",
+    "bytes": 169006,
+    "checksum": "sha256:98e790e742c4af5f48d07ac71076f24ab2b5cb4c7290608c0c77c3d8724d7e9d",
+    "reused": true
+  },
+  "status": "official municipal outline staging source; not a ward boundary and not yet combined with PMC"
+}

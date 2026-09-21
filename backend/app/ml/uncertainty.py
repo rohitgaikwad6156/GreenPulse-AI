@@ -39,6 +39,7 @@ def load_uncertainty_assumptions(config_path: Path = DEFAULT_CONFIG_PATH) -> dic
         high = float(thresholds["high_below"])
         medium = float(thresholds["medium_at_most"])
         cv_values = {name: float(cvs[name]) for name in SUPPORTED_INTERVENTIONS}
+        provenance = config["provenance"]
     except (KeyError, TypeError, ValueError) as exc:
         raise UncertaintyUnavailableError("Uncertainty assumptions JSON is incomplete or nonnumeric") from exc
     if (not isinstance(config.get("label"), str) or not config["label"].strip()
@@ -49,7 +50,13 @@ def load_uncertainty_assumptions(config_path: Path = DEFAULT_CONFIG_PATH) -> dic
             or any(not math.isfinite(value) or value < 0 for value in cv_values.values())
             or not isinstance(horizons, dict)
             or any(not isinstance(horizons.get(name), str) or not horizons[name].strip()
-                   for name in (*SUPPORTED_INTERVENTIONS, "tree_canopy_and_cool_roof"))):
+                   for name in (*SUPPORTED_INTERVENTIONS, "tree_canopy_and_cool_roof"))
+            or not isinstance(provenance, dict)
+            or provenance.get("evidence_status") not in {"calibration_required", "locally_calibrated", "authoritative_product"}
+            or provenance.get("coverage_validation") not in {"not_empirically_validated", "empirically_validated"}
+            or any(not isinstance(provenance.get(key), str) or not provenance[key].strip()
+                   for key in ("parameter_source", "model_error_source", "growth_horizon_source",
+                               "survival_source", "version"))):
         raise UncertaintyUnavailableError("Uncertainty assumptions JSON has invalid ranges or labels")
     return config
 
@@ -121,7 +128,10 @@ def estimate_cooling_uncertainty(mean_cooling_c: float, spatial_cv_rmse_c: float
         "sigma_model_c": model_sigma,
         "sigma_param_c": parameter_sigma,
         "sigma_total_c": total_sigma,
-        "interval_label": "Approximate nominal 90% normal-style range; coverage is not calibrated",
+        "interval_label": ("Empirically coverage-calibrated interval" if config["provenance"]["coverage_validation"] == "empirically_validated"
+                           else "Approximate nominal 90% normal-style range; coverage is not calibrated"),
+        "coverage_calibrated": config["provenance"]["coverage_validation"] == "empirically_validated",
+        "provenance": config["provenance"],
         "assumptions": {
             "label": config["label"],
             "selected_interventions": list(intervention_types),

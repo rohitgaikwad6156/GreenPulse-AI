@@ -10,7 +10,8 @@ from xgboost import XGBRegressor
 
 from .config import (CoolRoofAssumptions, TreeCanopyAssumptions,
                      cool_roof_assumptions_from_env, tree_canopy_assumptions_from_env)
-from .tree_canopy import load_saved_grid_cell, simulate_tree_canopy
+from .tree_canopy import (_resolve_capacity, assess_training_support,
+                          load_saved_grid_cell, simulate_tree_canopy)
 
 
 def _roof_modified_features(feature_names: list[str], baseline_features: dict[str, float],
@@ -75,6 +76,10 @@ def _roof_modified_features(feature_names: list[str], baseline_features: dict[st
             "existing_roof_albedo": assumptions.existing_roof_albedo,
             "cool_roof_albedo": assumptions.cool_roof_albedo,
             "k_roof_ndbi_per_retrofit_fraction": assumptions.k_roof_ndbi_per_retrofit_fraction,
+            "evidence_status": assumptions.evidence_status,
+            "provenance": {"roof_albedo": assumptions.albedo_source,
+                           "roof_to_ndbi": assumptions.ndbi_source,
+                           "aging_horizon": assumptions.aging_horizon_source},
             "ndbi_note": "k_roof is an empirical calibration parameter, not a physical law; 0 disables NDBI changes",
             "albedo_note": "Only the eligible roof fraction changes; the non-roof component of grid albedo is held fixed",
             "area_note": "Eligible roof area must be verified from roof geometry/assessment; it is not inferred from built percentage",
@@ -87,7 +92,8 @@ def _roof_modified_features(feature_names: list[str], baseline_features: dict[st
 def simulate_cool_roof(model: XGBRegressor, feature_names: list[str],
                        baseline_features: dict[str, float], retrofit_percent: float,
                        eligible_roof_area_m2: float,
-                       assumptions: CoolRoofAssumptions | None = None) -> dict:
+                       assumptions: CoolRoofAssumptions | None = None,
+                       training_distributions: dict | None = None) -> dict:
     """Re-run XGBoost after retrofitting 0–50% of eligible roof area.
 
     Area is m² within one 30 m cell; albedo and NDBI are unitless. All LST
@@ -103,6 +109,9 @@ def simulate_cool_roof(model: XGBRegressor, feature_names: list[str],
         raise ValueError("Model feature count differs from the supplied feature list")
     modified, details = _roof_modified_features(
         feature_names, baseline_features, retrofit_percent, eligible_roof_area_m2, assumptions)
+    support = assess_training_support(
+        {name: float(baseline_features[name]) for name in feature_names}, modified,
+        training_distributions)
     base_vector = np.array([[baseline_features[name] for name in feature_names]], dtype=np.float64)
     modified_vector = np.array([[modified[name] for name in feature_names]], dtype=np.float64)
     predictions = np.asarray(model.predict(np.vstack([base_vector, modified_vector])), dtype=np.float64)
@@ -118,6 +127,7 @@ def simulate_cool_roof(model: XGBRegressor, feature_names: list[str],
         "baseline_lst_c": baseline_lst, "scenario_lst_c": scenario_lst,
         "delta_lst_c": delta, "cooling_magnitude_c": max(0.0, -delta),
         "modified_features": changes, "scenario_features": modified,
+        "training_support": support,
         **details,
     }
 
@@ -127,7 +137,8 @@ def simulate_combined(model: XGBRegressor, feature_names: list[str],
                       feasible_ground_area_m2: float, retrofit_percent: float,
                       eligible_roof_area_m2: float,
                       tree_assumptions: TreeCanopyAssumptions | None = None,
-                      roof_assumptions: CoolRoofAssumptions | None = None) -> dict:
+                      roof_assumptions: CoolRoofAssumptions | None = None,
+                      training_distributions: dict | None = None) -> dict:
     """Apply canopy and roof changes to one vector, then predict jointly.
 
     The combined response comes from XGBoost on the jointly modified vector,
@@ -141,9 +152,11 @@ def simulate_combined(model: XGBRegressor, feature_names: list[str],
     if float(feasible_ground_area_m2) + float(eligible_roof_area_m2) > tree_settings.cell_area_m2 + 1e-9:
         raise ValueError("Available planting ground plus eligible roof area exceeds one grid cell")
     tree = simulate_tree_canopy(model, feature_names, baseline_features,
-                                canopy_increase_pp, feasible_ground_area_m2, tree_settings)
+                                canopy_increase_pp, feasible_ground_area_m2, tree_settings,
+                                training_distributions)
     roof = simulate_cool_roof(model, feature_names, tree["scenario_features"],
-                              retrofit_percent, eligible_roof_area_m2, roof_settings)
+                              retrofit_percent, eligible_roof_area_m2, roof_settings,
+                              training_distributions)
     combined_features = roof["scenario_features"]
     original = {name: float(baseline_features[name]) for name in feature_names}
     combined_prediction = roof["scenario_lst_c"]
@@ -169,6 +182,7 @@ def simulate_combined(model: XGBRegressor, feature_names: list[str],
         "modified_features": {name: {"baseline": original[name], "scenario": combined_features[name]}
                               for name in feature_names if combined_features[name] != original[name]},
         "scenario_features": combined_features,
+        "training_support": assess_training_support(original, combined_features, training_distributions),
         "assumptions": {
             "tree_canopy": tree["assumptions"],
             "cool_roof": roof["assumptions"],
@@ -178,30 +192,38 @@ def simulate_combined(model: XGBRegressor, feature_names: list[str],
 
 
 def simulate_saved_cool_roof(dataset_path: Path, model_path: Path, metadata_path: Path,
-                             grid_id: str, retrofit_percent: float, eligible_roof_area_m2: float,
+                             grid_id: str, retrofit_percent: float, eligible_roof_area_m2: float | None,
                              assumptions: CoolRoofAssumptions | None = None) -> dict:
     """Run a cool-roof scenario for one verified saved grid row."""
     model, names, features, metadata = load_saved_grid_cell(
         dataset_path, model_path, metadata_path, grid_id)
+    eligible, feasibility = _resolve_capacity(
+        eligible_roof_area_m2, metadata, "eligible_roof_area_m2", "eligible roof area")
     result = simulate_cool_roof(model, names, features, retrofit_percent,
-                                eligible_roof_area_m2, assumptions)
+                                eligible, assumptions, metadata["training_feature_distributions"])
     result["grid_id"] = str(grid_id)
     result["model_dataset_version"] = metadata["dataset_version"]
+    result["feasibility"] = {"eligible_roof": feasibility}
     return result
 
 
 def simulate_saved_combined(dataset_path: Path, model_path: Path, metadata_path: Path,
                             grid_id: str, canopy_increase_pp: float,
-                            feasible_ground_area_m2: float, retrofit_percent: float,
-                            eligible_roof_area_m2: float,
+                            feasible_ground_area_m2: float | None, retrofit_percent: float,
+                            eligible_roof_area_m2: float | None,
                             tree_assumptions: TreeCanopyAssumptions | None = None,
                             roof_assumptions: CoolRoofAssumptions | None = None) -> dict:
     """Run a joint canopy and roof scenario for one verified saved grid row."""
     model, names, features, metadata = load_saved_grid_cell(
         dataset_path, model_path, metadata_path, grid_id)
+    feasible, ground_source = _resolve_capacity(
+        feasible_ground_area_m2, metadata, "plantable_ground_m2", "plantable ground area")
+    eligible, roof_source = _resolve_capacity(
+        eligible_roof_area_m2, metadata, "eligible_roof_area_m2", "eligible roof area")
     result = simulate_combined(model, names, features, canopy_increase_pp,
-                               feasible_ground_area_m2, retrofit_percent,
-                               eligible_roof_area_m2, tree_assumptions, roof_assumptions)
+                               feasible, retrofit_percent, eligible, tree_assumptions,
+                               roof_assumptions, metadata["training_feature_distributions"])
     result["grid_id"] = str(grid_id)
     result["model_dataset_version"] = metadata["dataset_version"]
+    result["feasibility"] = {"plantable_ground": ground_source, "eligible_roof": roof_source}
     return result

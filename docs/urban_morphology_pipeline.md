@@ -14,7 +14,7 @@ GreenPulse AI is **An AI-powered Urban Climate Decision-Support System.** This s
 | WorldPop | `data/raw/worldpop/india_population_counts.tif` | A documented WorldPop **population counts** GeoTIFF, with people per source pixel, preferably the year closest to LST. WorldPop's [India population-count catalogue](https://hub.worldpop.org/project/categories?id=3) lists the source year, resolution, version, and whether counts are constrained. The local filename is just a convenient alias; record the exact original dataset citation and year. |
 | Optional OSM buildings | Give `--osm-buildings` a path | WGS84 polygons with a `building` tag. Use only after checking inventory completeness. |
 
-No input above is currently present in this workspace. The command will stop before creating real feature rasters. Test data live only in temporary test directories.
+WorldCover, WorldPop, and the OSM road extract are currently present and manifest-verified. The verified municipal boundary, OSM green-space extract, and real LST reference are still absent, so the command stops before creating feature rasters. Test data live only in temporary test directories.
 
 ## Grid, definitions, and resampling
 

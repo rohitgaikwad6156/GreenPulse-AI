@@ -21,6 +21,14 @@ from backend.app.simulation.tree_canopy import (
 NAMES = ["ndvi", "tree_canopy_pct", "ndvi_mean_3x3", "ndvi_mean_5x5", "ndbi"]
 
 
+def _distributions() -> dict:
+    limits = {"ndvi": (-1, 0.05, 0.8, 1), "tree_canopy_pct": (0, 5, 65, 100),
+              "ndvi_mean_3x3": (-1, 0.05, 0.8, 1), "ndvi_mean_5x5": (-1, 0.05, 0.8, 1),
+              "ndbi": (-1, -0.3, 0.5, 1)}
+    return {name: {"count": 120, "min": values[0], "p01": values[1], "p99": values[2], "max": values[3]}
+            for name, values in limits.items()}
+
+
 def _model() -> XGBRegressor:
     rng = np.random.default_rng(18)
     ndvi = rng.uniform(0.0, 0.8, 120)
@@ -88,6 +96,20 @@ class TreeCanopyTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             simulate_tree_canopy(self.model, NAMES, _features(), 10.0, float("inf"))
 
+    def test_training_support_boundary_ood_and_rejection(self):
+        distributions = _distributions()
+        typical = simulate_tree_canopy(self.model, NAMES, _features(), 10, 90,
+                                       training_distributions=distributions)
+        self.assertFalse(typical["training_support"]["is_ood"])
+        distributions["ndvi"]["p99"] = 0.35
+        warning = simulate_tree_canopy(self.model, NAMES, _features(), 10, 90,
+                                       training_distributions=distributions)
+        self.assertTrue(warning["training_support"]["is_ood"])
+        distributions["ndvi"]["max"] = 0.39
+        with self.assertRaisesRegex(ValueError, "outside observed training support"):
+            simulate_tree_canopy(self.model, NAMES, _features(), 10, 90,
+                                 training_distributions=distributions)
+
     def test_saved_real_path_contract_uses_matching_metadata(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -95,12 +117,15 @@ class TreeCanopyTests(unittest.TestCase):
             data_dir.mkdir(parents=True)
             dataset = data_dir / "greenpulse_ml_grid.parquet"
             features = _features()
-            pq.write_table(pa.table({"grid_id": ["ARTIFICIAL-CELL"],
+            pq.write_table(pa.table({"grid_id": ["ARTIFICIAL-CELL"], "plantable_ground_m2": [120.0],
                                      **{name: [value] for name, value in features.items()}}), dataset)
             (data_dir / "metadata.json").write_text(json.dumps({
                 "row_count": 1, "features": NAMES, "crs": "EPSG:32643",
                 "raster_resolution_m": 30, "date_range": "2025-03-01/2025-05-31",
-                "source": "ARTIFICIAL TEST FIXTURE"}), encoding="utf-8")
+                "source": "ARTIFICIAL TEST FIXTURE",
+                "capacity_fields": {"plantable_ground_m2": {"verification_status": "verified",
+                    "source": "ARTIFICIAL TEST FIXTURE", "method": "ARTIFICIAL TEST FIXTURE calculation",
+                    "source_sha256": "sha256:" + "0" * 64}}}), encoding="utf-8")
             model_dir = root / "models"
             model_dir.mkdir()
             model_path = model_dir / "xgboost_lst.joblib"
@@ -110,10 +135,15 @@ class TreeCanopyTests(unittest.TestCase):
                 "feature_list": NAMES, "dataset_version": "sha256:" + hashlib.sha256(dataset.read_bytes()).hexdigest(),
                 "target": "lst_c", "objective": "reg:squarederror", "dataset_rows": 1,
                 "dataset_date_range": "2025-03-01/2025-05-31", "crs": "EPSG:32643",
-                "resolution_m": 30}), encoding="utf-8")
+                "resolution_m": 30, "training_feature_distributions": _distributions(),
+                "model_artifact_sha256": "sha256:" + hashlib.sha256(model_path.read_bytes()).hexdigest()}), encoding="utf-8")
             report = simulate_saved_grid_cell(dataset, model_path, metadata_path,
                                               "ARTIFICIAL-CELL", 10.0, 90.0)
             self.assertEqual(report["grid_id"], "ARTIFICIAL-CELL")
+            derived = simulate_saved_grid_cell(dataset, model_path, metadata_path,
+                                               "ARTIFICIAL-CELL", 10.0, None)
+            self.assertEqual(derived["feasibility"]["plantable_ground"]["source_type"],
+                             "calculated_verified_spatial_input")
             with self.assertRaisesRegex(ValueError, "not found"):
                 simulate_saved_grid_cell(dataset, model_path, metadata_path, "OTHER", 10.0, 90.0)
             metadata = json.loads(metadata_path.read_text())

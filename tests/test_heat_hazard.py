@@ -49,6 +49,7 @@ def _fixture(root: Path) -> tuple[Path, Path, Path, Path, Path]:
     model_metadata = model_dir / "model_metadata.json"
     model_metadata.write_text(json.dumps({
         "target": "lst_c", "objective": "reg:squarederror", "feature_list": ["ndvi"],
+        "model_artifact_sha256": "sha256:" + hashlib.sha256(model.read_bytes()).hexdigest(),
         "dataset_version": "sha256:" + hashlib.sha256(dataset.read_bytes()).hexdigest(),
         "dataset_rows": 100, "dataset_date_range": "2025-03-01/2025-05-31",
         "crs": "EPSG:32643", "resolution_m": 30}), encoding="utf-8")
@@ -101,6 +102,20 @@ class HeatHazardTests(unittest.TestCase):
             self.assertNotIn("heat_hazard_score", json.loads(metadata.read_text()))
             with self.assertRaisesRegex(ValueError, "unavailable"):
                 score_from_model_metadata(35.0, metadata)
+
+    def test_overlapping_periurban_ids_and_stale_model_stop(self):
+        with tempfile.TemporaryDirectory() as temp:
+            dataset, model, metadata, rural, provenance = _fixture(Path(temp))
+            table = pq.read_table(rural).to_pydict()
+            table["grid_id"][0] = "ARTIFICIAL-CITY-0"
+            pq.write_table(pa.table(table), rural)
+            with self.assertRaisesRegex(ValueError, "overlapping"):
+                derive_heat_hazard_references(dataset, model, metadata, rural, provenance)
+            self.assertNotIn("heat_hazard_score", json.loads(metadata.read_text()))
+            dataset, model, metadata, rural, provenance = _fixture(Path(temp) / "stale")
+            model.write_text("CHANGED ARTIFICIAL MODEL", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "do not match"):
+                derive_heat_hazard_references(dataset, model, metadata, rural, provenance)
 
 
 if __name__ == "__main__":

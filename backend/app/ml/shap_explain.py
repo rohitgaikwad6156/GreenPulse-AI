@@ -80,7 +80,9 @@ def _load_inputs(dataset_path: Path, model_path: Path, metadata_path: Path
         report = json.loads(metadata_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError("Cannot read XGBoost model metadata") from exc
+    model_hash = f"sha256:{_sha256(model_path)}"
     if (report.get("feature_list") != names or report.get("dataset_version") != f"sha256:{_sha256(dataset_path)}"
+            or report.get("model_artifact_sha256") != model_hash
             or report.get("dataset_rows") != len(matrix) or report.get("crs") != dataset_metadata["crs"]
             or report.get("resolution_m") != dataset_metadata["raster_resolution_m"]
             or report.get("target") != "lst_c" or report.get("objective") != "reg:squarederror"):
@@ -154,6 +156,10 @@ def explain_saved_model(dataset_path: Path, model_path: Path, metadata_path: Pat
     global_report = {
         "label": "REAL DATA MODEL EXPLANATION", "method": "TreeSHAP tree_path_dependent raw regression output",
         "target": "LST", "unit": "°C", "model_dataset_version": report["dataset_version"],
+        "model_artifact_sha256": report["model_artifact_sha256"],
+        "dataset_sha256": _sha256(dataset_path),
+        "dataset_metadata_sha256": _sha256(dataset_path.with_name("metadata.json")),
+        "model_metadata_sha256": _sha256(metadata_path),
         "dataset_rows": int(len(matrix)), "sample_rows": int(len(sample)), "sample_seed": SEED,
         "baseline_lST": baseline, "feature_correlations": correlations,
         "feature_importance_bar_data": bars, "group_importance_bar_data": group_importance,
@@ -182,10 +188,16 @@ def explain_saved_model(dataset_path: Path, model_path: Path, metadata_path: Pat
                     for category in CATEGORIES]
     local_report = {
         "label": "REAL DATA MODEL EXPLANATION", "grid_id": str(grid_ids[local_index]),
+        "model_dataset_version": report["dataset_version"],
+        "model_artifact_sha256": report["model_artifact_sha256"],
+        "dataset_sha256": _sha256(dataset_path),
+        "dataset_metadata_sha256": _sha256(dataset_path.with_name("metadata.json")),
+        "model_metadata_sha256": _sha256(metadata_path),
         "baseline_lST": baseline, "predicted_lst": prediction,
         "unit": "°C", "features": feature_rows, "waterfall_data": waterfall,
         "bar_chart_data": feature_rows, "group_contributions": local_groups,
         "warming_percentage_denominator_c": positive_total,
+        "presentation_percentage_note": "warming_percentage_ui is a positive-only display share; shap_value_c is the signed raw model-output contribution used for additivity.",
         "redundancy_warning": warning if correlations["highly_redundant_pairs"] else None,
         "scientific_limit": "Feature contributions explain this fitted LST prediction; they are not causal temperature changes."
     }

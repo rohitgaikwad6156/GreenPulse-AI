@@ -56,6 +56,7 @@ def artificial_files(root: Path):
     metadata = root / "model_metadata.json"
     metadata.write_text(json.dumps({
         "feature_list": ["ndvi", "ndbi"], "dataset_version": "sha256:" + hashlib.sha256(grid.read_bytes()).hexdigest(),
+        "model_artifact_sha256": "sha256:" + hashlib.sha256(model_path.read_bytes()).hexdigest(),
         "dataset_rows": 4, "crs": "EPSG:32643", "resolution_m": 30,
         "target": "lst_c", "objective": "reg:squarederror",
     }), encoding="utf-8")

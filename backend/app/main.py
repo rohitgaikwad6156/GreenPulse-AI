@@ -36,13 +36,13 @@ def health_check() -> dict[str, str]:
 class TreeCanopyRequest(BaseModel):
     grid_id: str = Field(min_length=1)
     canopy_increase_percentage_points: float
-    feasible_ground_area_m2: float
+    feasible_ground_area_m2: float | None = None
 
 
 class CoolRoofRequest(BaseModel):
     grid_id: str = Field(min_length=1)
     retrofit_percent_of_eligible_roof: float
-    eligible_roof_area_m2: float
+    eligible_roof_area_m2: float | None = None
 
 
 class CombinedScenarioRequest(TreeCanopyRequest, CoolRoofRequest):
@@ -92,6 +92,10 @@ def tree_canopy_config() -> dict:
         "cell_area_m2": settings.cell_area_m2,
         "ndvi_per_canopy_percentage_point": settings.ndvi_per_canopy_percentage_point,
         "assumption_label": settings.assumption_label,
+        "evidence_status": settings.evidence_status,
+        "provenance": {"canopy_to_ndvi": settings.coefficient_source,
+                       "growth_horizon": settings.growth_horizon_source,
+                       "survival": settings.survival_source},
     }
 
 
@@ -132,6 +136,10 @@ def cool_roof_config() -> dict:
         "cool_roof_albedo": settings.cool_roof_albedo,
         "k_roof_ndbi_per_retrofit_fraction": settings.k_roof_ndbi_per_retrofit_fraction,
         "assumption_label": settings.assumption_label,
+        "evidence_status": settings.evidence_status,
+        "provenance": {"roof_albedo": settings.albedo_source,
+                       "roof_to_ndbi": settings.ndbi_source,
+                       "aging_horizon": settings.aging_horizon_source},
     }
 
 

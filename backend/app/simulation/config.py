@@ -24,6 +24,10 @@ class TreeCanopyAssumptions:
     ndvi_min: float = -1.0
     ndvi_max: float = 1.0
     assumption_label: str = "CONFIGURABLE EMPIRICAL MVP ASSUMPTION — REQUIRES LOCAL CALIBRATION"
+    evidence_status: str = "calibration_required"
+    coefficient_source: str = "GreenPulse configurable MVP assumption; no local or authoritative canopy-to-NDVI calibration supplied"
+    growth_horizon_source: str = "Qualitative scenario horizon only; no locally validated time-to-canopy model supplied"
+    survival_source: str = "Not modelled; no locally validated survival rate supplied"
 
     def __post_init__(self) -> None:
         numbers = (self.cell_area_m2, self.max_canopy_increase_pp,
@@ -72,6 +76,10 @@ class CoolRoofAssumptions:
     focal_3x3_valid_cells: int = 9
     focal_5x5_valid_cells: int = 25
     assumption_label: str = "ILLUSTRATIVE COOL-ROOF MVP ASSUMPTIONS — NOT PUNE MEASUREMENTS; CALIBRATION REQUIRED"
+    evidence_status: str = "calibration_required"
+    albedo_source: str = "Illustrative configurable values; no measured Pune roof-albedo dataset or selected product specification supplied"
+    ndbi_source: str = "Disabled by default; no local roof-retrofit-to-NDBI calibration supplied"
+    aging_horizon_source: str = "Qualitative comparable-season horizon only; coating aging is not modelled"
 
     def __post_init__(self) -> None:
         numeric = (self.cell_area_m2, self.max_retrofit_percent_of_eligible_roof,

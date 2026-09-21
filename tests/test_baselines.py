@@ -54,6 +54,8 @@ class BaselineTests(unittest.TestCase):
             report = evaluate_baselines(dataset, dataset.parent, output, rf_trees=8, rf_jobs=1)
             self.assertEqual(set(report["models"]), {"linear_regression", "decision_tree", "random_forest"})
             self.assertTrue(report["same_saved_folds_for_every_model"])
+            self.assertTrue(report["dataset_checksum"].startswith("sha256:"))
+            self.assertEqual(report["reproducibility_seed"], 42)
             validation_patterns = []
             for model in report["models"].values():
                 self.assertEqual(len(model["folds"]), 5)
@@ -98,6 +100,18 @@ class BaselineTests(unittest.TestCase):
             values["validation_fold"][0] = 1 + values["validation_fold"][0] % 5
             pq.write_table(pa.table(values), mapping)
             with self.assertRaisesRegex(ValueError, "mapping differs from metadata"):
+                evaluate_baselines(dataset, dataset.parent, root / "models" / "baseline_metrics.json",
+                                   rf_trees=5, rf_jobs=1)
+
+    def test_changed_dataset_bytes_are_rejected_by_saved_cv(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            dataset = _artificial_dataset(root)
+            table = pq.read_table(dataset)
+            values = table.to_pydict()
+            values["lst_c"][0] += 0.01
+            pq.write_table(pa.table(values), dataset)
+            with self.assertRaisesRegex(ValueError, "Saved CV metadata disagrees"):
                 evaluate_baselines(dataset, dataset.parent, root / "models" / "baseline_metrics.json",
                                    rf_trees=5, rf_jobs=1)
 

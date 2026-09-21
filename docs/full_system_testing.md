@@ -97,8 +97,9 @@ At this step, the real ML grid, trained Pune/PCMC model, and calibrated
 location-specific intervention benefits are not available. The automated
 integration path passes on labelled synthetic fixtures. A live municipal
 end-to-end acceptance run remains pending until verified source artifacts and
-post-implementation observations exist. The dedicated Root Cause Analysis
-page is pending even though the SHAP API and map factor summary are present.
+post-implementation observations exist. The Root Cause Analysis page is wired
+to `POST /api/explain` and reports explicit unavailable states until the real
+ML grid and matching model are present.
 
 LST is not 2 m air temperature. TreeSHAP does not prove causation. DiD needs
 parallel-trends and confounding review. MILP optimality holds only under the

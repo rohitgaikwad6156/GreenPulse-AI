@@ -97,7 +97,10 @@ def derive_heat_hazard_references(dataset_path: Path, model_path: Path,
         model_metadata = json.loads(model_metadata_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError("Cannot read model metadata") from exc
+    model_hash = f"sha256:{_sha256(model_path)}"
+    source_metadata_hash = _sha256(model_metadata_path)
     if (model_metadata.get("dataset_version") != f"sha256:{_sha256(dataset_path)}"
+            or model_metadata.get("model_artifact_sha256") != model_hash
             or model_metadata.get("feature_list") != features
             or model_metadata.get("dataset_rows") != len(observed)
             or model_metadata.get("target") != "lst_c"
@@ -134,7 +137,10 @@ def derive_heat_hazard_references(dataset_path: Path, model_path: Path,
         "hot_reference_lst_c": hot, "hot_reference_method": "95th percentile observed QA-valid municipal LST",
         "hot_reference_percentile": 95, "hot_reference_rows": int(len(observed)),
         "hot_reference_dataset_sha256": _sha256(dataset_path),
+        "hot_reference_dataset_metadata_sha256": _sha256(dataset_path.with_name("metadata.json")),
         "model_dataset_version": model_metadata["dataset_version"],
+        "model_artifact_sha256": model_hash,
+        "source_model_metadata_sha256": source_metadata_hash,
         "reference_date_range": date_range,
         "calibrated_at_utc": datetime.now(timezone.utc).isoformat(),
         "interpretation": "0 is at or below the observed peri-urban median; 100 is at or above the observed municipal summer 95th percentile; intermediate values linearly locate predicted LST between them.",

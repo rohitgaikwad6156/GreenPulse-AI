@@ -2,7 +2,7 @@
 
 GreenPulse AI is **An AI-powered Urban Climate Decision-Support System.** This step creates a table with **one row per 30 m × 30 m cell** and a continuous observed **land surface temperature target, `lst_c` in °C**. It performs no ML training. LST is land skin temperature, not pedestrian air temperature.
 
-The project currently has **no real LST, NDVI/NDBI, morphology rasters, or verified ward boundaries**, so the real Parquet and metadata cannot yet be generated. Tests use temporary **ARTIFICIAL TEST FIXTURES** and never save synthetic rows to the real processed-data paths.
+The project currently has **no real LST, NDVI/NDBI, morphology rasters, or verified ward boundaries**, so the real Parquet and metadata cannot yet be generated. WorldCover, WorldPop, and OSM roads are locally verified inputs but cannot produce the dependent grid alone. Tests use temporary **ARTIFICIAL TEST FIXTURES** and never save synthetic rows to the real processed-data paths.
 
 ## Required inputs
 
@@ -31,6 +31,7 @@ The LST, NDVI, and NDBI raster `period` tags must all be identical and exactly `
 6. Generate the fixed `grid_id` from the 30 m UTM lattice, compute x/y at the cell centre, and transform that centre to WGS84 latitude/longitude. IDs and coordinates are **metadata**, not default ML predictors.
 7. Apply a **complete-case policy** for this first table: keep a cell only if LST, every required feature (including focal means and population density), and a unique ward assignment are present. Do not impute, replace missing with zero, or substitute DEMO DATA. Missing counts for each source and sequential exclusions are recorded before rows are dropped. This policy can reduce coverage and create spatial selection bias; inspect the counts and map retained cells before training.
 8. Calculate Pearson correlations on retained features and flag pairs with `|r| ≥ 0.85`. Also report variance inflation factors above 5 as a multicollinearity screen. These are descriptive; no predictors are automatically dropped, and neither correlation nor VIF proves a causal temperature driver. Correlated NDVI/canopy or NDBI/built-up variables may split future model attribution.
+9. Write a complete-case coverage map distinguishing retained cells, missing LST, missing predictors, and unassigned/ambiguous wards. Metadata records overall and per-ward retention percentages so spatial selection bias is visible rather than hidden by a single final row count. Grid IDs are generated once from unique raster row/column positions and the output reports zero duplicates.
 
 `population_density` is included because this Step 12 request lists it among features. It remains a coarser, modelled exposure estimate, and the choice to use it as an LST predictor should be revisited during spatial validation. Optional albedo is **omitted as a column** when no defensible source is provided.
 
@@ -57,6 +58,7 @@ To include an independently documented albedo raster, add `--albedo` with that r
 - `data/processed/greenpulse_ml_grid.parquet`: one row per retained 30 m cell, target plus requested features and metadata. The Parquet file has no geometry column; `grid_id` and coordinates link it to the raster grid and wards. [Pandas/Arrow Parquet documentation](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_parquet.html) describes the format.
 - `data/processed/metadata.json`: CRS, 30 m resolution, March–May date range, all source layer paths and tags, original morphology provenance, row count, per-column missing counts, sequential rejection counts, ward ambiguity, missing-data policy, correlations, VIF, and scientific cautions.
 - `data/processed/greenpulse_ml_correlations.png`: feature-correlation QC plot.
+- `data/processed/greenpulse_ml_coverage.png`: complete-case retention/exclusion map for spatial selection-bias review.
 - `data/processed/greenpulse_ml_grid_sample.csv`: up to 200 retained rows by default, solely for manual inspection. The Parquet is the authoritative table.
 
 Expected table columns are `grid_id`, `x`, `y`, `latitude`, `longitude`, `ward_id`, `ward_name`, `lst_c`, `ndvi`, `ndbi`, `tree_canopy_pct`, `built_pct`, `road_density`, `distance_green_m`, `population_density`, `ndvi_mean_3x3`, `ndvi_mean_5x5`, `ndbi_mean_3x3`, `ndbi_mean_5x5`, plus `albedo` only when supplied.

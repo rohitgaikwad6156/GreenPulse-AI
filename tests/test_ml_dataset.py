@@ -112,6 +112,10 @@ class MlDatasetTests(unittest.TestCase):
             self.assertTrue(metadata.is_file())
             self.assertTrue(output.with_name("greenpulse_ml_grid_sample.csv").is_file())
             self.assertTrue(output.with_name("greenpulse_ml_correlations.png").is_file())
+            self.assertTrue(output.with_name("greenpulse_ml_coverage.png").is_file())
+            self.assertEqual(report["duplicate_grid_ids"], 0)
+            self.assertGreater(report["complete_case_retention_percent"], 0)
+            self.assertEqual(set(report["complete_case_retention_by_ward"]), {"PMC:1", "PCMC:1"})
             self.assertTrue(report["severe_pairwise_correlations_abs_r_ge_0_85"])
 
     def test_misaligned_source_is_rejected_before_output(self):

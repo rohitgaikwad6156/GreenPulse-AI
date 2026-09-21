@@ -46,6 +46,7 @@ def _fixture(root: Path) -> tuple[Path, Path, Path]:
     joblib.dump(model, model_path)
     metadata_path.write_text(json.dumps({
         "feature_list": names, "dataset_version": "sha256:" + hashlib.sha256(dataset.read_bytes()).hexdigest(),
+        "model_artifact_sha256": "sha256:" + hashlib.sha256(model_path.read_bytes()).hexdigest(),
         "dataset_rows": n, "crs": "EPSG:32643", "resolution_m": 30,
         "target": "lst_c", "objective": "reg:squarederror"}), encoding="utf-8")
     return dataset, model_path, metadata_path
@@ -61,6 +62,8 @@ class TreeShapTests(unittest.TestCase):
                                                        "ARTIFICIAL-7", output, sample_size=80)
             self.assertEqual(global_report["sample_rows"], 80)
             self.assertEqual(global_report["target"], "LST")
+            self.assertEqual(global_report["unit"], "°C")
+            self.assertTrue(global_report["model_artifact_sha256"].startswith("sha256:"))
             self.assertEqual(len(global_report["feature_importance_bar_data"]), 5)
             self.assertTrue(any(pair["feature_a"] == "ndvi" and pair["feature_b"] == "ndvi_mean_3x3"
                                 for pair in global_report["feature_correlations"]["highly_redundant_pairs"]))
@@ -73,6 +76,7 @@ class TreeShapTests(unittest.TestCase):
                              local["baseline_lST"] + sum(row["shap_value_c"] for row in local["features"]))
             self.assertTrue(all(row["warming_percentage_ui"] == 0 for row in local["features"]
                                 if row["direction"] != "warming"))
+            self.assertIn("positive-only display share", local["presentation_percentage_note"])
             for filename in ("shap_global.json", "shap_local.json", "shap_global_importance.png",
                              "shap_local_waterfall.png"):
                 self.assertTrue((output / filename).is_file())
@@ -86,6 +90,15 @@ class TreeShapTests(unittest.TestCase):
             report = json.loads(metadata.read_text())
             report["dataset_version"] = "sha256:wrong"
             metadata.write_text(json.dumps(report))
+            with self.assertRaisesRegex(ValueError, "does not match"):
+                explain_saved_model(dataset, model, metadata, "ARTIFICIAL-0", root / "out")
+
+    def test_stale_model_artifact_stops_before_explanation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            dataset, model, metadata = _fixture(root)
+            with model.open("ab") as stream:
+                stream.write(b"stale")
             with self.assertRaisesRegex(ValueError, "does not match"):
                 explain_saved_model(dataset, model, metadata, "ARTIFICIAL-0", root / "out")
 

@@ -99,19 +99,19 @@ class SimulateRequest(GridIdRequest):
     def validate_scenario(self) -> "SimulateRequest":
         tree = self.scenario_type in {"tree_canopy", "combined"}
         roof = self.scenario_type in {"cool_roof", "combined"}
-        if tree and (self.canopy_increase_percentage_points is None
-                     or self.feasible_ground_area_m2 is None):
-            raise ValueError("Tree scenarios need canopy increase and feasible ground area")
-        if roof and (self.retrofit_fraction is None or self.eligible_roof_area_m2 is None):
-            raise ValueError("Roof scenarios need retrofit fraction and eligible roof area")
+        if tree and self.canopy_increase_percentage_points is None:
+            raise ValueError("Tree scenarios need a canopy increase")
+        if roof and self.retrofit_fraction is None:
+            raise ValueError("Roof scenarios need a retrofit fraction")
         if not tree and (self.canopy_increase_percentage_points is not None
                          or self.feasible_ground_area_m2 is not None):
             raise ValueError("Tree fields are only valid for tree or combined scenarios")
         if not roof and (self.retrofit_fraction is not None
                          or self.eligible_roof_area_m2 is not None):
             raise ValueError("Roof fields are only valid for roof or combined scenarios")
-        if self.scenario_type == "combined" and (
-            self.feasible_ground_area_m2 + self.eligible_roof_area_m2 > 900):
+        if (self.scenario_type == "combined" and self.feasible_ground_area_m2 is not None
+                and self.eligible_roof_area_m2 is not None and
+                self.feasible_ground_area_m2 + self.eligible_roof_area_m2 > 900):
             raise ValueError("Ground plus eligible roof area cannot exceed one 900 m² grid cell")
         return self
 

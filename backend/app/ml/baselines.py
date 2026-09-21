@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import platform
 import tempfile
 from pathlib import Path
 
@@ -23,7 +24,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeRegressor
 
-from backend.app.ml.spatial_cv import SpatialBlockCV, load_cv_assignment, summarize_blocks
+from backend.app.ml.spatial_cv import SpatialBlockCV, load_cv_assignment, sha256_file, summarize_blocks
 
 TARGET = "lst_c"
 RANDOM_STATE = 42
@@ -165,12 +166,14 @@ def evaluate_baselines(dataset_path: Path, cv_dir: Path, output_path: Path,
         results[name] = {"folds": per_fold, "summary": summary}
     report = {"system": "GreenPulse AI — An AI-powered Urban Climate Decision-Support System",
               "target": "lst_c", "target_units": "degrees Celsius, land surface temperature",
-              "dataset": str(dataset_path), "dataset_date_range": metadata.get("date_range"),
+              "dataset": str(dataset_path), "dataset_checksum": sha256_file(dataset_path),
+              "dataset_date_range": metadata.get("date_range"),
               "dataset_rows": int(target.size), "feature_names": feature_names,
               "cv_block_mapping": str(cv_dir / "spatial_cv_blocks.parquet"),
               "cv_metadata": str(cv_dir / "spatial_cv_metadata.json"),
               "cv_folds": assignment.n_folds, "cv_block_size_m": assignment.block_size_m,
               "same_saved_folds_for_every_model": True,
+              "reproducibility_seed": RANDOM_STATE,
               "metric_definitions": {"mae_c": "mean(abs(y_true-y_pred))",
                                      "rmse_c": "sqrt(mean((y_true-y_pred)^2))",
                                      "r2": "1-sum((y_true-y_pred)^2)/sum((y_true-mean(y_true))^2)"},
@@ -184,7 +187,8 @@ def evaluate_baselines(dataset_path: Path, cv_dir: Path, output_path: Path,
                                                         "min_samples_leaf": MIN_SAMPLES_LEAF,
                                                         "random_state": RANDOM_STATE,
                                                         "n_jobs": rf_jobs}},
-              "software": {"scikit_learn": sklearn.__version__, "numpy": np.__version__},
+              "software": {"python": platform.python_version(), "scikit_learn": sklearn.__version__,
+                           "numpy": np.__version__, "pyarrow": pa.__version__},
               "models": results,
               "scientific_limitations": ["Nearby 5 km blocks can still be spatially dependent at their borders.",
                                          "Landsat LST is not pedestrian air temperature.",

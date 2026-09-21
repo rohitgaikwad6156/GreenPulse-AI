@@ -109,8 +109,11 @@ class Sentinel2IndicesTests(unittest.TestCase):
             t20 = from_origin(transform.c, transform.f, 20, 20)
             for band, value in (("B04", 3000), ("B08", 7000)):
                 _write_raster(granule / "R10m" / f"TEST_{band}_10m.jp2", np.full(shape10, value, dtype=np.uint16), t10, driver="JP2OpenJPEG")
-            for band, value in (("B11", 5000), ("SCL", 5)):
-                _write_raster(granule / "R20m" / f"TEST_{band}_20m.jp2", np.full(shape20, value, dtype=np.uint16), t20, driver="JP2OpenJPEG")
+            _write_raster(granule / "R20m" / "TEST_B11_20m.jp2",
+                          np.full(shape20, 5000, dtype=np.uint16), t20, driver="JP2OpenJPEG")
+            # Real L2A SCL products may be uint8; the fixture exercises that production dtype.
+            _write_raster(granule / "R20m" / "TEST_SCL_20m.jp2",
+                          np.full(shape20, 5, dtype=np.uint8), t20, driver="JP2OpenJPEG")
             found = discover_granules(root / "raw", 2025)
             self.assertEqual(len(found), 1)
             ndvi, ndbi, nv, nb, used = build_composites(found, transform, height, width, inside)

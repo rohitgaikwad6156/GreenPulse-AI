@@ -56,7 +56,7 @@ The command prints one MAE, RMSE, and R² mean ± standard deviation line per mo
 
 ## Expected outputs after a successful real-data run
 
-- `models/baseline_metrics.json`: input table and fold-map paths, continuous target and units, feature list, fixed model settings, software versions, five held-out metric triplets per model, and mean ± sample standard deviation for each metric.
+- `models/baseline_metrics.json`: input table path and SHA-256 checksum, fold-map path, reproducibility seed, continuous target and units, feature list, fixed model settings, software versions, five held-out metric triplets per model, and mean ± sample standard deviation for each metric.
 - `models/baseline_comparison.png`: side-by-side MAE, RMSE, and R² comparison panels with individual fold values.
 
 The evaluator saves **metrics only**. It does not save or deploy fitted baseline models; a later training/deployment step should explicitly choose how to fit a final model after spatial evaluation.

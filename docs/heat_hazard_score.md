@@ -17,7 +17,7 @@ The existing municipal ML table contains only PMC/PCMC wards, so it cannot estab
 ## Required real input files
 
 1. `data/processed/greenpulse_ml_grid.parquet` and `data/processed/metadata.json` from Step 12, containing observed `lst_c`, grid IDs, and the March–May period.
-2. `models/xgboost_lst.joblib` and `models/model_metadata.json` from Step 15, matching the table hash, target, features, CRS, resolution, and date range.
+2. `models/xgboost_lst.joblib` and `models/model_metadata.json` from Step 15, matching the model-artifact hash, table hash, target, features, CRS, resolution, and date range. Calibration rejects a stale or substituted model.
 3. `data/processed/periurban_lst_reference.parquet`, containing `grid_id` and `lst_c` columns of observed, QA-valid LST cells outside the municipal grid. IDs must be unique and must not overlap municipal IDs.
 4. `data/processed/periurban_lst_reference_metadata.json`, documenting `source_organization`, `source_product`, `source_scene_or_composite`, `periurban_area_definition`, `area_boundary_source`, `qa_mask_method`, `temperature_variable` (`land_surface_temperature`), `units` (`degC`), `date_range` (identical to the municipal March–May period), and `region` (`Pune rural/peri-urban outside PMC/PCMC`). This provenance is supplied by the data preparer; the code checks its presence and ID separation but cannot independently prove the selected geography is truly rural. Inspect the polygon/source before using the score publicly.
 
@@ -31,12 +31,12 @@ From the `GreenPulse-AI` root, after all required real files exist:
 .\.venv\Scripts\python.exe scripts\calibrate_heat_hazard.py
 ```
 
-The script prints the **calculated** background median, municipal 95th percentile, period, and metadata path. It writes a `heat_hazard_score` object into `models/model_metadata.json`, preserving the XGBoost target and training metrics. That object stores both temperatures, methods, row counts, file hashes, provenance, date range, formula, interpretation, and limitations. If real references are absent or invalid, calibration stops and does not create a numeric score.
+The script prints the **calculated** background median, municipal 95th percentile, period, and metadata path. It writes a `heat_hazard_score` object into `models/model_metadata.json`, preserving the XGBoost target and training metrics. That object stores both temperatures, methods, row counts, model/dataset/peri-urban/provenance hashes, the source model-metadata hash, date range, formula, interpretation, and limitations. If real references are absent, overlap the municipal grid, have a mismatched season, or belong to a stale model, calibration stops and does not create a numeric score.
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest tests.test_heat_hazard -v
 ```
 
-Expected: four passing tests, all based on **ARTIFICIAL TEST FIXTURES** in temporary directories. Their numbers are formula checks, not Pune measurements.
+Expected: five passing tests, all based on **ARTIFICIAL TEST FIXTURES** in temporary directories. They cover formula behavior, mismatched seasons, overlapping peri-urban IDs, and stale model artifacts. Their numbers are formula checks, not Pune measurements.
 
 The Overview dashboard currently shows an empty Heat Hazard Score card. A numeric cell score can be displayed only after the real model predicts that cell's LST and the metadata contains calibrated references. No XGBoost retraining or score-target training occurs in this step.

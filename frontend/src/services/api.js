@@ -63,6 +63,13 @@ export async function getMapWardDetail(wardId, signal) {
   return response.data;
 }
 
+export async function explainGridCell(gridId, signal) {
+  requireApiBaseUrl();
+  const response = await api.post("/api/explain", { grid_id: gridId, sample_size: 2000 },
+    { signal, timeout: 120000 });
+  return response.data;
+}
+
 export async function simulateScenario(payload, signal) {
   requireApiBaseUrl();
   const response = await api.post("/api/simulate", payload, { signal, timeout: 30000 });

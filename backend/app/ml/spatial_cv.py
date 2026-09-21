@@ -7,8 +7,10 @@ EPSG:32643, as in GreenPulse's 30 m ML Parquet table.
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 import os
+import platform
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,6 +28,15 @@ from matplotlib.patches import Patch, Rectangle
 BLOCK_SIZE_M = 5000.0
 N_FOLDS = 5
 EXPECTED_CRS = "EPSG:32643"
+
+
+def sha256_file(path: Path) -> str:
+    """Return a provenance-ready SHA-256 for an immutable dataset artifact."""
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return "sha256:" + digest.hexdigest()
 
 
 @dataclass(frozen=True)
@@ -215,7 +226,8 @@ def build_cv_artifacts(dataset_path: Path, output_dir: Path,
     for _ in SpatialBlockCV(assignment).split():
         pass
     blocks, folds = summarize_blocks(assignment)
-    report = {"source_dataset": str(dataset_path), "source_metadata": str(metadata_path),
+    report = {"source_dataset": str(dataset_path), "source_dataset_checksum": sha256_file(dataset_path),
+              "source_metadata": str(metadata_path),
               "crs": EXPECTED_CRS, "block_size_m": assignment.block_size_m,
               "x_min": assignment.x_min, "y_min": assignment.y_min,
               "formula": "block_x=floor((x-x_min)/block_size_m); block_y=floor((y-y_min)/block_size_m)",
@@ -223,6 +235,8 @@ def build_cv_artifacts(dataset_path: Path, output_dir: Path,
               "row_count": int(table.num_rows), "unique_blocks": len(blocks),
               "fold_summary": folds, "block_overlap_between_train_and_validation": False,
               "method": "deterministic GroupKFold-equivalent, greedy balance by populated row count",
+              "software": {"python": platform.python_version(), "numpy": np.__version__,
+                           "pyarrow": pa.__version__},
               "caution": "Adjacent blocks can remain spatially correlated; assess a held-out buffer or larger blocks before claiming strict geographic transfer."}
     output_dir.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="greenpulse_cv_", dir=output_dir) as temporary:
@@ -258,6 +272,7 @@ def load_cv_assignment(x: object, y: object, dataset_path: Path,
     except (OSError, json.JSONDecodeError, pa.ArrowException) as exc:
         raise ValueError("Cannot read saved spatial CV artifacts") from exc
     if (Path(report.get("source_dataset", "")).resolve() != dataset_path.resolve()
+            or report.get("source_dataset_checksum") != sha256_file(dataset_path)
             or report.get("crs") != EXPECTED_CRS
             or report.get("n_folds") != N_FOLDS
             or report.get("block_size_m") != BLOCK_SIZE_M

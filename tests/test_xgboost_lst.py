@@ -1,6 +1,7 @@
 """All model tests use ARTIFICIAL TEST FIXTURES in temporary directories."""
 
 import json
+import hashlib
 import math
 import tempfile
 import unittest
@@ -55,6 +56,14 @@ class XgboostLstTests(unittest.TestCase):
             self.assertEqual(report["resolution_m"], 30)
             self.assertEqual(report["crs"], "EPSG:32643")
             self.assertTrue(report["dataset_version"].startswith("sha256:"))
+            self.assertEqual(report["model_artifact_sha256"],
+                             "sha256:" + hashlib.sha256(model_path.read_bytes()).hexdigest())
+            self.assertEqual(report["reproducibility_seed"], 42)
+            self.assertEqual(set(report["training_feature_distributions"]), {"ndvi", "ndbi"})
+            self.assertLessEqual(report["training_feature_distributions"]["ndvi"]["min"],
+                                 report["training_feature_distributions"]["ndvi"]["p01"])
+            self.assertIn("valid_intervention_ranges", report["scenario_support_policy"])
+            self.assertEqual(report["final_model_configuration"]["random_state"], 42)
             self.assertEqual(len(report["outer_fold_results"]), 5)
             self.assertEqual(sum(fold["validation_rows"] for fold in report["outer_fold_results"]), 180)
             for fold in report["outer_fold_results"]:

@@ -185,10 +185,12 @@ def index_from_reflectance(numerator_a: np.ndarray, numerator_b: np.ndarray, val
     return result
 
 
-def _read_vrt(path: Path, transform: Affine, height: int, width: int, window: Window, resampling: Resampling) -> np.ndarray:
+def _read_vrt(path: Path, transform: Affine, height: int, width: int, window: Window,
+              resampling: Resampling, allowed_dtypes: tuple[str, ...] = ("uint16",)) -> np.ndarray:
     with rasterio.open(path) as source:
-        if source.count != 1 or source.crs is None or source.dtypes[0] != "uint16":
-            raise ValueError(f"Expected georeferenced single-band uint16 Sentinel-2 JP2: {path}")
+        if source.count != 1 or source.crs is None or source.dtypes[0] not in allowed_dtypes:
+            expected = "/".join(allowed_dtypes)
+            raise ValueError(f"Expected georeferenced single-band {expected} Sentinel-2 JP2: {path}")
         with WarpedVRT(source, crs=TARGET_CRS, transform=transform, width=width, height=height,
                        src_nodata=0, nodata=0, resampling=resampling) as vrt:
             return vrt.read(1, window=window)
@@ -232,7 +234,8 @@ def granule_indices(granule: Granule, transform: Affine, height: int, width: int
         win20 = Window(0, start20, width20, rows20)
         b4_10 = _read_vrt(granule.bands["B04"], transform10, height * 3, width * 3, win10, Resampling.nearest)
         b8_10 = _read_vrt(granule.bands["B08"], transform10, height * 3, width * 3, win10, Resampling.nearest)
-        scl10 = _read_vrt(granule.bands["SCL"], transform10, height * 3, width * 3, win10, Resampling.nearest)
+        scl10 = _read_vrt(granule.bands["SCL"], transform10, height * 3, width * 3, win10,
+                          Resampling.nearest, ("uint8", "uint16"))
         red = boa_reflectance(b4_10, granule.offsets["B04"], granule.quantification)
         nir10 = boa_reflectance(b8_10, granule.offsets["B08"], granule.quantification)
         ndvi_block = index_from_reflectance(nir10, red, np.isin(scl10, VALID_SCL))
@@ -241,7 +244,8 @@ def granule_indices(granule: Granule, transform: Affine, height: int, width: int
 
         b8_20 = _read_vrt(granule.bands["B08"], transform20, height20, width20, win20, Resampling.average)
         b11_20 = _read_vrt(granule.bands["B11"], transform20, height20, width20, win20, Resampling.nearest)
-        scl20 = _read_vrt(granule.bands["SCL"], transform20, height20, width20, win20, Resampling.nearest)
+        scl20 = _read_vrt(granule.bands["SCL"], transform20, height20, width20, win20,
+                          Resampling.nearest, ("uint8", "uint16"))
         nir20 = boa_reflectance(b8_20, granule.offsets["B08"], granule.quantification)
         swir20 = boa_reflectance(b11_20, granule.offsets["B11"], granule.quantification)
         ndbi_block = index_from_reflectance(swir20, nir20, np.isin(scl20, VALID_SCL))

@@ -86,11 +86,16 @@ function Selection({ selected, detail }) {
         <span className="truncate text-[#64796a]">{factor.feature.replaceAll("_", " ")}</span>
         <span className={`shrink-0 font-semibold ${factor.mean_shap_value_c > 0 ? "text-[#b45e4a]" : "text-[#337f76]"}`}>
           {factor.mean_shap_value_c > 0 ? "+" : ""}{factor.mean_shap_value_c.toFixed(2)}°C</span></div>)}</div></div>
-    {value.selection_type === "grid_cell" && <Link
-      to={`/scenario-simulator?grid_id=${encodeURIComponent(value.grid_id)}`}
-      className="block rounded-lg bg-[#397a50] px-3 py-2.5 text-center text-xs font-semibold text-white hover:bg-[#2d6842]">
-      Simulate an intervention for this cell
-    </Link>}
+    {value.selection_type === "grid_cell" && <div className="grid gap-2">
+      <Link to={`/root-cause?grid_id=${encodeURIComponent(value.grid_id)}`}
+        className="block rounded-lg border border-[#b9d3bd] bg-[#f2f8f1] px-3 py-2.5 text-center text-xs font-semibold text-[#2f6c45] hover:bg-[#e8f3e8] focus:outline-none focus:ring-2 focus:ring-[#6d9d79]">
+        Explain this prediction
+      </Link>
+      <Link to={`/scenario-simulator?grid_id=${encodeURIComponent(value.grid_id)}`}
+        className="block rounded-lg bg-[#397a50] px-3 py-2.5 text-center text-xs font-semibold text-white hover:bg-[#2d6842] focus:outline-none focus:ring-2 focus:ring-[#6d9d79]">
+        Simulate an intervention for this cell
+      </Link>
+    </div>}
   </div>;
 }
 

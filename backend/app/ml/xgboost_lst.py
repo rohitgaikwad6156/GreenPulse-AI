@@ -10,6 +10,7 @@ import hashlib
 import json
 import math
 import os
+import platform
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -21,6 +22,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import optuna
+import pyarrow
 import sklearn
 import xgboost
 from optuna.samplers import TPESampler
@@ -34,6 +36,20 @@ DEFAULT_TRIALS = 8
 DEFAULT_INNER_FOLDS = 3
 SEED = 42
 METRICS = ("mae_c", "rmse_c", "r2")
+
+
+def _training_feature_distributions(matrix: np.ndarray, names: list[str]) -> dict[str, dict]:
+    """Return deterministic finite training support used by scenario guards."""
+    return {name: {
+        "count": int(matrix.shape[0]),
+        "min": float(np.min(matrix[:, index])),
+        "p01": float(np.quantile(matrix[:, index], 0.01)),
+        "p05": float(np.quantile(matrix[:, index], 0.05)),
+        "median": float(np.median(matrix[:, index])),
+        "p95": float(np.quantile(matrix[:, index], 0.95)),
+        "p99": float(np.quantile(matrix[:, index], 0.99)),
+        "max": float(np.max(matrix[:, index])),
+    } for index, name in enumerate(names)}
 
 
 def _sha256(path: Path) -> str:
@@ -100,6 +116,7 @@ def _load_baselines(path: Path, dataset_path: Path, cv_dir: Path,
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError(f"Cannot read baseline metrics: {path}") from exc
     if (Path(report.get("dataset", "")).resolve() != dataset_path.resolve()
+            or report.get("dataset_checksum") != f"sha256:{_sha256(dataset_path)}"
             or Path(report.get("cv_block_mapping", "")).resolve() != (cv_dir / "spatial_cv_blocks.parquet").resolve()
             or report.get("dataset_rows") != row_count
             or report.get("feature_names") != features
@@ -203,10 +220,23 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
         "prediction_equation": "y_hat_i = sum(k=1..K) f_k(x_i)",
         "target": "lst_c", "target_units": "degrees Celsius, land surface temperature",
         "feature_list": feature_names,
+        "reproducibility_seed": SEED,
         "training_date_utc": datetime.now(timezone.utc).isoformat(),
         "dataset_version": f"sha256:{dataset_hash}",
         "dataset_path": str(dataset_path), "dataset_date_range": dataset_metadata.get("date_range"),
         "dataset_rows": int(len(target)), "dataset_metadata_path": str(dataset_path.with_name("metadata.json")),
+        "training_feature_distributions": _training_feature_distributions(features, feature_names),
+        "scenario_support_policy": {
+            "hard_bounds": "reject any modified model feature outside the observed training min/max",
+            "typical_bounds": "prominently flag modified features outside the observed training p01/p99",
+            "valid_intervention_ranges": {
+                "tree_canopy_increase_percentage_points": {"min": 0.0, "configured_max": 40.0},
+                "cool_roof_retrofit_fraction_of_eligible_roof": {"min": 0.0, "configured_max": 0.5},
+                "plantable_ground_area_m2": {"min": 0.0, "cell_max": 900.0},
+                "eligible_roof_area_m2": {"min": 0.0, "cell_max": 900.0},
+            },
+            "evidence_status": "training-distribution guard only; intervention transformations require separate calibration",
+        },
         "crs": dataset_metadata["crs"], "resolution_m": dataset_metadata["raster_resolution_m"],
         "spatial_validation_method": "Saved 5 km 5-fold outer block holdouts; Optuna inner GroupKFold by the same blocks",
         "outer_folds": assignment.n_folds, "block_size_m": assignment.block_size_m,
@@ -225,11 +255,15 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
                                     "colsample_bytree": "0.6..1.0", "gamma": "0..5",
                                     "reg_alpha": "1e-6..10 log", "reg_lambda": "1e-3..20 log"}},
         "final_hyperparameters": final_params,
+        "final_model_configuration": {"objective": "reg:squarederror", "tree_method": "hist",
+                                      "random_state": SEED, "n_jobs": jobs, **final_params},
         "baseline_metrics_path": str(baseline_metrics_path),
         "baseline_comparison": {name: baselines["models"][name]["summary"]
                                 for name in ("linear_regression", "decision_tree", "random_forest")},
-        "software": {"xgboost": xgboost.__version__, "optuna": optuna.__version__,
-                     "scikit_learn": sklearn.__version__, "numpy": np.__version__},
+        "software": {"python": platform.python_version(), "xgboost": xgboost.__version__,
+                     "optuna": optuna.__version__, "scikit_learn": sklearn.__version__,
+                     "numpy": np.__version__, "pyarrow": pyarrow.__version__,
+                     "joblib": joblib.__version__},
         "scientific_limitations": ["30 m LST cells share a coarser thermal footprint; adjacent outer blocks can still be correlated.",
                                    "The complete-case input may overrepresent clear and well-mapped places.",
                                    "Outer metrics estimate the nested tuning procedure, not final full-data in-sample fit.",
@@ -243,6 +277,7 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
         temporary_metadata = folder / metadata_path.name
         temporary_plot = folder / plot_path.name
         joblib.dump(final_model, temporary_model)
+        report["model_artifact_sha256"] = f"sha256:{_sha256(temporary_model)}"
         # Check that the saved artifact reproduces the in-memory estimator.
         restored = joblib.load(temporary_model)
         probe = features[: min(5, len(features))]

@@ -1,0 +1,13 @@
+{
+  "source_organization": "ESA WorldCover Consortium",
+  "source_url": "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N18E072_Map.tif",
+  "product": "ESA WorldCover 10m 2021 v200 N18E072",
+  "license": "CC BY 4.0",
+  "file": {
+    "path": "data/raw/worldcover/ESA_WorldCover_10m_2021_v200_N18E072_Map.tif",
+    "url": "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N18E072_Map.tif",
+    "bytes": 125766199,
+    "checksum": "sha256:2d28650e0eba865efb08656e45b75a269eaf535f9260a245ae5aad72ee5a5c63",
+    "reused": true
+  }
+}

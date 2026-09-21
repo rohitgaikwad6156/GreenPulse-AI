@@ -1,5 +1,14 @@
 {
   "label": "CONFIGURABLE MVP UNCERTAINTY ASSUMPTIONS — NOT EMPIRICALLY CALIBRATED FOR PUNE",
+  "provenance": {
+    "evidence_status": "calibration_required",
+    "parameter_source": "GreenPulse configurable MVP assumptions; no Pune intervention-error calibration dataset supplied",
+    "model_error_source": "Mean held-out XGBoost RMSE across five 5 km spatial CV folds",
+    "growth_horizon_source": "Qualitative establishment horizon; no calendar-year growth model supplied",
+    "survival_source": "Not modelled; no locally validated canopy survival distribution supplied",
+    "coverage_validation": "not_empirically_validated",
+    "version": "1.1"
+  },
   "intervention_cv": {
     "cool_roof": 0.08,
     "tree_canopy": 0.20,
