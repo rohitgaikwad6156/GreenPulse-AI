@@ -96,13 +96,13 @@ export default function AppShell() {
       </aside>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-[2000] isolate lg:hidden">
           <button
-            className="absolute inset-0 bg-[#153026]/35"
+            className="absolute inset-0 z-[2000] bg-[#153026]/35"
             aria-label="Close navigation"
             onClick={() => setMenuOpen(false)}
           />
-          <aside className="relative h-full w-72 max-w-[85vw] shadow-xl">
+          <aside className="relative z-[2100] h-full w-72 max-w-[85vw] shadow-xl">
             <Sidebar onNavigate={() => setMenuOpen(false)} onClose={() => setMenuOpen(false)} />
           </aside>
         </div>
