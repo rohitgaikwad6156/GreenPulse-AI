@@ -81,7 +81,7 @@ npm run build
 - `models/`: trained model artifacts in later steps
 - `notebooks/`, `scripts/`, `tests/`, `docs/`: future analysis and project materials
 
-No measured temperature, model metric, or intervention outcome is currently available. Verified WorldCover, OSM roads, and WorldPop source files are present, plus a staged official PCMC outline that is not a ward layer and is not yet combined with PMC. The dashboard requests production artifacts and shows explicit unavailable states when they are absent.
+The Heat Map now displays dated NASA MODIS surface-temperature imagery by default, with an observation-date selector and approximately 1 km source resolution. This independent satellite view does not require a trained model. No locally processed 30 m temperature grid, model metric, or intervention outcome is currently available. Verified WorldCover, OSM roads, and WorldPop source files are present, plus a staged official PCMC outline that is not a ward layer and is not yet combined with PMC. The dashboard requests production artifacts and shows explicit unavailable states when they are absent.
 
 ## Real satellite pipelines
 

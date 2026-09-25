@@ -5,6 +5,8 @@ import L from "leaflet";
 import { AlertCircle, Database, Layers3, LoaderCircle, MapPinned, RotateCcw, ThermometerSun } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import PageIntro from "../components/PageIntro.jsx";
+import SatelliteHeatLayer from "../components/SatelliteHeatLayer.jsx";
+import { SATELLITE_LST, validSatelliteDate } from "../utils/satelliteLayer.js";
 import { getMapCellDetail, getMapWardDetail, getMapWards, getVisibleCellHeat, getWardHeat } from "../services/api.js";
 
 const COLORS = ["#397d85", "#77a7a2", "#d9d18a", "#e3975b", "#ad4e42"];
@@ -100,6 +102,12 @@ function Selection({ selected, detail }) {
 }
 
 export default function HeatMap() {
+  const [mode, setMode] = useState("satellite");
+  const [date, setDate] = useState(SATELLITE_LST.defaultDate);
+  const [opacity, setOpacity] = useState(0.7);
+  const [satellite, setSatellite] = useState({ status: "loading", message: "Loading NASA imagery…" });
+  const satelliteMode = mode === "satellite";
+  const dateValid = validSatelliteDate(date);
   const [boundaries, setBoundaries] = useState(initial);
   const [wardHeat, setWardHeat] = useState(initial);
   const [cellHeat, setCellHeat] = useState({ status: "idle", data: null, message: "" });
@@ -109,6 +117,7 @@ export default function HeatMap() {
   const [reload, setReload] = useState(0);
 
   useEffect(() => {
+    if (satelliteMode) return;
     const boundaryAbort = new AbortController();
     const heatAbort = new AbortController();
     setBoundaries(initial); setWardHeat(initial);
@@ -119,11 +128,11 @@ export default function HeatMap() {
       .then((data) => setWardHeat({ status: data.features?.length ? "ready" : "no-data", data, message: "No modeled ward cells." }))
       .catch((error) => { if (error.code !== "ERR_CANCELED") setWardHeat(failure(error)); });
     return () => { boundaryAbort.abort(); heatAbort.abort(); };
-  }, [reload]);
+  }, [reload, satelliteMode]);
 
   const onViewport = useCallback((view) => setViewport(view), []);
   useEffect(() => {
-    if (!viewport || viewport.zoom < 16) { setCellHeat({ status: "idle", data: null, message: "" }); return; }
+    if (satelliteMode || !viewport || viewport.zoom < 16) { setCellHeat({ status: "idle", data: null, message: "" }); return; }
     const abort = new AbortController();
     setCellHeat({ status: "loading", data: null, message: "" });
     const timer = window.setTimeout(() => getVisibleCellHeat({ west: viewport.west, south: viewport.south,
@@ -132,12 +141,12 @@ export default function HeatMap() {
         data, message: data.message || "" }))
       .catch((error) => { if (error.code !== "ERR_CANCELED") setCellHeat(failure(error)); }), 250);
     return () => { window.clearTimeout(timer); abort.abort(); };
-  }, [viewport, reload]);
+  }, [viewport, reload, satelliteMode]);
 
   const selectWard = useCallback((id) => setSelected({ kind: "ward", id }), []);
   const selectCell = useCallback((id) => setSelected({ kind: "cell", id }), []);
   useEffect(() => {
-    if (!selected) return;
+    if (satelliteMode || !selected) return;
     const abort = new AbortController();
     setDetail({ status: "loading", data: null, message: "" });
     const fetcher = selected.kind === "ward" ? getMapWardDetail : getMapCellDetail;
@@ -145,7 +154,7 @@ export default function HeatMap() {
       .then((data) => setDetail({ status: "ready", data, message: "" }))
       .catch((error) => { if (error.code !== "ERR_CANCELED") setDetail(failure(error)); });
     return () => abort.abort();
-  }, [selected, reload]);
+  }, [selected, reload, satelliteMode]);
 
   const detailed = viewport?.zoom >= 16 && cellHeat.status === "ready";
   const range = useMemo(() => {
@@ -161,12 +170,20 @@ export default function HeatMap() {
 
   return <>
     <PageIntro eyebrow="Spatial analysis" title="Pune / PCMC heat map"
-      description="Inspect predicted land surface temperature by ward, then zoom in to examine individual 30 m cells. Climate overlays require verified local data." />
+      description="Explore dated NASA satellite surface temperatures over Pune / PCMC, or switch to the research model's 30 m predictions when its data are available." />
+    <fieldset className="mb-5 flex flex-wrap gap-3 rounded-xl border border-[#dfe8de] bg-white p-4">
+      <legend className="px-1 text-xs font-semibold text-[#294a35]">Heat layer source</legend>
+      {[ ["satellite", "Satellite observations · NASA MODIS"], ["model", "Research model · 30 m predictions"] ].map(([value, label]) =>
+        <label key={value} className="flex items-center gap-2 text-sm text-[#36533d]">
+          <input type="radio" name="heat-source" value={value} checked={mode === value}
+            onChange={() => { setMode(value); setSelected(null); }} />{label}
+        </label>)}
+    </fieldset>
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
       <section className="min-w-0 overflow-hidden rounded-2xl border border-[#dfe8de] bg-white shadow-[0_3px_18px_rgba(23,54,35,0.05)]">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#eaf0e9] px-5 py-4">
-          <div><h2 className="flex items-center gap-2 text-sm font-semibold text-[#284936]"><Layers3 size={17} className="text-[#438263]" /> Predicted LST layer</h2>
-            <p className="mt-1 text-[11px] text-[#829385]">Ward means at city scale · 30 m cells at zoom 16+</p></div>
+          <div><h2 className="flex items-center gap-2 text-sm font-semibold text-[#284936]"><Layers3 size={17} className="text-[#438263]" /> {satelliteMode ? "Satellite land surface temperature" : "Predicted LST layer"}</h2>
+            <p className="mt-1 text-[11px] text-[#829385]">{satelliteMode ? `Terra / MODIS daytime · ${date || "select a date"} · approximately 1 km source resolution` : "Ward means at city scale · 30 m cells at zoom 16+"}</p></div>
           <button type="button" onClick={() => setReload((value) => value + 1)} className="inline-flex items-center gap-1.5 rounded-lg border border-[#d9e6d9] px-3 py-1.5 text-[11px] font-semibold text-[#39714d] hover:bg-[#f2f8f0]"><RotateCcw size={13} /> Refresh</button>
         </div>
         <div className="relative h-[470px] bg-[#edf2ed] sm:h-[560px]">
@@ -175,29 +192,56 @@ export default function HeatMap() {
             <TileLayer url={TILE_URL} attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
             <ZoomControl position="topright" />
             <ViewEvents onChange={onViewport} />
-            <FitWards data={boundaries.status === "ready" ? boundaries.data : null} />
-            {wardHeat.status === "ready" && !detailed && <GeoJSON key={`ward-${reload}`} data={wardHeat.data}
+            {satelliteMode && dateValid && <SatelliteHeatLayer key={`${date}-${reload}`} date={date} opacity={opacity} onStatus={setSatellite} />}
+            {!satelliteMode && <FitWards data={boundaries.status === "ready" ? boundaries.data : null} />}
+            {!satelliteMode && wardHeat.status === "ready" && !detailed && <GeoJSON key={`ward-${reload}`} data={wardHeat.data}
               style={(feature) => ({ color: "#456d52", weight: 1.2, fillColor: color(feature.properties.predicted_lst_c, range), fillOpacity: 0.62 })}
               onEachFeature={(feature, layer) => layer.on("click", () => selectWard(feature.properties.ward_id))} />}
-            {detailed && <GeoJSON key={`cell-${viewport.west}-${viewport.south}`} data={cellHeat.data}
+            {!satelliteMode && detailed && <GeoJSON key={`cell-${viewport.west}-${viewport.south}`} data={cellHeat.data}
               style={(feature) => ({ color: color(feature.properties.predicted_lst_c, range), weight: 0.15,
                 fillColor: color(feature.properties.predicted_lst_c, range), fillOpacity: 0.82 })}
               onEachFeature={(feature, layer) => layer.on("click", () => selectCell(feature.properties.grid_id))} />}
-            {boundaries.status === "ready" && <GeoJSON key={`outline-${reload}`} data={boundaries.data}
+            {!satelliteMode && boundaries.status === "ready" && <GeoJSON key={`outline-${reload}`} data={boundaries.data}
               interactive={wardHeat.status !== "ready" && !detailed}
               style={{ color: "#264b37", weight: 1.8, fillOpacity: 0, opacity: 0.85 }}
               onEachFeature={(feature, layer) => layer.on("click", () => selectWard(feature.properties.ward_id))} />}
           </MapContainer>
-          {(noData || hasError) && <div className="pointer-events-none absolute left-4 top-4 z-[500] max-w-[min(360px,calc(100%-32px))] rounded-xl border border-[#e1e7df] bg-white/95 p-4 shadow-lg" aria-live="polite">
+          {!satelliteMode && (noData || hasError) && <div className="pointer-events-none absolute left-4 top-4 z-[500] max-w-[min(360px,calc(100%-32px))] rounded-xl border border-[#e1e7df] bg-white/95 p-4 shadow-lg" aria-live="polite">
             <div className="flex items-start gap-2.5">{hasError ? <AlertCircle size={18} className="mt-0.5 shrink-0 text-[#aa6a4c]" /> : <Database size={18} className="mt-0.5 shrink-0 text-[#818d72]" />}
-              <div><p className="text-xs font-semibold text-[#314e38]">{hasError ? "Map layer connection error" : "Climate layers not available yet"}</p>
-                <p className="mt-1 text-[11px] leading-5 text-[#718172]">{hasError ? "Check FastAPI, then refresh." : "Verified PMC/PCMC boundaries and a trained LST model are required. The base map is geographic context only."}</p></div></div></div>}
-          {viewport?.zoom >= 16 && cellHeat.status === "too-many" && <div className="pointer-events-none absolute bottom-8 left-4 z-[500] rounded-lg border border-[#e6d9bd] bg-white/95 px-3 py-2 text-[11px] font-medium text-[#806c43] shadow-sm">Zoom in further to display the 30 m cells.</div>}
-          {viewport?.zoom >= 16 && cellHeat.status === "loading" && <div className="pointer-events-none absolute bottom-8 left-4 z-[500] flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 text-[11px] text-[#4d7458] shadow-sm"><LoaderCircle size={13} className="animate-spin" /> Loading cells…</div>}
+              <div><p className="text-xs font-semibold text-[#314e38]">{hasError ? "Map layer connection error" : "30 m model inputs are missing"}</p>
+                <p className="mt-1 text-[11px] leading-5 text-[#718172]">{hasError ? "Check FastAPI, then refresh." : "This model needs verified wards, the ML grid and trained XGBoost weights. Switch to Satellite observations to see NASA surface-temperature imagery now."}</p></div></div></div>}
+          {!satelliteMode && viewport?.zoom >= 16 && cellHeat.status === "too-many" && <div className="pointer-events-none absolute bottom-8 left-4 z-[500] rounded-lg border border-[#e6d9bd] bg-white/95 px-3 py-2 text-[11px] font-medium text-[#806c43] shadow-sm">Zoom in further to display the 30 m cells.</div>}
+          {!satelliteMode && viewport?.zoom >= 16 && cellHeat.status === "loading" && <div className="pointer-events-none absolute bottom-8 left-4 z-[500] flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 text-[11px] text-[#4d7458] shadow-sm"><LoaderCircle size={13} className="animate-spin" /> Loading cells…</div>}
         </div>
-        <div className="flex flex-wrap justify-between gap-2 border-t border-[#eaf0e9] px-5 py-3 text-[11px] text-[#728576]"><span>Model-estimated surface temperature · °C</span><span>Geographic basemap: OpenStreetMap</span></div>
+        <div className="flex flex-wrap justify-between gap-2 border-t border-[#eaf0e9] px-5 py-3 text-[11px] text-[#728576]"><span>{satelliteMode ? `NASA satellite retrieval · ${date} · historical imagery` : "Model-estimated surface temperature · °C"}</span><span>Geographic basemap: OpenStreetMap</span></div>
       </section>
       <aside className="space-y-4">
+        {satelliteMode ? <>
+          <section className="rounded-2xl border border-[#e2e9e0] bg-white p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-[#294a35]">Satellite layer controls</h2>
+            <label className="mt-4 block text-xs font-medium text-[#617665]">Observation date (UTC)
+              <input type="date" value={date} min={SATELLITE_LST.firstDate} max={new Date().toISOString().slice(0, 10)}
+                onChange={(event) => setDate(event.target.value)} className="mt-2 block w-full rounded-lg border border-[#d8e4d8] px-3 py-2" />
+            </label>
+            <p className="mt-2 text-xs leading-5 text-[#718172]">Starts on 10 May 2025, within the research's peak-summer season. This is a dated observation, not current weather or a seasonal average.</p>
+            <label className="mt-4 block text-xs font-medium text-[#617665]">Heat layer opacity: {Math.round(opacity * 100)}%
+              <input type="range" min="0" max="1" step="0.05" value={opacity} onChange={(event) => setOpacity(Number(event.target.value))} className="mt-2 block w-full" />
+            </label>
+            <p role="status" className="mt-4 text-xs leading-5 text-[#607467]">{dateValid ? satellite.message : "Choose a valid observation date on or before today."}</p>
+            <p className="mt-2 text-xs leading-5 text-[#718172]">Zooming enlarges the imagery; it does not create 30 m detail. Cloud and overpass gaps can leave some dates empty.</p>
+          </section>
+          <section className="rounded-2xl border border-[#e2e9e0] bg-white p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-[#294a35]">NASA temperature legend</h2>
+            <img src={SATELLITE_LST.legendUrl} alt="NASA land surface temperature color scale from below 200 to above 350 kelvin" className="mt-3 h-auto w-full" />
+            <p className="mt-3 text-xs leading-5 text-[#718172]">The source legend uses kelvin. °C = K − 273.15; 300 K = 26.85°C and 325 K = 51.85°C.</p>
+          </section>
+          <section className="rounded-2xl border border-[#e2e9e0] bg-white p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-[#294a35]">Source & interpretation</h2>
+            <p className="mt-2 text-xs leading-5 text-[#718172]">NASA GIBS publishes Terra/MODIS daytime land-surface temperature retrievals at approximately 1 km source resolution. This imagery is independent of the GreenPulse model and does not supply SHAP values, intervention estimates or ward statistics.</p>
+            <a href={SATELLITE_LST.metadataUrl} target="_blank" rel="noreferrer" className="mt-3 inline-block text-xs font-semibold text-[#39714d] underline">NASA layer metadata</a>
+          </section>
+        </> : <>
+
         <section className="rounded-2xl border border-[#e2e9e0] bg-white p-5 shadow-sm"><h2 className="text-sm font-semibold text-[#294a35]">Map layers</h2>
           <div className="mt-3"><Status label="Ward boundaries" layer={boundaries} /><Status label="Predicted ward heat" layer={wardHeat} />
             {viewport?.zoom >= 16 && <Status label="Visible 30 m cells" layer={cellHeat} />}</div>
@@ -217,6 +261,7 @@ export default function HeatMap() {
           <div className="flex justify-between gap-2"><h2 className="text-sm font-semibold text-[#294a35]">Selection details</h2>
             {selected && <button type="button" onClick={() => { setSelected(null); setDetail({ status: "idle", data: null, message: "" }); }} className="text-[11px] font-semibold text-[#518460] hover:underline">Clear</button>}</div>
           <div className="mt-4"><Selection selected={selected} detail={detail} /></div></section>
+        </>}
         <p className="px-1 text-[11px] leading-5 text-[#819083]">LST is not pedestrian air temperature. SHAP explains model predictions and does not prove causation.</p>
       </aside>
     </div>
