@@ -5,7 +5,7 @@ import { getBackendHealth } from "../services/api.js";
 const initialState = {
   kind: "loading",
   label: "Checking...",
-  detail: "Contacting the FastAPI backend",
+  detail: "Contacting FastAPI; a sleeping service can take about a minute",
 };
 
 export default function BackendStatus() {
@@ -19,6 +19,7 @@ export default function BackendStatus() {
         if (result?.status !== "ok") {
           throw new Error("The backend returned an unexpected health response.");
         }
+        if (controller.signal.aborted) return;
         setState({
           kind: "healthy",
           label: "Healthy",
@@ -32,9 +33,7 @@ export default function BackendStatus() {
           label: "Connection Error",
           detail: error.response
             ? `Backend returned HTTP ${error.response.status}`
-            : error.message === "VITE_API_BASE_URL is not configured."
-              ? error.message
-              : "Cannot reach FastAPI. Check that the backend is running.",
+            : "Cannot reach FastAPI. Use Refresh status to retry; the service may still be starting.",
         });
       });
 

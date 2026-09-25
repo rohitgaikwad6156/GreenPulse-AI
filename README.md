@@ -30,8 +30,8 @@ From the `GreenPulse-AI` directory in PowerShell:
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r backend\requirements.txt
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000
+.\.venv\Scripts\python.exe -m pip install -r backend\requirements-shap.txt -r backend\requirements-optimizer.txt
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 ```
 
 Open <http://127.0.0.1:8000/docs> for the FastAPI Swagger interface.
@@ -65,7 +65,7 @@ npm install
 npm run dev -- --host localhost --port 5173 --strictPort
 ```
 
-The copy command is needed only for first-time setup. It sets `VITE_API_BASE_URL` to the local FastAPI address. Start FastAPI and Vite in separate PowerShell windows. Open <http://localhost:5173/> and expect `Backend Status: Healthy`. If FastAPI is stopped, the card shows `Backend Status: Connection Error`. Restart Vite after changing its environment file. The sidebar links to Overview, Heat Map, Root Cause Analysis, Scenario Simulator, Climate Action Optimizer, Validation, and Methodology. On a narrow screen, use the menu button in the top bar. Press `Ctrl+C` in the frontend server window to stop it.
+The copy command is optional: Vite also proxies `/api` to the local FastAPI server when no URL override is set. It sets `VITE_API_BASE_URL` to the local FastAPI address. Start FastAPI and Vite in separate PowerShell windows. Open <http://localhost:5173/> and expect `Backend Status: Healthy`. If FastAPI is stopped, the card shows `Backend Status: Connection Error`. Restart Vite after changing its environment file. The sidebar links to Overview, Heat Map, Root Cause Analysis, Scenario Simulator, Climate Action Optimizer, Validation, and Methodology. On a narrow screen, use the menu button in the top bar. Press `Ctrl+C` in the frontend server window to stop it.
 
 To check the production build:
 

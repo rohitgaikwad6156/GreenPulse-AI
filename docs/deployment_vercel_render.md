@@ -6,6 +6,25 @@ unavailable responses for features that require those artifacts.
 
 Repository: https://github.com/rohitgaikwad6156/GreenPulse-AI
 
+## Current production connection (2026-09-26)
+
+The deployed dashboard was failing before any API request because its build
+had no `VITE_API_BASE_URL`. The repository now uses same-origin `/api` requests
+by default. `frontend/vercel.json` forwards them to the confirmed Render service
+`https://greenpulse-ai-v0gz.onrender.com/api/:path*`, before the SPA fallback.
+No Vercel environment variable or cross-origin CORS change is needed for this
+configuration. Keep `VITE_API_BASE_URL` unset to use this proxy. An explicit
+variable still overrides it for other deployments.
+
+Vite development and preview proxy `/api` to `http://127.0.0.1:8000`. Start the
+backend separately. Health/config requests allow 65 seconds for cold starts;
+the overview offers Refresh status for another attempt. The overview reads
+artifact availability from `/api/methodology`; file presence does not claim
+scientific validation. Actual prediction routes still enforce evidence gates.
+
+For a fork, change the external rewrite to your own backend. Never point
+`VITE_API_BASE_URL` at localhost in a production build.
+
 ## 1. Deploy FastAPI on Render first
 
 1. Sign in to https://dashboard.render.com and connect your GitHub account.
@@ -59,7 +78,8 @@ surviving restart. No real model, raster, or ward boundary is in GitHub now.
    | Build Command | `npm run build` |
    | Output Directory | `dist` |
 
-4. Before clicking **Deploy**, add the Production environment variable:
+4. For the current repository, leave `VITE_API_BASE_URL` unset to use the
+   committed API proxy. For a separate backend without that proxy, add:
 
    `VITE_API_BASE_URL=<YOUR_RENDER_HTTPS_BASE_URL>`
 
@@ -70,7 +90,7 @@ surviving restart. No real model, raster, or ward boundary is in GitHub now.
 6. `frontend/vercel.json` rewrites deep links to `index.html` so refreshing
    `/heat-map`, `/scenario-simulator`, or `/methodology` loads React Router.
 
-## 3. Connect browser access with CORS
+## 3. Connect direct browser access with CORS (only with a URL override)
 
 1. Return to the Render web service > **Environment**.
 2. Set `GREENPULSE_CORS_ORIGINS` to the exact Vercel production origin, for
@@ -83,12 +103,14 @@ surviving restart. No real model, raster, or ward boundary is in GitHub now.
 4. Reopen the Vercel site. The Overview health card should say
    **Backend Status: Healthy** after the Render service wakes.
 
+The default same-origin proxy does not require these CORS changes.
+
 ## 4. Verify and understand the current data gate
 
 - Open the Vercel home page, then refresh `/heat-map` and `/methodology`
   directly. They should load as React pages, not return a Vercel 404.
-- In the browser's Network tab, verify the health request goes to the Render
-  HTTPS origin and returns 200. The backend `/docs` page should list APIs.
+- In the browser's Network tab, verify `/api/health` on the Vercel
+  origin returns JSON with HTTP 200 (or the configured override origin). The backend `/docs` page should list APIs.
 - Methodology should report that the real ML grid and trained model are not
   available. Map/prediction/simulation/optimization features must report
   unavailable rather than show fabricated Pune climate results.

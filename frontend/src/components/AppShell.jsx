@@ -73,10 +73,10 @@ function Sidebar({ onNavigate, onClose }) {
         <div className="rounded-xl border border-[#e4ebe2] bg-[#f7faf6] p-3.5">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#315f43]">
             <CircleHelp size={15} aria-hidden="true" />
-            Prototype workspace
+            Research workspace
           </div>
           <p className="mt-2 text-[11px] leading-5 text-[#728577]">
-            Climate data and model outputs will appear after verified sources are connected.
+            Follow the overview to check inputs, then explore heat, explanations, scenarios, planning and validation.
           </p>
         </div>
       </div>
@@ -127,10 +127,10 @@ export default function AppShell() {
             <span className="hidden rounded-full border border-[#e7ede6] bg-[#f9fbf8] px-3 py-1.5 text-[11px] font-medium text-[#607467] sm:inline-flex">
               Pune / PCMC study area
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#e5ebe4] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#61776a]">
+            <Link to="/" className="inline-flex items-center gap-2 rounded-full border border-[#e5ebe4] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#61776a]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#bb9b50]" />
-              Data pending
-            </span>
+              Research status
+            </Link>
           </div>
         </header>
 
