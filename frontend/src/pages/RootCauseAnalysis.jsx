@@ -2,11 +2,27 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { AlertCircle, BarChart3, CheckCircle2, Database, LoaderCircle, RotateCcw, Search, TriangleAlert } from "lucide-react";
 import PageIntro from "../components/PageIntro.jsx";
-import { explainGridCell } from "../services/api.js";
+import { explainGridCell, getMethodology } from "../services/api.js";
 
 const initial = { status: "idle", data: null, message: "" };
 const GROUP_LABELS = { "Vegetation / Canopy": "Vegetation", "Built Environment": "Built environment",
   "Surface Reflectivity": "Albedo / reflectivity", "Road / Infrastructure": "Mobility", Other: "Exposure / context" };
+
+function ArtifactStatus({ availability }) {
+  const files = [
+    ["Real 30 m ML grid", availability?.real_ml_grid_available, "Aligned Landsat/Sentinel/GIS feature cells"],
+    ["Matching XGBoost model", availability?.trained_model_available, "A saved model with spatial-validation metadata"],
+  ];
+  return <section className="rounded-2xl border border-[#eadfc9] bg-[#fbf8ef] p-6" role="status">
+    <div className="flex items-start gap-3"><Database className="mt-0.5 shrink-0 text-[#a36d45]" size={20} aria-hidden="true" />
+      <div className="min-w-0"><h2 className="font-semibold text-[#5e4c32]">Model explanation is waiting for research data</h2>
+        <p className="mt-2 text-sm leading-6 text-[#806f56]">TreeSHAP needs the same validated 30 m feature grid and trained XGBoost artifact used for predictions. The NASA satellite view is real imagery, but it does not contain the model features or explainable predictions.</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">{files.map(([name, present, detail]) => <div key={name} className="rounded-xl border border-[#eadfc9] bg-white px-3 py-3"><p className="text-xs font-semibold text-[#5e4c32]">{name}: {availability ? present ? "available" : "missing" : "checking"}</p><p className="mt-1 text-[11px] leading-5 text-[#806f56]">{detail}</p></div>)}</div>
+        <div className="mt-4 flex flex-wrap gap-2"><Link to="/heat-map" className="rounded-lg bg-[#397a50] px-3 py-2 text-xs font-semibold text-white hover:bg-[#2d6842]">Open satellite heat map</Link><Link to="/methodology" className="rounded-lg border border-[#dac8a7] bg-white px-3 py-2 text-xs font-semibold text-[#775c36]">View data requirements</Link></div>
+      </div>
+    </div>
+  </section>;
+}
 
 function label(value = "") {
   return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -112,8 +128,16 @@ export default function RootCauseAnalysis() {
   const [state, setState] = useState(initial);
   const [validation, setValidation] = useState("");
   const [reload, setReload] = useState(0);
+  const [availability, setAvailability] = useState(null);
 
   useEffect(() => { setGridId(selectedGridId); }, [selectedGridId]);
+  useEffect(() => {
+    const controller = new AbortController();
+    getMethodology(controller.signal)
+      .then((data) => { if (!controller.signal.aborted) setAvailability(data?.data_status || null); })
+      .catch(() => { if (!controller.signal.aborted) setAvailability(null); });
+    return () => controller.abort();
+  }, []);
   useEffect(() => {
     if (!selectedGridId) { setState(initial); return undefined; }
     const controller = new AbortController();
@@ -163,7 +187,7 @@ export default function RootCauseAnalysis() {
     </section>
 
     <div className="mt-5" aria-live="polite">
-      {state.status === "idle" && <section className="rounded-2xl border border-dashed border-[#cad8ca] bg-[#f9fbf8] px-6 py-12 text-center"><BarChart3 size={30} className="mx-auto text-[#72957b]" strokeWidth={1.5} aria-hidden="true" /><h2 className="mt-3 font-semibold text-[#34503d]">Select a real grid cell</h2><p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[#78887c]">Enter its ID above or navigate here from a selected Heat Map cell. No placeholder explanation is shown.</p></section>}
+      {state.status === "idle" && <div className="space-y-4"><ArtifactStatus availability={availability} /><section className="rounded-2xl border border-dashed border-[#cad8ca] bg-[#f9fbf8] px-6 py-10 text-center"><BarChart3 size={30} className="mx-auto text-[#72957b]" strokeWidth={1.5} aria-hidden="true" /><h2 className="mt-3 font-semibold text-[#34503d]">Select a real model grid cell</h2><p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[#78887c]">Enter an exact ID from the validated ML dataset or navigate here from a selected cell in the Research model heat-map view. No placeholder explanation is shown.</p></section></div>}
       {state.status === "loading" && <section className="rounded-2xl border border-[#e2e9e0] bg-white px-6 py-14 text-center"><LoaderCircle size={28} className="mx-auto animate-spin text-[#438263]" aria-hidden="true" /><p className="mt-3 text-sm font-medium text-[#526d5b]">Computing TreeSHAP explanations…</p><p className="mt-1 text-xs text-[#819084]">This may take longer for a large global sample.</p></section>}
       {!["idle", "loading", "ready"].includes(state.status) && <StateCard state={state} onRetry={() => setReload((count) => count + 1)} />}
       {state.status === "ready" && local && global && <div className="space-y-5">
