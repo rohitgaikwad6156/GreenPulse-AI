@@ -129,6 +129,27 @@ def _ward_prediction_summary(signature: tuple) -> dict:
             for ward_id, (total, count) in totals.items() if count}
 
 
+def _map_context() -> dict:
+    summaries = _ward_prediction_summary(_signature())
+    count = sum(row["grid_cell_count"] for row in summaries.values())
+    baseline = (sum(row["predicted_lst_c"] * row["grid_cell_count"] for row in summaries.values()) / count
+                if count else None)
+    _, _, metadata = _bundle()
+    return {"city_baseline_c": baseline, "dataset_date_range": metadata.get("dataset_date_range")}
+
+
+def _layer_properties(predictions) -> list[dict]:
+    try:
+        scores = np.atleast_1d(score_from_model_metadata(np.asarray(predictions), services.MODEL_METADATA)).tolist()
+    except ValueError:
+        scores = [None] * len(predictions)
+    try:
+        rmse, _ = spatial_cv_rmse_from_metadata(services.MODEL_METADATA)
+    except UncertaintyUnavailableError:
+        rmse = None
+    return [{"heat_hazard_score": score, "spatial_cv_rmse_c": rmse} for score in scores]
+
+
 def ward_heat() -> dict:
     boundaries = ward_boundaries()
     summaries = _ward_prediction_summary(_signature())
@@ -139,10 +160,13 @@ def ward_heat() -> dict:
         if summary is not None:
             features.append({**feature, "properties": {**feature["properties"], **summary}})
     values = [item["properties"]["predicted_lst_c"] for item in features]
+    if values:
+        for feature, properties in zip(features, _layer_properties(values)):
+            feature["properties"].update(properties)
     return {"type": "FeatureCollection", "features": features,
             "temperature_range_c": {"min": min(values), "max": max(values)} if values else None,
             "unit": "°C", "aggregation": "mean XGBoost predicted LST across complete-case 30 m cells assigned to each ward",
-            "missing_wards": len(boundaries["features"]) - len(features)}
+            "missing_wards": len(boundaries["features"]) - len(features), **_map_context()}
 
 
 def cell_heat(west: float, south: float, east: float, north: float) -> dict:
@@ -167,11 +191,11 @@ def cell_heat(west: float, south: float, east: float, north: float) -> dict:
     if not np.isfinite(predictions).all():
         raise services.DataUnavailableError("Saved model produced nonfinite map predictions")
     features = []
-    for row, temperature in zip(selected, predictions):
+    for row, temperature, properties in zip(selected, predictions, _layer_properties(predictions)):
         x, y = float(row["x"]), float(row["y"])
         features.append({"type": "Feature", "geometry": _cell_polygon(x, y),
                          "properties": {"grid_id": str(row["grid_id"]), "ward_id": str(row["ward_id"]),
-                                        "predicted_lst_c": float(temperature)}})
+                                        "predicted_lst_c": float(temperature), **properties}})
     return {"type": "FeatureCollection", "features": features, "too_many_cells": False,
             "max_cells": MAX_VIEW_CELLS, "unit": "°C", "message": None}
 
@@ -191,8 +215,14 @@ def _score_and_confidence(predicted_lst_c: float) -> tuple[float | None, str, di
     return score, score_status, confidence
 
 
-def _factor_rows(names: tuple[str, ...], matrix: np.ndarray, model: XGBRegressor) -> list[dict]:
+def _factor_rows(names: tuple[str, ...], matrix: np.ndarray, model: XGBRegressor, grouped=False) -> list[dict]:
     _, values = _shap_values(model, matrix)
+    if grouped:
+        categories = list(dict.fromkeys(feature_category(name) for name in names))
+        values = np.column_stack([values[:, [i for i, name in enumerate(names)
+                                            if feature_category(name) == category]].sum(axis=1)
+                                  for category in categories])
+        names = tuple(categories)
     signed = values.mean(axis=0)
     magnitude = np.abs(values).mean(axis=0)
     rows = [{"feature": name, "category": feature_category(name),
@@ -201,7 +231,7 @@ def _factor_rows(names: tuple[str, ...], matrix: np.ndarray, model: XGBRegressor
              "direction": "warming" if signed[i] > 0 else "cooling" if signed[i] < 0 else "neutral"}
             for i, name in enumerate(names)]
     rows.sort(key=lambda item: item["mean_abs_shap_c"], reverse=True)
-    return rows[:5]
+    return rows[:3] if grouped else rows[:5]
 
 
 def cell_detail(grid_id: str) -> dict:
@@ -227,6 +257,8 @@ def cell_detail(grid_id: str) -> dict:
             "predicted_lst_c": prediction, "heat_hazard_score": score,
             "heat_hazard_score_status": score_status, "confidence": confidence,
             "top_shap_factors": _factor_rows(names, matrix, model),
+            "grouped_shap_factors": _factor_rows(names, matrix, model, grouped=True),
+            **_map_context(),
             "shap_scope": "TreeSHAP contributions for this one grid-cell prediction; not causal effects",
             "model_dataset_version": model_meta["dataset_version"], "unit": "°C"}
 
@@ -265,5 +297,7 @@ def ward_detail(ward_id: str) -> dict:
             "grid_cell_count": summary["grid_cell_count"], "predicted_lst_c": prediction,
             "heat_hazard_score": score, "heat_hazard_score_status": score_status,
             "confidence": confidence, "top_shap_factors": _factor_rows(names, matrix, model),
+            "grouped_shap_factors": _factor_rows(names, matrix, model, grouped=True),
+            **_map_context(),
             "shap_scope": f"Mean TreeSHAP across a deterministic sample of {len(sample)} ward cells; not causal effects",
             "model_dataset_version": model_meta["dataset_version"], "unit": "°C"}

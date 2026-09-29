@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { api, getBackendHealth, getMethodology, simulateScenario } from "./api.js";
+import { api, getBackendHealth, getGridCells, getMethodology, simulateScenario } from "./api.js";
 
 const response = (config, data) => ({ config, data, status: 200, statusText: "OK", headers: {} });
 
@@ -15,11 +15,13 @@ test("missing build-time API URL uses same-origin GET and POST endpoints", async
   try {
     assert.equal((await getBackendHealth()).status, "ok");
     await getMethodology();
+    await getGridCells({ limit: 6, offset: 2 });
     await simulateScenario({ grid_id: "test-cell" });
     assert.ok(requests.every((request) => !request.baseURL));
-    assert.deepEqual(requests.map((request) => request.url), ["/api/health", "/api/methodology", "/api/simulate"]);
-    assert.equal(requests[2].method, "post");
-    assert.equal(JSON.parse(requests[2].data).grid_id, "test-cell");
+    assert.deepEqual(requests.map((request) => request.url), ["/api/health", "/api/methodology", "/api/grid", "/api/simulate"]);
+    assert.deepEqual(requests[2].params, { limit: 6, offset: 2 });
+    assert.equal(requests[3].method, "post");
+    assert.equal(JSON.parse(requests[3].data).grid_id, "test-cell");
   } finally { api.defaults.adapter = original; }
 });
 

@@ -238,7 +238,7 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
             "evidence_status": "training-distribution guard only; intervention transformations require separate calibration",
         },
         "crs": dataset_metadata["crs"], "resolution_m": dataset_metadata["raster_resolution_m"],
-        "spatial_validation_method": "Saved 5 km 5-fold outer block holdouts; Optuna inner GroupKFold by the same blocks",
+        "spatial_validation_method": "Saved 5 km 5-fold outer spatial block holdouts; Optuna inner GroupKFold by the same blocks",
         "outer_folds": assignment.n_folds, "block_size_m": assignment.block_size_m,
         "cv_mapping_path": str(cv_dir / "spatial_cv_blocks.parquet"),
         "outer_fold_results": outer_results,

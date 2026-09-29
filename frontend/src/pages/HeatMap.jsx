@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { GeoJSON, MapContainer, TileLayer, ZoomControl, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
@@ -58,7 +58,8 @@ function Status({ label, layer }) {
   </div>;
 }
 
-function Selection({ selected, detail }) {
+function Selection({ selected, detail, onExplore }) {
+  const [explaining, setExplaining] = useState(false);
   if (!selected) return <div className="py-8 text-center"><MapPinned size={27} className="mx-auto text-[#7c9d83]" strokeWidth={1.5} />
     <p className="mt-3 text-sm font-semibold text-[#344e3b]">Select a ward or cell</p>
     <p className="mt-2 text-xs leading-5 text-[#7b8d80]">Click a boundary or heat cell to retrieve model details.</p></div>;
@@ -75,19 +76,30 @@ function Selection({ selected, detail }) {
     <div className="rounded-xl border border-[#dceadd] bg-[#f2f8f1] p-4">
       <p className="flex items-center gap-2 text-xs text-[#547a5c]"><ThermometerSun size={16} /> Predicted land surface temperature</p>
       <p className="mt-2 text-[29px] font-semibold leading-none text-[#1f5036]">{value.predicted_lst_c.toFixed(1)}<span className="ml-1 text-base">°C</span></p></div>
+    <p className="text-xs text-[#617665]">Above city baseline: {Number.isFinite(value.city_baseline_c)
+      ? `${value.predicted_lst_c - value.city_baseline_c >= 0 ? "+" : ""}${(value.predicted_lst_c - value.city_baseline_c).toFixed(1)}°C` : "Unavailable"}</p>
+    <p className="text-[11px] text-[#718476]">Baseline: cell-weighted modeled Pune / PCMC mean.</p>
+    <p className="text-xs text-[#617665]">90% prediction range: {value.prediction_range_90_c
+      ? `${value.prediction_range_90_c.lower.toFixed(1)}–${value.prediction_range_90_c.upper.toFixed(1)}°C` : "Unavailable — calibration required"}</p>
     <div className="grid grid-cols-2 gap-2.5">
-      <div className="rounded-xl border border-[#e6ece4] p-3"><p className="text-[11px] text-[#718476]">Heat Hazard Score</p>
+      <div className="rounded-xl border border-[#e6ece4] p-3"><p className="text-[11px] text-[#718476]">Derived Heat Hazard Score</p>
         <p className="mt-1 text-sm font-semibold text-[#315b40]">{value.heat_hazard_score == null ? "Unavailable" : `${value.heat_hazard_score.toFixed(0)} / 100`}</p></div>
       <div className="rounded-xl border border-[#e6ece4] p-3"><p className="text-[11px] text-[#718476]">Confidence</p>
         <p className="mt-1 text-xs font-semibold leading-5 text-[#315b40]">{value.confidence.label}</p></div></div>
     {value.heat_hazard_score == null && <p className="text-[11px] leading-5 text-[#8a8069]">Score unavailable until documented LST references are calibrated.</p>}
     {value.confidence.spatial_cv_rmse_c != null && <p className="text-[11px] leading-5 text-[#718476]">Held-out spatial RMSE: {value.confidence.spatial_cv_rmse_c.toFixed(2)}°C. This is not a cell-level interval.</p>}
-    <div className="border-t border-[#edf1eb] pt-4"><h4 className="text-xs font-semibold text-[#2a4933]">Top SHAP factors</h4>
+    <div className="border-t border-[#edf1eb] pt-4"><h4 className="text-xs font-semibold text-[#2a4933]">Top 3 grouped SHAP attributions</h4>
       <p className="mt-1 text-[11px] leading-4 text-[#819184]">{value.shap_scope}</p>
-      <div className="mt-3 space-y-2.5">{value.top_shap_factors.map((factor) => <div key={factor.feature} className="flex items-center justify-between gap-3 text-xs">
+      <div className="mt-3 space-y-2.5">{(value.grouped_shap_factors || []).slice(0, 3).map((factor) => <div key={factor.feature} className="flex items-center justify-between gap-3 text-xs">
         <span className="truncate text-[#64796a]">{factor.feature.replaceAll("_", " ")}</span>
         <span className={`shrink-0 font-semibold ${factor.mean_shap_value_c > 0 ? "text-[#b45e4a]" : "text-[#337f76]"}`}>
           {factor.mean_shap_value_c > 0 ? "+" : ""}{factor.mean_shap_value_c.toFixed(2)}°C</span></div>)}</div></div>
+    {!(value.grouped_shap_factors?.length) && <p className="text-xs text-[#718476]">Grouped SHAP unavailable.</p>}
+    {value.selection_type === "ward" && <div className="grid gap-2">
+      <button type="button" onClick={() => setExplaining(!explaining)} className="rounded-lg border border-[#b9d3bd] px-3 py-2.5 text-xs font-semibold text-[#2f6c45]">Explain</button>
+      {explaining && <p className="text-xs leading-5 text-[#718476]">{value.shap_scope}. Groups sum feature contributions within each sampled cell before averaging. Signed values attribute warming or cooling relative to the model reference; they are not intervention effects.</p>}
+      <button type="button" onClick={() => onExplore(value.ward_id)} className="rounded-lg bg-[#397a50] px-3 py-2.5 text-xs font-semibold text-white">Simulate — choose a cell in this ward</button>
+    </div>}
     {value.selection_type === "grid_cell" && <div className="grid gap-2">
       <Link to={`/root-cause?grid_id=${encodeURIComponent(value.grid_id)}`}
         className="block rounded-lg border border-[#b9d3bd] bg-[#f2f8f1] px-3 py-2.5 text-center text-xs font-semibold text-[#2f6c45] hover:bg-[#e8f3e8] focus:outline-none focus:ring-2 focus:ring-[#6d9d79]">
@@ -102,10 +114,14 @@ function Selection({ selected, detail }) {
 }
 
 export default function HeatMap() {
-  const [mode, setMode] = useState("satellite");
+  const [mode, setMode] = useState("auto");
   const [date, setDate] = useState(SATELLITE_LST.defaultDate);
   const [opacity, setOpacity] = useState(0.7);
   const [satellite, setSatellite] = useState({ status: "loading", message: "Loading NASA imagery…" });
+  const [metric, setMetric] = useState("predicted_lst_c");
+  const [view, setView] = useState("auto");
+  const [season, setSeason] = useState("dataset");
+  const mapRef = useRef(null);
   const satelliteMode = mode === "satellite";
   const dateValid = validSatelliteDate(date);
   const [boundaries, setBoundaries] = useState(initial);
@@ -117,7 +133,6 @@ export default function HeatMap() {
   const [reload, setReload] = useState(0);
 
   useEffect(() => {
-    if (satelliteMode) return;
     const boundaryAbort = new AbortController();
     const heatAbort = new AbortController();
     setBoundaries(initial); setWardHeat(initial);
@@ -125,14 +140,16 @@ export default function HeatMap() {
       .then((data) => setBoundaries({ status: data.features?.length ? "ready" : "no-data", data, message: "Boundary file has no wards." }))
       .catch((error) => { if (error.code !== "ERR_CANCELED") setBoundaries(failure(error)); });
     getWardHeat(heatAbort.signal)
-      .then((data) => setWardHeat({ status: data.features?.length ? "ready" : "no-data", data, message: "No modeled ward cells." }))
-      .catch((error) => { if (error.code !== "ERR_CANCELED") setWardHeat(failure(error)); });
+      .then((data) => { setWardHeat({ status: data.features?.length ? "ready" : "no-data", data, message: "No modeled ward cells." });
+        setMode((current) => current === "auto" ? data.features?.length ? "model" : "satellite" : current); })
+      .catch((error) => { if (error.code !== "ERR_CANCELED") { setWardHeat(failure(error));
+        setMode((current) => current === "auto" ? "satellite" : current); } });
     return () => { boundaryAbort.abort(); heatAbort.abort(); };
-  }, [reload, satelliteMode]);
+  }, [reload]);
 
   const onViewport = useCallback((view) => setViewport(view), []);
   useEffect(() => {
-    if (satelliteMode || !viewport || viewport.zoom < 16) { setCellHeat({ status: "idle", data: null, message: "" }); return; }
+    if (satelliteMode || season !== "dataset" || view === "wards" || !viewport || viewport.zoom < 16) { setCellHeat({ status: "idle", data: null, message: "" }); return; }
     const abort = new AbortController();
     setCellHeat({ status: "loading", data: null, message: "" });
     const timer = window.setTimeout(() => getVisibleCellHeat({ west: viewport.west, south: viewport.south,
@@ -141,10 +158,10 @@ export default function HeatMap() {
         data, message: data.message || "" }))
       .catch((error) => { if (error.code !== "ERR_CANCELED") setCellHeat(failure(error)); }), 250);
     return () => { window.clearTimeout(timer); abort.abort(); };
-  }, [viewport, reload, satelliteMode]);
+  }, [viewport, reload, satelliteMode, view, season]);
 
-  const selectWard = useCallback((id) => setSelected({ kind: "ward", id }), []);
-  const selectCell = useCallback((id) => setSelected({ kind: "cell", id }), []);
+  const selectWard = useCallback((id) => { setDetail(initial); setSelected({ kind: "ward", id }); }, []);
+  const selectCell = useCallback((id) => { setDetail(initial); setSelected({ kind: "cell", id }); }, []);
   useEffect(() => {
     if (satelliteMode || !selected) return;
     const abort = new AbortController();
@@ -156,53 +173,75 @@ export default function HeatMap() {
     return () => abort.abort();
   }, [selected, reload, satelliteMode]);
 
-  const detailed = viewport?.zoom >= 16 && cellHeat.status === "ready";
+  const detailed = season === "dataset" && view !== "wards" && viewport?.zoom >= 16 && cellHeat.status === "ready";
+  const metricLabel = metric === "predicted_lst_c" ? "LST" : metric === "heat_hazard_score" ? "Heat Hazard" : "Confidence · spatial CV RMSE";
+  const unit = metric === "heat_hazard_score" ? " / 100" : "°C";
+  const activeFeatures = season === "dataset" ? (detailed ? cellHeat.data?.features : wardHeat.data?.features) || [] : [];
   const range = useMemo(() => {
-    if (detailed) {
-      const values = cellHeat.data.features.map((item) => item.properties.predicted_lst_c);
-      return values.length ? { min: Math.min(...values), max: Math.max(...values) } : null;
-    }
-    return wardHeat.status === "ready" ? wardHeat.data.temperature_range_c : null;
-  }, [detailed, cellHeat, wardHeat]);
+    const values = activeFeatures.map((item) => item.properties[metric]).filter(Number.isFinite);
+    return values.length ? { min: Math.min(...values), max: Math.max(...values) } : null;
+  }, [activeFeatures, metric]);
+  const hotspots = [...activeFeatures].filter((f) => Number.isFinite(f.properties.predicted_lst_c))
+    .sort((a, b) => b.properties.predicted_lst_c - a.properties.predicted_lst_c).slice(0, 5);
+  const exploreWard = (id) => {
+    const feature = boundaries.data?.features.find((f) => f.properties.ward_id === id);
+    if (!feature || !mapRef.current) return;
+    setView("cells");
+    mapRef.current.setView(L.geoJSON(feature).getBounds().getCenter(), 16);
+  };
   const wards = boundaries.data?.features || [];
   const noData = boundaries.status === "no-data" && wardHeat.status === "no-data";
   const hasError = boundaries.status === "error" || wardHeat.status === "error";
 
   return <>
     <PageIntro eyebrow="Spatial analysis" title="Pune / PCMC heat map"
-      description="Explore dated NASA satellite surface temperatures over Pune / PCMC, or switch to the research model's 30 m predictions when its data are available." />
+      description="Explore research-model LST, heat hazard and confidence across wards and 30 m cells. NASA MODIS observations are an optional source." />
     <fieldset className="mb-5 flex flex-wrap gap-3 rounded-xl border border-[#dfe8de] bg-white p-4">
       <legend className="px-1 text-xs font-semibold text-[#294a35]">Heat layer source</legend>
-      {[ ["satellite", "Satellite observations · NASA MODIS"], ["model", "Research model · 30 m predictions"] ].map(([value, label]) =>
+      {[ ["model", "Research Model · 30 m predictions"], ["satellite", "Optional · NASA MODIS"] ].map(([value, label]) =>
         <label key={value} className="flex items-center gap-2 text-sm text-[#36533d]">
           <input type="radio" name="heat-source" value={value} checked={mode === value}
             onChange={() => { setMode(value); setSelected(null); }} />{label}
         </label>)}
     </fieldset>
+    {!satelliteMode && <div className="mb-5 flex flex-wrap gap-4 rounded-xl border border-[#dfe8de] bg-white p-4 text-xs text-[#36533d]">
+      <label>Layer <select aria-label="Model layer" value={metric} onChange={(e) => setMetric(e.target.value)} className="ml-2 rounded border p-2">
+        <option value="predicted_lst_c">LST</option><option value="heat_hazard_score">Heat Hazard</option><option value="spatial_cv_rmse_c">Confidence</option>
+      </select></label>
+      <label>View <select aria-label="Spatial view" value={view} onChange={(e) => { setView(e.target.value); if (e.target.value === "cells") mapRef.current?.setZoom(Math.max(16, mapRef.current.getZoom())); }} className="ml-2 rounded border p-2">
+        <option value="auto">Auto · zoom to cells</option><option value="wards">Wards</option><option value="cells">30 m cells</option>
+      </select></label>
+      <label>Season <select aria-label="Model season" value={season} onChange={(e) => { setSeason(e.target.value); setSelected(null); }} className="ml-2 rounded border p-2">
+        <option value="dataset">{wardHeat.data?.dataset_date_range?.match(/^\d{4}-03-01\/\d{4}-05-31$/) ? `Peak Summer · ${wardHeat.data.dataset_date_range}` : `Loaded model period · ${wardHeat.data?.dataset_date_range || "dates unavailable"}`}</option>
+        {!wardHeat.data?.dataset_date_range?.match(/^\d{4}-03-01\/\d{4}-05-31$/) && <option value="summer">Peak Summer · unavailable</option>}
+        <option value="monsoon">Monsoon · unavailable</option><option value="post-monsoon">Post-monsoon · unavailable</option><option value="winter">Winter · unavailable</option>
+      </select></label>
+      {season !== "dataset" && <p role="status">No trained model for this season. Predictions are unavailable.</p>}
+    </div>}
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
       <section className="min-w-0 overflow-hidden rounded-2xl border border-[#dfe8de] bg-white shadow-[0_3px_18px_rgba(23,54,35,0.05)]">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#eaf0e9] px-5 py-4">
-          <div><h2 className="flex items-center gap-2 text-sm font-semibold text-[#284936]"><Layers3 size={17} className="text-[#438263]" /> {satelliteMode ? "Satellite land surface temperature" : "Predicted LST layer"}</h2>
+          <div><h2 className="flex items-center gap-2 text-sm font-semibold text-[#284936]"><Layers3 size={17} className="text-[#438263]" /> {satelliteMode ? "Satellite land surface temperature" : `${metricLabel} layer`}</h2>
             <p className="mt-1 text-[11px] text-[#829385]">{satelliteMode ? `Terra / MODIS daytime · ${date || "select a date"} · approximately 1 km source resolution` : "Ward means at city scale · 30 m cells at zoom 16+"}</p></div>
           <button type="button" onClick={() => setReload((value) => value + 1)} className="inline-flex items-center gap-1.5 rounded-lg border border-[#d9e6d9] px-3 py-1.5 text-[11px] font-semibold text-[#39714d] hover:bg-[#f2f8f0]"><RotateCcw size={13} /> Refresh</button>
         </div>
         <div className="relative h-[470px] bg-[#edf2ed] sm:h-[560px]">
-          <MapContainer center={[18.565, 73.865]} zoom={11} minZoom={10} maxZoom={19}
+          <MapContainer ref={mapRef} center={[18.565, 73.865]} zoom={11} minZoom={10} maxZoom={19}
             zoomControl={false} preferCanvas scrollWheelZoom className="h-full w-full">
             <TileLayer url={TILE_URL} attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
             <ZoomControl position="topright" />
             <ViewEvents onChange={onViewport} />
             {satelliteMode && dateValid && <SatelliteHeatLayer key={`${date}-${reload}`} date={date} opacity={opacity} onStatus={setSatellite} />}
             {!satelliteMode && <FitWards data={boundaries.status === "ready" ? boundaries.data : null} />}
-            {!satelliteMode && wardHeat.status === "ready" && !detailed && <GeoJSON key={`ward-${reload}`} data={wardHeat.data}
-              style={(feature) => ({ color: "#456d52", weight: 1.2, fillColor: color(feature.properties.predicted_lst_c, range), fillOpacity: 0.62 })}
+            {!satelliteMode && season === "dataset" && wardHeat.status === "ready" && !detailed && <GeoJSON key={`ward-${reload}-${metric}-${season}`} data={wardHeat.data}
+              style={(feature) => ({ color: "#456d52", weight: 1.2, fillColor: color(feature.properties[metric], range), fillOpacity: 0.62 })}
               onEachFeature={(feature, layer) => layer.on("click", () => selectWard(feature.properties.ward_id))} />}
-            {!satelliteMode && detailed && <GeoJSON key={`cell-${viewport.west}-${viewport.south}`} data={cellHeat.data}
-              style={(feature) => ({ color: color(feature.properties.predicted_lst_c, range), weight: 0.15,
-                fillColor: color(feature.properties.predicted_lst_c, range), fillOpacity: 0.82 })}
+            {!satelliteMode && detailed && <GeoJSON key={`cell-${reload}-${metric}-${viewport.west}-${viewport.south}-${viewport.east}-${viewport.north}`} data={cellHeat.data}
+              style={(feature) => ({ color: color(feature.properties[metric], range), weight: 0.15,
+                fillColor: color(feature.properties[metric], range), fillOpacity: 0.82 })}
               onEachFeature={(feature, layer) => layer.on("click", () => selectCell(feature.properties.grid_id))} />}
-            {!satelliteMode && boundaries.status === "ready" && <GeoJSON key={`outline-${reload}`} data={boundaries.data}
-              interactive={wardHeat.status !== "ready" && !detailed}
+            {!satelliteMode && boundaries.status === "ready" && <GeoJSON key={`outline-${reload}-${season}-${wardHeat.status}-${detailed}`} data={boundaries.data}
+              interactive={season === "dataset" && wardHeat.status !== "ready" && !detailed}
               style={{ color: "#264b37", weight: 1.8, fillOpacity: 0, opacity: 0.85 }}
               onEachFeature={(feature, layer) => layer.on("click", () => selectWard(feature.properties.ward_id))} />}
           </MapContainer>
@@ -246,21 +285,30 @@ export default function HeatMap() {
           <div className="mt-3"><Status label="Ward boundaries" layer={boundaries} /><Status label="Predicted ward heat" layer={wardHeat} />
             {viewport?.zoom >= 16 && <Status label="Visible 30 m cells" layer={cellHeat} />}</div>
           {(boundaries.status === "no-data" || wardHeat.status === "no-data") && <p className="mt-3 break-words text-[11px] leading-5 text-[#8c8066]">{boundaries.message || wardHeat.message}</p>}
-          {wards.length > 0 && <label className="mt-4 block text-[11px] font-medium text-[#617665]">Select a ward
+          {season === "dataset" && wards.length > 0 && <label className="mt-4 block text-[11px] font-medium text-[#617665]">Select a ward
             <select value={selected?.kind === "ward" ? selected.id : ""} onChange={(event) => event.target.value && selectWard(event.target.value)}
               className="mt-1.5 w-full rounded-lg border border-[#d8e4d8] bg-white px-3 py-2 text-xs text-[#36533d] focus:border-[#6a9e77] focus:outline-none">
               <option value="">Choose a loaded ward</option>
               {wards.map((feature) => <option key={feature.properties.ward_id} value={feature.properties.ward_id}>{feature.properties.ward_name} · {feature.properties.ward_id}</option>)}
             </select></label>}</section>
-        <section className="rounded-2xl border border-[#e2e9e0] bg-white p-5 shadow-sm"><h2 className="text-sm font-semibold text-[#294a35]">Predicted LST legend</h2>
+        <section className="rounded-2xl border border-[#e2e9e0] bg-white p-5 shadow-sm"><h2 className="text-sm font-semibold text-[#294a35]">{metricLabel} legend</h2>
           {range ? <><div className="mt-3 flex h-3 overflow-hidden rounded-full">{COLORS.map((shade) => <span key={shade} className="flex-1" style={{ backgroundColor: shade }} />)}</div>
-            <div className="mt-2 flex justify-between text-[11px] font-medium text-[#657a6a]"><span>{range.min.toFixed(1)}°C</span><span>{range.max.toFixed(1)}°C</span></div>
-            <p className="mt-2 text-[11px] leading-5 text-[#88978a]">Relative colors for the displayed model layer.</p></>
-            : <p className="mt-3 text-xs leading-5 text-[#829183]">No climate prediction range available.</p>}</section>
+            <div className="mt-2 flex justify-between text-[11px] font-medium text-[#657a6a]"><span>{range.min.toFixed(1)}{unit}</span><span>{range.max.toFixed(1)}{unit}</span></div>
+            <p className="mt-2 text-[11px] leading-5 text-[#88978a]">Relative colors for the displayed layer. Gray = unavailable.</p></>
+            : <p className="mt-3 text-xs leading-5 text-[#829183]">This layer has no available values.</p>}</section>
+        <section className="rounded-2xl border border-[#e2e9e0] bg-white p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-[#294a35]">Top 5 hotspots</h2>
+          <p className="mt-2 text-[11px] text-[#718172]">{detailed ? "Visible cells" : "Modeled wards"} ranked by predicted LST.</p>
+          {hotspots.length ? <ol className="mt-3 space-y-2">{hotspots.map((f) => <li key={f.properties.grid_id || f.properties.ward_id}>
+            <button type="button" onClick={() => detailed ? selectCell(f.properties.grid_id) : selectWard(f.properties.ward_id)} className="flex w-full justify-between gap-2 text-left text-xs text-[#39714d] hover:underline">
+              <span>{f.properties.grid_id || f.properties.ward_name}</span><span>{f.properties.predicted_lst_c.toFixed(1)}°C</span>
+            </button></li>)}</ol> : <p className="mt-3 text-xs text-[#718172]">No model hotspots available.</p>}
+        </section>
+        {metric === "spatial_cv_rmse_c" && <p className="px-1 text-[11px] leading-5 text-[#718172]">Confidence displays held-out spatial RMSE: lower error is better. This is model-wide evidence, not local confidence or a 90% prediction interval.</p>}
         <section className="rounded-2xl border border-[#e2e9e0] bg-white p-5 shadow-sm" aria-live="polite">
           <div className="flex justify-between gap-2"><h2 className="text-sm font-semibold text-[#294a35]">Selection details</h2>
             {selected && <button type="button" onClick={() => { setSelected(null); setDetail({ status: "idle", data: null, message: "" }); }} className="text-[11px] font-semibold text-[#518460] hover:underline">Clear</button>}</div>
-          <div className="mt-4"><Selection selected={selected} detail={detail} /></div></section>
+          <div className="mt-4"><Selection key={selected?.id} selected={selected} detail={detail} onExplore={exploreWard} /></div></section>
         </>}
         <p className="px-1 text-[11px] leading-5 text-[#819083]">LST is not pedestrian air temperature. SHAP explains model predictions and does not prove causation.</p>
       </aside>

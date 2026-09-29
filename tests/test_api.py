@@ -59,15 +59,19 @@ class ApiTests(unittest.TestCase):
                         {"cooling": -1, "green_cover": 1, "co_benefit": 0}):
             with self.assertRaises(ValidationError):
                 OptimizeRequest(**valid, priority_weights=weights)
-        with self.assertRaises(HTTPException) as context:
-            routes.get_model_metrics()
-        self.assertEqual(context.exception.status_code, 503)
-        with self.assertRaises(HTTPException) as context:
-            routes.post_predict(GridIdRequest(grid_id="missing"))
-        self.assertEqual(context.exception.status_code, 503)
-        with self.assertRaises(HTTPException) as context:
-            routes.post_explain(ExplainRequest(grid_id="missing"))
-        self.assertEqual(context.exception.status_code, 503)
+        with patch.object(services, "MODEL", Path("missing_model.joblib")), \
+             patch.object(services, "MODEL_METADATA", Path("missing_meta.json")), \
+             patch.object(services, "GRID", Path("missing_grid.parquet")), \
+             patch.object(services, "GRID_METADATA", Path("missing_grid_meta.json")):
+            with self.assertRaises(HTTPException) as context:
+                routes.get_model_metrics()
+            self.assertEqual(context.exception.status_code, 503)
+            with self.assertRaises(HTTPException) as context:
+                routes.post_predict(GridIdRequest(grid_id="missing"))
+            self.assertEqual(context.exception.status_code, 503)
+            with self.assertRaises(HTTPException) as context:
+                routes.post_explain(ExplainRequest(grid_id="missing"))
+            self.assertEqual(context.exception.status_code, 503)
 
     def test_grid_and_ward_routes_on_labelled_artificial_fixture(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -116,8 +120,8 @@ class ApiTests(unittest.TestCase):
     def test_methodology_reports_file_presence_without_demo_fallback(self):
         result = routes.get_methodology()
         self.assertIn("LST", result["target"])
-        self.assertFalse(result["data_status"]["real_ml_grid_available"])
-        self.assertFalse(result["data_status"]["trained_model_available"])
+        self.assertEqual(result["data_status"]["real_ml_grid_available"], services.GRID.is_file() and services.GRID_METADATA.is_file())
+        self.assertEqual(result["data_status"]["trained_model_available"], services.MODEL.is_file() and services.MODEL_METADATA.is_file())
         self.assertFalse(result["data_status"]["optimizer_location_available"])
         self.assertFalse(result["data_status"]["real_validation_dataset_available"])
 

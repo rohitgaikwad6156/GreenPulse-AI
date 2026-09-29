@@ -14,6 +14,8 @@ from backend.app.api import map_data, services
 class FeatureCollectionResponse(BaseModel):
     type: str
     features: list[dict[str, Any]]
+    city_baseline_c: float | None = None
+    dataset_date_range: str | None = None
     source: str | None = None
     temperature_range_c: dict[str, float] | None = None
     unit: str | None = None
@@ -31,6 +33,10 @@ class ConfidenceResponse(BaseModel):
 
 
 class MapDetailResponse(BaseModel):
+    city_baseline_c: float | None = None
+    dataset_date_range: str | None = None
+    grouped_shap_factors: list[dict[str, Any]] = []
+    prediction_range_90_c: dict[str, float] | None = None
     selection_type: str
     grid_id: str | None = None
     latitude: float | None = None

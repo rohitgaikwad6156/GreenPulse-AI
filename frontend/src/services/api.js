@@ -109,6 +109,11 @@ export async function getMethodology(signal) {
   return response.data;
 }
 
+export async function getGridCells({ limit = 6, offset = 0 } = {}, signal) {
+  const response = await api.get("/api/grid", { params: { limit, offset }, signal });
+  return response.data;
+}
+
 export async function getResearchStatus(signal) {
   const response = await api.get("/api/research/status", { signal });
   return response.data;

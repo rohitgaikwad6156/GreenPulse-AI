@@ -85,3 +85,30 @@ The tests create temporary **ARTIFICIAL / SYNTHETIC** geometry and a tiny fitted
 - Ward means include only complete-case modeled cells. They are not area-weighted estimates for every part of a ward.
 - Land surface temperature is not pedestrian air temperature. Landsat's underlying thermal footprint is coarser than the 30 m output grid. SHAP describes model predictions, not causal heat drivers.
 - The OpenStreetMap tile layer is a geographic basemap, not a climate measurement. The tile URL is configurable with `VITE_MAP_TILE_URL`; retain visible OSM attribution and comply with the [OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/). Do not bulk download tiles.
+
+
+### Research map controls
+
+Research Model is selected on initial load when verified ward predictions exist;
+otherwise the map falls back to optional MODIS imagery. Existing route paths and
+fields are preserved. Added response fields supply the cell-weighted city baseline,
+model date range, grouped SHAP attributions, and layer values.
+
+LST, calibrated Heat Hazard Score, and Confidence are separate layers. Confidence
+currently displays model-wide held-out spatial CV RMSE, not local certainty.
+A calibrated 90% prediction interval is not produced by the current pipeline;
+the detail field remains null and the UI reports calibration required. No RMSE
+multiplier is substituted for a calibrated prediction interval.
+
+Ward means or viewport-limited 30 m cells can be selected. Top 5 hotspots ranks
+available ward means or visible cells by predicted LST, explicitly labeling scope.
+The city comparison uses the full modeled grid, never the current viewport.
+Grouped SHAP sums all features in each category per sample before averaging and
+ranking by mean absolute group contribution; at most three groups are shown.
+Ward Explain expands that interpretation; ward Simulate zooms to cells for an
+explicit cell selection before using the existing simulation route.
+
+Peak Summer is labeled only for a model with a documented March–May period.
+Other seasonal selections report unavailable and hide predictions; they never
+reuse summer predictions as another season. MODIS keeps its independent dated
+observation controls and source resolution.

@@ -101,6 +101,18 @@ class HeatMapApiTests(unittest.TestCase):
                 self.assertIsNone(cell["heat_hazard_score"])
                 self.assertEqual(cell["confidence"]["label"], "Unavailable")
                 self.assertTrue(cell["top_shap_factors"])
+                self.assertLessEqual(len(cell["grouped_shap_factors"]), 3)
+                expected_baseline = sum(f["properties"]["predicted_lst_c"] * f["properties"]["grid_cell_count"]
+                                        for f in heat["features"]) / 4
+                self.assertAlmostEqual(cell["city_baseline_c"], expected_baseline)
+                self.assertAlmostEqual(heat["city_baseline_c"], expected_baseline)
+                self.assertIsNone(heat["dataset_date_range"])
+                self.assertIsNone(heat["features"][0]["properties"]["heat_hazard_score"])
+                self.assertIsNone(heat["features"][0]["properties"]["spatial_cv_rmse_c"])
+                serialized = map_routes.MapDetailResponse(**cell).model_dump()
+                self.assertIsNone(serialized["prediction_range_90_c"])
+                self.assertTrue(serialized["grouped_shap_factors"])
+
                 ward = map_routes.map_ward_detail("PMC:1")
                 self.assertEqual(ward["grid_cell_count"], 2)
                 self.assertEqual(ward["selection_type"], "ward")
@@ -109,6 +121,29 @@ class HeatMapApiTests(unittest.TestCase):
                 self.assertEqual(context.exception.status_code, 404)
             map_data._verified_model.cache_clear()
             map_data._ward_prediction_summary.cache_clear()
+
+    def test_city_baseline_is_cell_weighted(self):
+        with (patch.object(map_data, "_signature", return_value=()),
+              patch.object(map_data, "_ward_prediction_summary", return_value={
+                  "a": {"predicted_lst_c": 30.0, "grid_cell_count": 1},
+                  "b": {"predicted_lst_c": 40.0, "grid_cell_count": 3}}),
+              patch.object(map_data, "_bundle", return_value=(None, (), {
+                  "dataset_date_range": "2025-03-01/2025-05-31"}))):
+            context = map_data._map_context()
+        self.assertEqual(context["city_baseline_c"], 37.5)
+        self.assertEqual(context["dataset_date_range"], "2025-03-01/2025-05-31")
+
+    def test_grouped_shap_sums_before_ranking(self):
+        # Correlated vegetation features cancel within each row; do not rank
+        # a group by the sum of individual absolute contributions.
+        values = np.array([[4.0, -3.0, 2.0], [-4.0, 3.0, 2.0]])
+        with patch.object(map_data, "_shap_values", return_value=(0.0, values)):
+            groups = map_data._factor_rows(("ndvi", "tree_canopy_pct", "ndbi"),
+                                          np.zeros((2, 3)), None, grouped=True)
+        self.assertEqual(groups[0]["feature"], "Built Environment")
+        self.assertEqual(groups[0]["mean_shap_value_c"], 2.0)
+        self.assertEqual(groups[1]["mean_shap_value_c"], 0.0)
+        self.assertEqual(groups[1]["mean_abs_shap_c"], 1.0)
 
     def test_viewport_validation_and_openapi(self):
         with self.assertRaises(HTTPException) as context:
