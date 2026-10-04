@@ -1,0 +1,2 @@
+data/raw/landsat/*/*.TIF filter=lfs diff=lfs merge=lfs -text
+data/raw/landsat/*/*_MTL.txt -text
