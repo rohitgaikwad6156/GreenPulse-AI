@@ -197,6 +197,9 @@ def load_saved_grid_cell(dataset_path: Path, model_path: Path, metadata_path: Pa
         dataset_metadata = json.loads(dataset_metadata_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError("Cannot read model or dataset metadata") from exc
+    from backend.app.data_intake.provenance import reject_demo_metadata
+    reject_demo_metadata(dataset_metadata)
+    reject_demo_metadata(metadata)
     names = metadata.get("feature_list")
     hasher = hashlib.sha256()
     with dataset_path.open("rb") as stream:

@@ -131,6 +131,9 @@ def _synthetic_artifacts(root: Path) -> dict[str, Path]:
             ]]},
         }],
     }), encoding="utf-8")
+    grid_metadata = json.loads(grid_meta.read_text(encoding="utf-8"))
+    grid_metadata.update({"ward_reporting_available": True, "ward_boundary": str(boundary)})
+    grid_meta.write_text(json.dumps(grid_metadata), encoding="utf-8")
     evidence = root / "data" / "interventions" / "evidence"
     evidence.mkdir(parents=True)
     source_specs = {
@@ -216,6 +219,11 @@ class FullSystemHttpTests(unittest.TestCase):
             (services, "CATALOG", "catalog"), (map_data, "BOUNDARY", "boundary"),
         ):
             self.stack.enter_context(patch.object(module, attribute, paths[key]))
+        # Only this isolated HTTP fixture bypasses the production provenance gate.
+        # Production rejection is tested separately in test_heat_map_pipeline.py.
+        self.stack.enter_context(patch(
+            "backend.app.data_intake.provenance.reject_demo_metadata", return_value=None))
+        self.stack.enter_context(patch.object(services, "_require_ward_reporting", return_value=paths["boundary"]))
         map_data._verified_model.cache_clear()
         map_data._ward_prediction_summary.cache_clear()
         self.client = TestClient(app)

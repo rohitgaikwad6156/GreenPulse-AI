@@ -335,12 +335,17 @@ def summarize_layer(array: np.ndarray, inside: np.ndarray, low: float = 0,
 
 def save_layers(layers: dict[str, np.ndarray], transform: Affine, inside: np.ndarray,
                 output_dir: Path, sources: dict[str, str],
-                worldcover_valid_count: np.ndarray | None = None) -> dict[str, dict]:
+                worldcover_valid_count: np.ndarray | None = None,
+                profile: str = "full") -> dict[str, dict]:
     """Save aligned GeoTIFFs, coverage, source/QC JSON, maps and histograms."""
     expected = {"tree_canopy_pct": (0, 100, "%"), "built_pct": (0, 100, "%"),
                 "road_density": (0, math.inf, "km/km2"), "distance_green_m": (0, math.inf, "m"),
                 "population_density": (0, math.inf, "people/km2"), "building_fraction": (0, 1, "fraction")}
-    if not set(layers).issubset(expected) or not set(expected) - {"building_fraction"} <= set(layers):
+    if profile not in {"full", "heat-map"}:
+        raise ValueError("profile must be full or heat-map")
+    required = ({"tree_canopy_pct", "built_pct", "road_density"} if profile == "heat-map"
+                else set(expected) - {"building_fraction"})
+    if not set(layers).issubset(expected) or not required <= set(layers):
         raise ValueError("Required morphology layers missing or unknown")
     stats = {name: summarize_layer(array, inside, *expected[name][:2]) for name, array in layers.items()}
     output_dir.mkdir(parents=True, exist_ok=True)

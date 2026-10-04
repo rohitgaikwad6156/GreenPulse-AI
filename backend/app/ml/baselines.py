@@ -83,6 +83,8 @@ def _read_ml_inputs(dataset_path: Path, metadata_path: Path) -> tuple[np.ndarray
         metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise ValueError(f"Cannot read ML metadata: {metadata_path}") from exc
+    from backend.app.data_intake.provenance import reject_demo_metadata
+    reject_demo_metadata(metadata)
     if metadata.get("crs") != "EPSG:32643" or metadata.get("raster_resolution_m") != 30:
         raise ValueError("ML metadata must declare EPSG:32643 and 30 m raster resolution")
     features = metadata.get("features")

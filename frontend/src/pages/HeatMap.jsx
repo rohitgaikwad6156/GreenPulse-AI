@@ -70,7 +70,7 @@ function Selection({ selected, detail, onExplore }) {
   const value = detail.data;
   return <div className="space-y-4">
     <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6c9978]">{value.selection_type === "ward" ? "Ward selection" : "30 m grid cell"}</p>
-      <h3 className="mt-1 text-lg font-semibold text-[#24432e]">{value.ward_name}</h3>
+      <h3 className="mt-1 text-lg font-semibold text-[#24432e]">{value.ward_name || (value.selection_type === "grid_cell" ? "30 m grid cell" : "Ward")}</h3>
       <p className="mt-1 break-all text-[11px] text-[#8b9b8d]">{value.grid_id || value.ward_id}</p>
       {value.selection_type === "ward" && <p className="mt-1 text-[11px] text-[#7d8d80]">Mean of {value.grid_cell_count?.toLocaleString()} modeled cells</p>}</div>
     <div className="rounded-xl border border-[#dceadd] bg-[#f2f8f1] p-4">
@@ -192,6 +192,7 @@ export default function HeatMap() {
   const wards = boundaries.data?.features || [];
   const noData = boundaries.status === "no-data" && wardHeat.status === "no-data";
   const hasError = boundaries.status === "error" || wardHeat.status === "error";
+  const modelDateRange = cellHeat.data?.dataset_date_range || wardHeat.data?.dataset_date_range;
 
   return <>
     <PageIntro eyebrow="Spatial analysis" title="Pune / PCMC heat map"
@@ -201,7 +202,7 @@ export default function HeatMap() {
       {[ ["model", "Research Model · 30 m predictions"], ["satellite", "Optional · NASA MODIS"] ].map(([value, label]) =>
         <label key={value} className="flex items-center gap-2 text-sm text-[#36533d]">
           <input type="radio" name="heat-source" value={value} checked={mode === value}
-            onChange={() => { setMode(value); setSelected(null); }} />{label}
+            onChange={() => { setMode(value); setSelected(null); if (value === "model" && wardHeat.status !== "ready") { setView("cells"); mapRef.current?.setZoom(Math.max(16, mapRef.current.getZoom())); } }} />{label}
         </label>)}
     </fieldset>
     {!satelliteMode && <div className="mb-5 flex flex-wrap gap-4 rounded-xl border border-[#dfe8de] bg-white p-4 text-xs text-[#36533d]">
@@ -212,8 +213,8 @@ export default function HeatMap() {
         <option value="auto">Auto · zoom to cells</option><option value="wards">Wards</option><option value="cells">30 m cells</option>
       </select></label>
       <label>Season <select aria-label="Model season" value={season} onChange={(e) => { setSeason(e.target.value); setSelected(null); }} className="ml-2 rounded border p-2">
-        <option value="dataset">{wardHeat.data?.dataset_date_range?.match(/^\d{4}-03-01\/\d{4}-05-31$/) ? `Peak Summer · ${wardHeat.data.dataset_date_range}` : `Loaded model period · ${wardHeat.data?.dataset_date_range || "dates unavailable"}`}</option>
-        {!wardHeat.data?.dataset_date_range?.match(/^\d{4}-03-01\/\d{4}-05-31$/) && <option value="summer">Peak Summer · unavailable</option>}
+        <option value="dataset">{modelDateRange?.match(/^\d{4}-03-01\/\d{4}-05-31$/) ? `Peak Summer · ${modelDateRange}` : `Loaded model period · ${modelDateRange || "dates unavailable"}`}</option>
+        {!modelDateRange?.match(/^\d{4}-03-01\/\d{4}-05-31$/) && <option value="summer">Peak Summer · unavailable</option>}
         <option value="monsoon">Monsoon · unavailable</option><option value="post-monsoon">Post-monsoon · unavailable</option><option value="winter">Winter · unavailable</option>
       </select></label>
       {season !== "dataset" && <p role="status">No trained model for this season. Predictions are unavailable.</p>}
@@ -245,10 +246,10 @@ export default function HeatMap() {
               style={{ color: "#264b37", weight: 1.8, fillOpacity: 0, opacity: 0.85 }}
               onEachFeature={(feature, layer) => layer.on("click", () => selectWard(feature.properties.ward_id))} />}
           </MapContainer>
-          {!satelliteMode && (noData || hasError) && <div className="pointer-events-none absolute left-4 top-4 z-[500] max-w-[min(360px,calc(100%-32px))] rounded-xl border border-[#e1e7df] bg-white/95 p-4 shadow-lg" aria-live="polite">
+          {!satelliteMode && !detailed && (noData || hasError) && <div className="pointer-events-none absolute left-4 top-4 z-[500] max-w-[min(360px,calc(100%-32px))] rounded-xl border border-[#e1e7df] bg-white/95 p-4 shadow-lg" aria-live="polite">
             <div className="flex items-start gap-2.5">{hasError ? <AlertCircle size={18} className="mt-0.5 shrink-0 text-[#aa6a4c]" /> : <Database size={18} className="mt-0.5 shrink-0 text-[#818d72]" />}
-              <div><p className="text-xs font-semibold text-[#314e38]">{hasError ? "Map layer connection error" : "30 m model inputs are missing"}</p>
-                <p className="mt-1 text-[11px] leading-5 text-[#718172]">{hasError ? "Check FastAPI, then refresh." : "This model needs verified wards, the ML grid and trained XGBoost weights. Switch to Satellite observations to see NASA surface-temperature imagery now."}</p></div></div></div>}
+              <div><p className="text-xs font-semibold text-[#314e38]">Ward layer unavailable</p>
+                <p className="mt-1 text-[11px] leading-5 text-[#718172]">Verified ward GIS is required for ward reporting. Select 30 m cells and zoom to 16+ for cell predictions when the real ML grid and trained model are available.</p></div></div></div>}
           {!satelliteMode && viewport?.zoom >= 16 && cellHeat.status === "too-many" && <div className="pointer-events-none absolute bottom-8 left-4 z-[500] rounded-lg border border-[#e6d9bd] bg-white/95 px-3 py-2 text-[11px] font-medium text-[#806c43] shadow-sm">Zoom in further to display the 30 m cells.</div>}
           {!satelliteMode && viewport?.zoom >= 16 && cellHeat.status === "loading" && <div className="pointer-events-none absolute bottom-8 left-4 z-[500] flex items-center gap-2 rounded-lg bg-white/95 px-3 py-2 text-[11px] text-[#4d7458] shadow-sm"><LoaderCircle size={13} className="animate-spin" /> Loading cells…</div>}
         </div>

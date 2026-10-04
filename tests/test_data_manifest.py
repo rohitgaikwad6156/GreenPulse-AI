@@ -9,6 +9,7 @@ from pathlib import Path
 from backend.app.data_intake.manifest import (
     ALL_SOURCE_IDS,
     REQUIRED_SOURCE_IDS,
+    REPORTING_SOURCE_IDS,
     validate_manifest,
 )
 
@@ -94,10 +95,13 @@ class DataManifestTests(unittest.TestCase):
         by_id = {source["id"]: source for source in document["sources"]}
         self.assertEqual(set(by_id), ALL_SOURCE_IDS)
         self.assertTrue(all(by_id[source_id]["scope"] == "required_mvp" for source_id in REQUIRED_SOURCE_IDS))
+        self.assertEqual(REPORTING_SOURCE_IDS, {"ward_boundaries"})
+        self.assertEqual(by_id["ward_boundaries"]["scope"], "reporting_dependency")
         report = validate_manifest(root / "data" / "source_manifest.json", root)
         self.assertFalse(report.ok)  # Some required authority/credential-gated inputs remain absent.
         errors = "\n".join(report.errors)
-        self.assertIn("ward_boundaries.local_path", errors)
+        self.assertNotIn("ward_boundaries.local_path", errors)
+        self.assertIn("ward_boundaries.local_path", "\n".join(report.warnings))
         self.assertIn("periurban_lst_reference.companion_files[0].local_path", errors)
 
 

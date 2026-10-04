@@ -36,6 +36,20 @@ def _feature(geometry, properties):
 
 
 class UrbanMorphologyTests(unittest.TestCase):
+    def test_heat_map_profile_saves_only_three_morphology_layers(self):
+        with tempfile.TemporaryDirectory() as temp:
+            transform = from_origin(500000, 2050030, 30, 30)
+            inside = np.ones((2, 2), dtype=bool)
+            layers = {name: np.ones((2, 2), dtype=np.float32)
+                      for name in ("tree_canopy_pct", "built_pct", "road_density")}
+            output = Path(temp)
+            stats = save_layers(layers, transform, inside, output,
+                                {name: "ARTIFICIAL TEST FIXTURE" for name in layers}, profile="heat-map")
+            self.assertEqual(set(stats), set(layers))
+            self.assertFalse((output / "population_density_pune_30m.tif").exists())
+            with self.assertRaisesRegex(ValueError, "Required morphology"):
+                save_layers(layers, transform, inside, output, {})
+
     def test_worldcover_fractions_and_missing_pixels(self):
         with tempfile.TemporaryDirectory() as temp:
             transform = from_origin(500000, 2050030, 30, 30)

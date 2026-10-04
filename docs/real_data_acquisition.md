@@ -4,7 +4,7 @@ This is the operational hand-off for the real-data phase. The search envelope `7
 
 ## Reproducible commands
 
-Run from `D:\green plus ai\GreenPulse-AI`:
+Run from the repository root:
 
 ```powershell
 .\.venv\Scripts\python.exe .\scripts\acquire_real_sources.py discover
@@ -24,11 +24,23 @@ $env:CDSE_PASSWORD = 'your Copernicus Data Space password'
 
 Downloads are atomic and reused when already valid. HTML authentication responses and malformed GeoTIFFs are rejected. Provenance records, including URLs, selection rules, scene IDs, timestamps, byte sizes, and SHA-256 values, are written under `data/provenance/`. Source rasters remain under the existing ignored `data/raw/` tree.
 
-## Municipal boundaries: smallest required user action
+## Municipal outlines required for the study grid
+
+Acquire separate, official EPSG:4326 PMC and PCMC **municipal outline** GeoJSON files, with the issuing authority, dataset identifier, effective date, and reuse permission. The staged PCMC Smart GIS outline covers PCMC only; a matching verified PMC outline is still needed. A search envelope or ward map PDF is not a substitute. Import the two outlines independently of ward GIS:
+
+```powershell
+.\.venv\Scripts\python.exe .\scripts\import_municipal_outlines.py `
+  --pmc-outline C:\path\pmc-outline.geojson --pcmc-outline C:\path\pcmc-outline.geojson `
+  --provenance C:\path\outline-provenance.json
+```
+
+The provenance JSON has `PMC` and `PCMC` objects with `source_organization`, `source_url`, `dataset_identifier`, `license`, and `effective_date` fields. Validate the resulting `data/boundaries/pmc_pcmc.geojson`, record its checksum in `data/source_manifest.json`, and run manifest validation. The importer only combines supplied official outlines; it does not create ward geometry.
+
+## Ward boundaries required only for reporting
 
 The official PMC open-data catalogue currently exposes ward maps as PDFs and a coordinate list, not GIS polygons. The PCMC election site likewise exposes final ward maps as PDFs. PCMC Smart GIS exposes the official `citylayers4:boundary` municipal outline through WFS, but its published capabilities do not include a ward/prabhag polygon layer. A map PDF or screenshot must not be digitized and relabelled as authoritative GIS data.
 
-Request/export two **EPSG:4326 GeoJSON ward polygon files** from the responsible municipal election/GIS offices, with release/effective date, dataset identifier or written response URL, and reuse license/permission. Contact points published by the portals are `opendata@punecorporation.org` for PMC open data and `egov@pcmcindia.gov.in` for PCMC. Save the files outside the output paths, create a provenance JSON, and import them:
+For ward aggregation and the ward UI, request/export two **EPSG:4326 GeoJSON ward polygon files** from the responsible municipal election/GIS offices, with release/effective date, dataset identifier or written response URL, and reuse license/permission. Cell-level dataset assembly and training can proceed without them. Contact points published by the portals are `opendata@punecorporation.org` for PMC open data and `egov@pcmcindia.gov.in` for PCMC. Save the files outside the output paths, create a provenance JSON, and import them:
 
 ```json
 {

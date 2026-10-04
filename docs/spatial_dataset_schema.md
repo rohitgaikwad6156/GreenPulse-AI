@@ -11,7 +11,7 @@ Primary research reference: GreenPulse_AI_Research_Symbols_Cleaned.pdf, especial
 - Primary key: (grid_id, observation_date). grid_id never changes between dates. The same cell can appear on several dates.
 - Target: lst_c, observed satellite land surface temperature in degrees Celsius. No 0–100 risk score is an ML target.
 - Training table: only rows with a quality-accepted lst_c are eligible. Cells with masked LST remain in the grid and interim layers as no-data, not as zero-temperature training examples.
-- Final reporting unit: a verified PMC or PCMC ward. Ward summaries are calculated after cell-level analysis.
+- Optional final reporting unit: a verified PMC or PCMC ward. Cell-level analysis and model training do not require wards; ward summaries are calculated only after verified official ward polygons are available.
 - Geometry: full, uncut 900 m² grid squares in EPSG:32643. Study-area and ward intersections are handled by masks and overlap weights, so border cells do not silently change shape.
 
 The 30 m spacing is an analysis grid. Landsat thermal observations have a coarser native footprint, although the delivered product is gridded at 30 m. Adjacent 30 m LST values are therefore not independent 30 m thermometer readings. LST is surface skin temperature, not 2 m pedestrian air temperature.
@@ -40,7 +40,7 @@ Roles: Target = observed value the ML model will learn; Feature = candidate pred
 
 Ranges below are admissible domains or QA expectations, not measured Pune/PCMC results. "Finite" means no fixed local bound is asserted before inspecting genuine data. NULL means an actual missing value, never a fabricated zero. Source resolution describes the original information content; every value is aligned to a 30 m output cell later.
 
-The default candidate LST feature set is ndvi, ndbi, tree_canopy_pct, built_pct, albedo, road_density, distance_green_m, elevation_m, ndvi_mean_3x3, ndvi_mean_5x5, ndbi_mean_3x3, and ndbi_mean_5x5. This is a schema-level candidate list, not a fitted model. A feature without a defensible source or adequate coverage must be omitted with the reason recorded before training; in particular, cool-roof simulation must wait for a documented albedo/roof-response method rather than filling albedo with a guess.
+The default MVP LST model uses ndvi, ndbi, tree_canopy_pct, built_pct, and road_density. A larger schema-level candidate list also includes albedo, distance_green_m, elevation_m, ndvi_mean_3x3, ndvi_mean_5x5, ndbi_mean_3x3, and ndbi_mean_5x5. Elevation is not implemented as a predictor until a verified DEM pipeline exists. Population density is exposure metadata and never a default LST predictor. A feature without a defensible source or adequate coverage must be omitted with the reason recorded before training; cool-roof simulation must wait for a documented albedo/roof-response method rather than filling albedo with a guess.
 
 ### 3.1 Identity, location, and provenance
 
@@ -110,7 +110,7 @@ Optional point observations must retain sensor identity, observation time, and s
 
 ## 5. Ward reporting contract
 
-Use verified, versioned PMC and PCMC polygons. For each grid cell/ward intersection, store area a(g,w) in m² and overlap weight a(g,w)/900. A cell crossing a boundary can contribute to both wards. Keep ward_id in the main row as a convenient primary label only; use the overlap table for authoritative ward summaries.
+Use verified, versioned PMC and PCMC ward polygons only when available. Without them, retain eligible climate cells with NULL ward_id and ward_name and keep ward reporting unavailable. For each later grid cell/ward intersection, store area a(g,w) in m² and overlap weight a(g,w)/900. A cell crossing a boundary can contribute to both wards. Keep ward_id in the main row as a convenient primary label only; use the overlap table for authoritative ward summaries.
 
 For a valid temperature field T(g) on an observation date, ward mean LST is:
 

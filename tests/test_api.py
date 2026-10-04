@@ -87,7 +87,8 @@ class ApiTests(unittest.TestCase):
             }), grid)
             metadata.write_text(json.dumps({"raster_resolution_m": 30,
                                             "features": ["ndvi"], "row_count": 3}), encoding="utf-8")
-            with patch.object(services, "GRID", grid), patch.object(services, "GRID_METADATA", metadata):
+            with patch.object(services, "GRID", grid), patch.object(services, "GRID_METADATA", metadata), \
+                 patch.object(services, "_require_ward_reporting", return_value=folder / "ARTIFICIAL-WARDS.geojson"):
                 wards = routes.get_wards()
                 self.assertEqual(wards["total"], 2)
                 self.assertEqual(wards["wards"][0]["grid_cell_count"], 2)
@@ -99,6 +100,31 @@ class ApiTests(unittest.TestCase):
                 with self.assertRaises(HTTPException) as context:
                     routes.get_ward("Z")
                 self.assertEqual(context.exception.status_code, 404)
+
+    def test_cell_grid_remains_available_without_ward_reporting(self):
+        with tempfile.TemporaryDirectory() as temp:
+            folder = Path(temp)
+            grid = folder / "grid.parquet"
+            metadata = folder / "metadata.json"
+            pq.write_table(pa.table({
+                "grid_id": ["ARTIFICIAL-1"], "x": [1.0], "y": [1.0],
+                "latitude": [18.0], "longitude": [73.0],
+                "ward_id": pa.array([None], type=pa.string()),
+                "ward_name": pa.array([None], type=pa.string()),
+                "lst_c": [30.0], "ndvi": [0.2],
+            }), grid)
+            metadata.write_text(json.dumps({"raster_resolution_m": 30,
+                                            "features": ["ndvi"], "row_count": 1,
+                                            "ward_reporting_available": False}), encoding="utf-8")
+            with patch.object(services, "GRID", grid), patch.object(services, "GRID_METADATA", metadata):
+                cell = routes.get_grid(limit=10, offset=0, ward_id=None)["cells"][0]
+                self.assertIsNone(cell["ward_id"])
+                self.assertIsNone(cell["ward_name"])
+                for call in (routes.get_wards, lambda: routes.get_ward("PMC:1"),
+                             lambda: routes.get_grid(limit=10, offset=0, ward_id="PMC:1")):
+                    with self.assertRaises(HTTPException) as context:
+                        call()
+                    self.assertEqual(context.exception.status_code, 503)
 
     def test_did_uses_paired_user_values_and_labels_provenance(self):
         request = DidRequest(intervention="ARTIFICIAL TEST INTERVENTION",
@@ -117,11 +143,12 @@ class ApiTests(unittest.TestCase):
             routes.post_validation_did(bad)
         self.assertEqual(context.exception.status_code, 422)
 
-    def test_methodology_reports_file_presence_without_demo_fallback(self):
-        result = routes.get_methodology()
+    def test_methodology_reports_validated_grid_availability(self):
+        with patch.object(services, "_real_grid", side_effect=services.DataUnavailableError("unavailable")):
+            result = routes.get_methodology()
         self.assertIn("LST", result["target"])
-        self.assertEqual(result["data_status"]["real_ml_grid_available"], services.GRID.is_file() and services.GRID_METADATA.is_file())
-        self.assertEqual(result["data_status"]["trained_model_available"], services.MODEL.is_file() and services.MODEL_METADATA.is_file())
+        self.assertFalse(result["data_status"]["real_ml_grid_available"])
+        self.assertFalse(result["data_status"]["trained_model_available"])
         self.assertFalse(result["data_status"]["optimizer_location_available"])
         self.assertFalse(result["data_status"]["real_validation_dataset_available"])
 

@@ -71,7 +71,8 @@ def _bundle() -> tuple[XGBRegressor, tuple[str, ...], dict]:
 
 
 def ward_boundaries() -> dict:
-    """Return the same WGS84 verified-input GeoJSON used by the ML pipeline."""
+    """Return authority-verified reporting geometry independently of ML training."""
+    services._require_ward_reporting()
     if not BOUNDARY.is_file():
         raise services.DataUnavailableError(f"PMC/PCMC ward boundary GeoJSON is missing: {BOUNDARY}")
     try:
@@ -123,18 +124,24 @@ def _ward_prediction_summary(signature: tuple) -> dict:
         if not np.isfinite(predictions).all():
             raise services.DataUnavailableError("Saved model produced nonfinite map predictions")
         for ward_id, prediction in zip(data["ward_id"], predictions):
-            totals[str(ward_id)][0] += float(prediction)
-            totals[str(ward_id)][1] += 1
+            if ward_id is not None:
+                totals[ward_id][0] += float(prediction)
+                totals[ward_id][1] += 1
     return {ward_id: {"predicted_lst_c": total / count, "grid_cell_count": count}
             for ward_id, (total, count) in totals.items() if count}
 
 
 def _map_context() -> dict:
-    summaries = _ward_prediction_summary(_signature())
-    count = sum(row["grid_cell_count"] for row in summaries.values())
-    baseline = (sum(row["predicted_lst_c"] * row["grid_cell_count"] for row in summaries.values()) / count
-                if count else None)
-    _, _, metadata = _bundle()
+    model, names, metadata = _bundle()
+    total = 0.0
+    count = 0
+    for data in _batches(list(names)):
+        predictions = np.asarray(model.predict(_matrix(data, names, slice(None))), dtype=float)
+        if not np.isfinite(predictions).all():
+            raise services.DataUnavailableError("Saved model produced nonfinite map predictions")
+        total += float(predictions.sum())
+        count += len(predictions)
+    baseline = total / count if count else None
     return {"city_baseline_c": baseline, "dataset_date_range": metadata.get("dataset_date_range")}
 
 
@@ -151,6 +158,9 @@ def _layer_properties(predictions) -> list[dict]:
 
 
 def ward_heat() -> dict:
+    reader, grid_metadata = services._real_grid()
+    reader.close()
+    services._require_ward_reporting(grid_metadata)
     boundaries = ward_boundaries()
     summaries = _ward_prediction_summary(_signature())
     features = []
@@ -194,7 +204,7 @@ def cell_heat(west: float, south: float, east: float, north: float) -> dict:
     for row, temperature, properties in zip(selected, predictions, _layer_properties(predictions)):
         x, y = float(row["x"]), float(row["y"])
         features.append({"type": "Feature", "geometry": _cell_polygon(x, y),
-                         "properties": {"grid_id": str(row["grid_id"]), "ward_id": str(row["ward_id"]),
+                         "properties": {"grid_id": str(row["grid_id"]), "ward_id": row["ward_id"],
                                         "predicted_lst_c": float(temperature), **properties}})
     return {"type": "FeatureCollection", "features": features, "too_many_cells": False,
             "max_cells": MAX_VIEW_CELLS, "unit": "°C", "message": None}
@@ -251,7 +261,7 @@ def cell_detail(grid_id: str) -> dict:
         raise services.DataUnavailableError("Saved model returned nonfinite LST")
     score, score_status, confidence = _score_and_confidence(prediction)
     return {"selection_type": "grid_cell", "grid_id": grid_id,
-            "ward_id": str(found["ward_id"]), "ward_name": str(found["ward_name"]),
+            "ward_id": found["ward_id"], "ward_name": found["ward_name"],
             "latitude": float(found["latitude"]), "longitude": float(found["longitude"]),
             "geometry": _cell_polygon(float(found["x"]), float(found["y"])),
             "predicted_lst_c": prediction, "heat_hazard_score": score,
@@ -264,6 +274,9 @@ def cell_detail(grid_id: str) -> dict:
 
 
 def ward_detail(ward_id: str) -> dict:
+    reader, grid_metadata = services._real_grid()
+    reader.close()
+    services._require_ward_reporting(grid_metadata)
     boundary_ids = {feature["properties"]["ward_id"] for feature in ward_boundaries()["features"]}
     if ward_id not in boundary_ids:
         raise services.ResourceNotFoundError(f"Ward boundary not found: {ward_id}")

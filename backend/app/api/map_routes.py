@@ -42,8 +42,8 @@ class MapDetailResponse(BaseModel):
     latitude: float | None = None
     longitude: float | None = None
     geometry: dict[str, Any] | None = None
-    ward_id: str
-    ward_name: str
+    ward_id: str | None
+    ward_name: str | None
     grid_cell_count: int | None = None
     predicted_lst_c: float
     heat_hazard_score: float | None

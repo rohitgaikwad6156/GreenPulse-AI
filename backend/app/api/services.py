@@ -46,6 +46,11 @@ def _real_grid():
     if not GRID.is_file():
         raise DataUnavailableError(f"Required real ML grid is missing: {GRID}")
     metadata = _read_json(GRID_METADATA)
+    from backend.app.data_intake.provenance import reject_demo_metadata
+    try:
+        reject_demo_metadata(metadata)
+    except ValueError as exc:
+        raise DataUnavailableError(str(exc)) from exc
     if (metadata.get("raster_resolution_m") != 30
             or not isinstance(metadata.get("features"), list)
             or not isinstance(metadata.get("row_count"), int)
@@ -70,9 +75,26 @@ def _real_grid():
     return reader, metadata
 
 
+def _require_ward_reporting(metadata: dict | None = None) -> Path:
+    """Gate ward responses on the current verified authority source."""
+    from backend.app.data_intake.manifest import verified_ward_path
+
+    try:
+        path = verified_ward_path(SOURCE_MANIFEST, ROOT)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        raise DataUnavailableError(f"Verified PMC/PCMC ward GIS is unavailable: {exc}") from exc
+    if path is None or (metadata is not None and
+                        (not metadata.get("ward_reporting_available")
+                         or metadata.get("ward_boundary") != str(path))):
+        raise DataUnavailableError("Verified PMC/PCMC ward GIS and a matching processed grid are required for ward reporting")
+    return path
+
+
 def model_metrics() -> dict:
     if not MODEL.is_file():
         raise DataUnavailableError(f"Required trained XGBoost model is missing: {MODEL}")
+    reader, _ = _real_grid()
+    reader.close()
     metadata = _read_json(MODEL_METADATA)
     if (metadata.get("target") != "lst_c" or metadata.get("objective") != "reg:squarederror"
             or not isinstance(metadata.get("spatial_cv_metrics"), dict)
@@ -87,6 +109,7 @@ def model_metrics() -> dict:
 
 
 def list_wards() -> dict:
+    _require_ward_reporting(_read_json(GRID_METADATA))
     reader, _ = _real_grid()
     counts = Counter()
     names = {}
@@ -104,6 +127,8 @@ def list_wards() -> dict:
 
 
 def list_grid(*, limit: int, offset: int, ward_id: str | None) -> dict:
+    if ward_id is not None:
+        _require_ward_reporting(_read_json(GRID_METADATA))
     reader, metadata = _real_grid()
     base = ["grid_id", "ward_id", "ward_name", "latitude", "longitude", "x", "y", "lst_c"]
     features = metadata["features"]
@@ -118,8 +143,8 @@ def list_grid(*, limit: int, offset: int, ward_id: str | None) -> dict:
                 if offset <= matched < offset + limit:
                     cells.append({
                         "grid_id": str(data["grid_id"][index]),
-                        "ward_id": str(data["ward_id"][index]),
-                        "ward_name": str(data["ward_name"][index]),
+                        "ward_id": data["ward_id"][index],
+                        "ward_name": data["ward_name"][index],
                         "latitude": float(data["latitude"][index]),
                         "longitude": float(data["longitude"][index]),
                         "x": float(data["x"][index]), "y": float(data["y"][index]),
@@ -134,6 +159,7 @@ def list_grid(*, limit: int, offset: int, ward_id: str | None) -> dict:
 
 
 def ward_summary(ward_id: str) -> dict:
+    _require_ward_reporting(_read_json(GRID_METADATA))
     reader, _ = _real_grid()
     count = 0
     total = 0.0
@@ -184,6 +210,13 @@ def predict_grid_cell(grid_id: str) -> dict:
 
 
 def methodology() -> dict:
+    real_grid_available = False
+    try:
+        reader, _ = _real_grid()
+        reader.close()
+        real_grid_available = True
+    except DataUnavailableError:
+        pass
     optimizer_location_available = False
     if CATALOG.is_file():
         try:
@@ -209,8 +242,8 @@ def methodology() -> dict:
                         "SHAP explains model predictions and does not prove causation.",
                         "Intervention estimates need local calibration and later field validation.",
                         "The optimization is optimal only under its modeled objective, assumptions and constraints."],
-        "data_status": {"real_ml_grid_available": GRID.is_file() and GRID_METADATA.is_file(),
-                        "trained_model_available": MODEL.is_file() and MODEL_METADATA.is_file(),
+        "data_status": {"real_ml_grid_available": real_grid_available,
+                        "trained_model_available": real_grid_available and MODEL.is_file() and MODEL_METADATA.is_file(),
                         "intervention_catalog_available": CATALOG.is_file(),
                         "optimizer_location_available": optimizer_location_available,
                         "real_validation_dataset_available": real_validation_available},

@@ -22,7 +22,7 @@
     },
     {
       "id": "ward_boundaries",
-      "scope": "required_mvp",
+      "scope": "reporting_dependency",
       "source_organization": null,
       "product": "Verified PMC and PCMC ward boundaries",
       "dataset_identifier": null,
@@ -37,7 +37,7 @@
       "verification_status": "pending",
       "data_classification": "real",
       "format": "geojson",
-      "notes": "Every feature requires municipality, ward_id, and ward_name. Do not use the fictional demo wards."
+      "notes": "Reporting and ward UI only. Every feature requires municipality, ward_id, and ward_name. Cell-level LST training proceeds without this source; never use demo or inferred wards."
     },
     {
       "id": "landsat_lst_scenes",

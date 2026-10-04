@@ -21,7 +21,6 @@ from pyproj import CRS
 CONTRACT_VERSION = "1.0"
 REQUIRED_SOURCE_IDS = {
     "municipal_boundary",
-    "ward_boundaries",
     "landsat_lst_scenes",
     "sentinel2_l2a_scenes",
     "esa_worldcover",
@@ -30,10 +29,11 @@ REQUIRED_SOURCE_IDS = {
     "worldpop",
     "periurban_lst_reference",
 }
+REPORTING_SOURCE_IDS = {"ward_boundaries"}
 OPTIONAL_SOURCE_IDS = {"osm_buildings", "measured_albedo"}
 FUTURE_SOURCE_IDS = {"municipal_sensor_observations"}
-ALL_SOURCE_IDS = REQUIRED_SOURCE_IDS | OPTIONAL_SOURCE_IDS | FUTURE_SOURCE_IDS
-VALID_SCOPES = {"required_mvp", "optional_mvp", "future_scope"}
+ALL_SOURCE_IDS = REQUIRED_SOURCE_IDS | REPORTING_SOURCE_IDS | OPTIONAL_SOURCE_IDS | FUTURE_SOURCE_IDS
+VALID_SCOPES = {"required_mvp", "reporting_dependency", "optional_mvp", "future_scope"}
 VALID_STATUSES = {"pending", "verified", "rejected"}
 SHA256_RE = re.compile(r"^sha256:([0-9a-f]{64})$")
 SEASON_RE = re.compile(r"^(\d{4})-03-01/(\d{4})-05-31$")
@@ -314,6 +314,7 @@ def _validate_source(source: Any, root: Path, report: ValidationReport,
     if scope not in VALID_SCOPES:
         _error(report, source_id, "scope", f"must be one of {sorted(VALID_SCOPES)}")
     expected_scope = ("required_mvp" if source_id in REQUIRED_SOURCE_IDS else
+                      "reporting_dependency" if source_id in REPORTING_SOURCE_IDS else
                       "optional_mvp" if source_id in OPTIONAL_SOURCE_IDS else
                       "future_scope" if source_id in FUTURE_SOURCE_IDS else None)
     if expected_scope and scope != expected_scope:
@@ -392,7 +393,8 @@ def _validate_source(source: Any, root: Path, report: ValidationReport,
 
 def validate_manifest(manifest_path: Path, root: Path | None = None, *,
                       allow_synthetic: bool = False,
-                      enforce_inventory: bool = True) -> ValidationReport:
+                      enforce_inventory: bool = True,
+                      source_ids: set[str] | None = None) -> ValidationReport:
     """Validate structure, provenance, files, checksums, CRS and season alignment."""
     report = ValidationReport()
     root = (root or manifest_path.resolve().parents[1]).resolve()
@@ -413,6 +415,12 @@ def validate_manifest(manifest_path: Path, root: Path | None = None, *,
     if not isinstance(sources, list):
         report.errors.append("sources: must be an array")
         return report
+    if source_ids is not None:
+        if not source_ids or not source_ids <= ALL_SOURCE_IDS:
+            report.errors.append("source_ids must be a nonempty subset of the source inventory")
+            return report
+        sources = [source for source in sources
+                   if isinstance(source, dict) and source.get("id") in source_ids]
     seen: set[str] = set()
     seasons: dict[str, tuple[date | None, date | None]] = {}
     errors_before: dict[str, int] = {}
@@ -430,7 +438,7 @@ def validate_manifest(manifest_path: Path, root: Path | None = None, *,
         if len(report.errors) == errors_before[candidate_id] and source.get("verification_status") == "verified":
             report.verified_sources.append(source_id)
     if enforce_inventory:
-        missing = ALL_SOURCE_IDS - seen
+        missing = (ALL_SOURCE_IDS if source_ids is None else source_ids) - seen
         extra = seen - ALL_SOURCE_IDS
         for source_id in sorted(missing):
             report.errors.append(f"sources: authoritative inventory entry is missing: {source_id}")
@@ -445,3 +453,16 @@ def validate_manifest(manifest_path: Path, root: Path | None = None, *,
             _error(report, source_id, "scene_date_range", "peak_summer must be exactly YYYY-03-01 through YYYY-05-31")
     report.verified_sources.sort()
     return report
+
+
+def verified_ward_path(manifest_path: Path, root: Path) -> Path | None:
+    """Use ward geometry only after its reporting source passes provenance checks."""
+    document = json.loads(manifest_path.read_text(encoding="utf-8"))
+    entry = next((item for item in document.get("sources", [])
+                  if item.get("id") == "ward_boundaries"), None)
+    if entry is None or entry.get("verification_status") != "verified":
+        return None
+    report = validate_manifest(manifest_path, root, source_ids={"ward_boundaries"})
+    if not report.ok or "ward_boundaries" not in report.verified_sources:
+        raise ValueError("Verified ward source is invalid: " + "; ".join(report.errors))
+    return _safe_local_path(root, entry["local_path"], "ward_boundaries", ValidationReport())

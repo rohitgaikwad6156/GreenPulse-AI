@@ -1,7 +1,7 @@
 """Assemble a real, aligned 30 m GreenPulse LST training table.
 
 This module never creates climate measurements or trains a model. Every row
-comes from QA-masked source rasters and verified ward polygons.
+comes from QA-masked source rasters within verified municipal polygons.
 """
 
 from __future__ import annotations
@@ -42,11 +42,11 @@ REQUIRED_RASTERS = {
     "built_pct": "data/interim/morphology/built_pct_pune_30m.tif",
     "road_density": "data/interim/morphology/road_density_pune_30m.tif",
     "distance_green_m": "data/interim/morphology/distance_green_m_pune_30m.tif",
-    "population_density": "data/interim/morphology/population_density_pune_30m.tif",
 }
+HEAT_MAP_FEATURES = ("ndvi", "ndbi", "tree_canopy_pct", "built_pct", "road_density")
 FOCAL_NAMES = ("ndvi_mean_3x3", "ndvi_mean_5x5", "ndbi_mean_3x3", "ndbi_mean_5x5")
 MODEL_BASE = ("ndvi", "ndbi", "tree_canopy_pct", "built_pct", "road_density",
-              "distance_green_m", "population_density")
+              "distance_green_m")
 LIMITS = {"lst_c": (-273.15, math.inf), "ndvi": (-1, 1), "ndbi": (-1, 1),
           "tree_canopy_pct": (0, 100), "built_pct": (0, 100), "albedo": (0, 1),
           "road_density": (0, math.inf), "distance_green_m": (0, math.inf),
@@ -217,31 +217,35 @@ def _coverage_plot(status: np.ndarray, path: Path) -> None:
     from matplotlib.colors import BoundaryNorm, ListedColormap
     shown = np.ma.masked_equal(status, 0)
     colors = ["#2f855a", "#c53030", "#dd6b20", "#805ad5"]
-    labels = ["retained", "missing LST", "missing predictor", "ward unassigned/ambiguous"]
+    labels = ["retained", "missing LST", "missing predictor"]
     cmap = ListedColormap(colors)
-    norm = BoundaryNorm([0.5, 1.5, 2.5, 3.5, 4.5], cmap.N)
+    norm = BoundaryNorm([0.5, 1.5, 2.5, 3.5], cmap.N)
     fig, ax = plt.subplots(figsize=(8, 8), constrained_layout=True)
     image = ax.imshow(shown, cmap=cmap, norm=norm, interpolation="nearest")
-    colorbar = fig.colorbar(image, ax=ax, ticks=[1, 2, 3, 4], shrink=0.75)
+    colorbar = fig.colorbar(image, ax=ax, ticks=[1, 2, 3], shrink=0.75)
     colorbar.ax.set_yticklabels(labels)
     ax.set(title="GreenPulse complete-case coverage", xlabel="30 m grid column", ylabel="30 m grid row")
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
 
-def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_path: Path,
+def build_ml_dataset(root: Path, ward_path: Path | None, output_path: Path, metadata_path: Path,
                      albedo_path: Path | None = None, csv_sample_rows: int = 200,
-                     chunk_rows: int = 128) -> dict:
+                     chunk_rows: int = 128, profile: str = "full") -> dict:
     """Join verified real rasters into one Parquet row per complete 30 m cell.
 
-    Missing LST or any required feature/ward excludes the cell. No imputation,
+    Missing LST or any required predictor excludes the cell. Ward labels are
+    nullable reporting metadata and never determine training eligibility. No imputation,
     clipping, model fitting, or synthetic fill occurs. Optional albedo is a
     feature only when a documented aligned raster is explicitly supplied.
     Outputs appear only after all chunks pass validation.
     """
     if csv_sample_rows < 0 or chunk_rows < 1:
         raise ValueError("csv_sample_rows must be nonnegative and chunk_rows positive")
-    paths = {name: root / relative for name, relative in REQUIRED_RASTERS.items()}
+    if profile not in {"full", "heat-map"}:
+        raise ValueError("profile must be full or heat-map")
+    paths = {name: root / relative for name, relative in REQUIRED_RASTERS.items()
+             if profile == "full" or name in {"lst_c", *HEAT_MAP_FEATURES}}
     if albedo_path is not None:
         paths["albedo"] = albedo_path
     for name, path in paths.items():
@@ -250,16 +254,19 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
     boundary_path = root / "data" / "boundaries" / "pmc_pcmc.geojson"
     boundary = load_municipal_boundary(boundary_path)
     transform, height, width, inside = target_grid(boundary)
-    wards = load_wards(ward_path)
-    ward_index, ward_count = ward_index_grid(wards, transform, height, width, inside)
-    feature_names = list(MODEL_BASE)
+    wards = load_wards(ward_path) if ward_path is not None and ward_path.is_file() else []
+    ward_index, ward_count = (ward_index_grid(wards, transform, height, width, inside)
+                              if wards else (np.zeros((height, width), dtype=np.int32),
+                                             np.zeros((height, width), dtype=np.uint16)))
+    feature_names = list(HEAT_MAP_FEATURES if profile == "heat-map" else MODEL_BASE)
     if albedo_path is not None:
         feature_names.append("albedo")
-    feature_names.extend(FOCAL_NAMES)
+    if profile == "full":
+        feature_names.extend(FOCAL_NAMES)
     schema = _schema(feature_names)
     missing = {name: 0 for name in ["lst_c", *feature_names, "ward_id"]}
     rejected = {"outside_municipality": int((~inside).sum()), "missing_lst": 0,
-                "missing_required_feature": 0, "unassigned_or_ambiguous_ward": 0}
+                "missing_required_feature": 0}
     feature_sum = np.zeros(len(feature_names), dtype=np.float64)
     feature_products = np.zeros((len(feature_names), len(feature_names)), dtype=np.float64)
     row_count = 0
@@ -327,7 +334,7 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                         halo_start, halo_stop = max(0, start - 2), min(height, stop + 2)
                         halo_window = Window(0, halo_start, width, halo_stop - halo_start)
                         focal = {}
-                        for name in ("ndvi", "ndbi"):
+                        for name in (("ndvi", "ndbi") if profile == "full" else ()):
                             context = _read_values(rasters[name], halo_window)
                             count_context = rasters[name + "_valid_count"].read(1, window=halo_window)
                             context[count_context == 0] = np.nan
@@ -345,15 +352,12 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                         features_ok = np.ones((rows, width), dtype=bool)
                         for name in feature_names:
                             features_ok &= np.isfinite(values[name])
-                        ward_ok = ward_block != 0
                         rejected["missing_lst"] += int(np.count_nonzero(local_inside & ~target_ok))
                         rejected["missing_required_feature"] += int(np.count_nonzero(target_ok & ~features_ok))
-                        rejected["unassigned_or_ambiguous_ward"] += int(np.count_nonzero(target_ok & features_ok & ~ward_ok))
-                        keep = target_ok & features_ok & ward_ok
+                        keep = target_ok & features_ok
                         status = coverage_status[start:stop]
                         status[local_inside & ~target_ok] = 2
                         status[target_ok & ~features_ok] = 3
-                        status[target_ok & features_ok & ~ward_ok] = 4
                         status[keep] = 1
                         row, col = np.nonzero(keep)
                         if not row.size:
@@ -366,8 +370,8 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                         data = {"grid_id": [f"utm43n_{int(transform.c + int(c) * 30)}_{int(transform.f - int(r) * 30)}"
                                             for r, c in zip(absolute_row, col)],
                                 "x": x, "y": y, "latitude": lat, "longitude": lon,
-                                "ward_id": [wards[i - 1].ward_id for i in chosen_wards],
-                                "ward_name": [wards[i - 1].ward_name for i in chosen_wards],
+                                "ward_id": [wards[i - 1].ward_id if i else None for i in chosen_wards],
+                                "ward_name": [wards[i - 1].ward_name if i else None for i in chosen_wards],
                                 "lst_c": values["lst_c"][row, col]}
                         matrix = np.column_stack([values[name][row, col].astype(np.float64) for name in feature_names])
                         feature_sum += matrix.sum(axis=0)
@@ -397,20 +401,22 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                     }
                 report = {
                     "system": "GreenPulse AI — An AI-powered Urban Climate Decision-Support System",
+                    "feature_profile": profile,
                     "target": "continuous observed land surface temperature, lst_c, degrees Celsius",
                     "crs": TARGET_CRS, "raster_resolution_m": 30,
                     "date_range": lst_period, "row_count": row_count,
                     "municipal_grid_cells": int(inside.sum()),
                     "source_layers": sources,
                     "municipal_boundary": str(boundary_path),
-                    "ward_boundary": str(ward_path),
+                    "ward_boundary": str(ward_path) if wards else None,
+                    "ward_reporting_available": bool(wards),
                     "morphology_source_report": str(qc_path),
                     "morphology_original_sources": morphology_qc.get("source_files", {}),
-                    "missing_data_policy": "Complete case: exclude cells with missing/QA-rejected LST, any required feature, or unassigned/ambiguous ward. Never impute or fill with zero. Optional albedo column is omitted unless supplied.",
+                    "missing_data_policy": "Complete case: exclude cells with missing/QA-rejected LST or any required predictor. Missing/ambiguous ward labels remain null and never remove cells. Never impute or fill with zero. Optional albedo is omitted unless supplied.",
                     "missing_cells_by_column_before_filter": missing,
                     "rejected_cells_sequential": rejected,
-                    "ambiguous_ward_cells": int(np.count_nonzero(inside & (ward_count > 1))),
-                    "unassigned_ward_cells": int(np.count_nonzero(inside & (ward_index == 0))),
+                    "ambiguous_ward_cells": int(np.count_nonzero(inside & (ward_count > 1))) if wards else None,
+                    "unassigned_ward_cells": int(np.count_nonzero(inside & (ward_index == 0))) if wards else None,
                     "duplicate_grid_ids": 0,
                     "complete_case_retention_percent": float(100.0 * row_count / int(inside.sum())),
                     "complete_case_retention_by_ward": ward_retention,
@@ -423,7 +429,7 @@ def build_ml_dataset(root: Path, ward_path: Path, output_path: Path, metadata_pa
                     "severe_vif_gt_5": [name for name, value in vif.items() if value is not None and value > 5],
                     "notes": ["No ML training or accuracy estimates in this step.",
                               "LST is surface temperature, not pedestrian air temperature.",
-                              "WorldCover tree cover and built-up class are proxies; WorldPop is coarser than 30 m.",
+                              "WorldCover tree cover and built-up class are proxies; population density is exposure metadata, not an LST predictor.",
                               "Correlations and VIF do not establish causation; correlated features are not removed automatically."]}
                 os.replace(temporary_path, output_path)
     metadata_path.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")

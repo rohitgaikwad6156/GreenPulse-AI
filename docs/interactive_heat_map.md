@@ -28,17 +28,18 @@ research training data. No numerical temperatures are inferred from RGB colors.
 
 ## Research model (separate selectable view)
 
-At city scale it colors ward polygons by the mean XGBoost-predicted **land surface temperature (LST, °C)** across complete-case 30 m cells. At zoom 16 or greater it requests only cells in the current viewport. Clicking a ward or cell calls FastAPI for its prediction, Heat Hazard Score if calibrated, confidence status, and descriptive TreeSHAP factors. No fake markers or fallback climate readings are added.
+When verified ward GIS is available, city scale colors ward polygons by the mean XGBoost-predicted **land surface temperature (LST, °C)** across complete-case 30 m cells. Independently, at zoom 16 or greater the cell view requests cells in the current viewport. Clicking a ward or cell calls FastAPI for its prediction, Heat Hazard Score if calibrated, confidence status, and descriptive TreeSHAP factors. No fake markers or fallback climate readings are added.
 
 ## Required real artifacts
 
 | File | Role |
 | --- | --- |
-| `data/boundaries/pmc_pcmc_wards.geojson` | PMC/PCMC WGS84 polygon input, using the Step 12 ward schema. Verify the issuing authority and version before municipal use. |
+| `data/boundaries/pmc_pcmc.geojson` | Verified PMC and PCMC municipal outlines required to define the 30 m study grid. |
+| `data/boundaries/pmc_pcmc_wards.geojson` | Optional for training; required for ward aggregation and ward UI, with verified issuing authority and version. |
 | `data/processed/greenpulse_ml_grid.parquet` and `metadata.json` | Real, aligned complete-case 30 m cells and their features. |
 | `models/xgboost_lst.joblib` and `model_metadata.json` | Matching trained continuous-LST model and held-out spatial metrics. |
 
-These files are **not currently present**. The research-model view therefore shows geographic context and an explicit missing-input state; the default NASA view remains independently usable. The demo CSV is never used in the map API. A numeric Heat Hazard Score also needs calibrated reference values in model metadata. Without them, the selection panel says `Unavailable`. The confidence panel reports that no cell-level interval is calibrated; where available, it shows held-out spatial RMSE separately.
+The combined municipal outline, real grid and trained model are **not currently present**. The research-model view therefore shows geographic context and an explicit missing-input state; the default NASA view remains independently usable. Missing ward GIS blocks ward views only. The demo CSV is never used in the map API. A numeric Heat Hazard Score also needs calibrated reference values in model metadata. Without them, the selection panel says `Unavailable`. The confidence panel reports that no cell-level interval is calibrated; where available, it shows held-out spatial RMSE separately.
 
 ## Map API
 
@@ -79,7 +80,7 @@ The tests create temporary **ARTIFICIAL / SYNTHETIC** geometry and a tiny fitted
 
 ## Limits and common errors
 
-- A 503 from ward boundaries means the required GeoJSON is missing or structurally invalid. An API check of its fields and geometry does not certify its legal boundary provenance.
+- A 503 from ward boundaries means verified official ward GIS is unavailable or does not match the processed grid. Cell routes remain independent of wards.
 - A 503 from heat or selection routes means a real model/grid artifact is missing or mismatched. No demo values are substituted.
 - `too_many_cells` means the view exceeds 2,500 modeled cells; zoom in. A wide city view uses ward aggregation instead.
 - Ward means include only complete-case modeled cells. They are not area-weighted estimates for every part of a ward.

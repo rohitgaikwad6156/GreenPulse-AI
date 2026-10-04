@@ -44,7 +44,9 @@ def artificial_files(root: Path):
     }), grid)
     grid_meta = root / "metadata.json"
     grid_meta.write_text(json.dumps({"crs": "EPSG:32643", "raster_resolution_m": 30,
-                                     "row_count": 4, "features": ["ndvi", "ndbi"]}), encoding="utf-8")
+                                     "row_count": 4, "features": ["ndvi", "ndbi"],
+                                     "ward_reporting_available": True,
+                                     "ward_boundary": str(boundary)}), encoding="utf-8")
     rng = np.random.default_rng(11)
     training = rng.uniform(0, 1, size=(40, 2))
     target = 35 - 2 * training[:, 0] + training[:, 1]
@@ -64,6 +66,35 @@ def artificial_files(root: Path):
 
 
 class HeatMapApiTests(unittest.TestCase):
+    def test_cell_map_works_with_null_wards_and_ward_map_stays_unavailable(self):
+        with tempfile.TemporaryDirectory() as temp:
+            boundary, grid, grid_meta, model, metadata = artificial_files(Path(temp))
+            table = pq.read_table(grid)
+            for name in ("ward_id", "ward_name"):
+                table = table.set_column(table.schema.get_field_index(name), name,
+                                         pa.array([None] * table.num_rows, type=pa.string()))
+            pq.write_table(table, grid)
+            grid_info = json.loads(grid_meta.read_text(encoding="utf-8"))
+            grid_info.update(ward_reporting_available=False, ward_boundary=None)
+            grid_meta.write_text(json.dumps(grid_info), encoding="utf-8")
+            model_info = json.loads(metadata.read_text(encoding="utf-8"))
+            model_info["dataset_version"] = "sha256:" + hashlib.sha256(grid.read_bytes()).hexdigest()
+            metadata.write_text(json.dumps(model_info), encoding="utf-8")
+            map_data._verified_model.cache_clear()
+            with (patch.object(services, "GRID", grid),
+                  patch.object(services, "GRID_METADATA", grid_meta),
+                  patch.object(services, "MODEL", model),
+                  patch.object(services, "MODEL_METADATA", metadata)):
+                cells = map_routes.map_cell_heat(73.79, 18.49, 73.82, 18.52)
+                self.assertEqual(len(cells["features"]), 2)
+                self.assertIsNone(cells["features"][0]["properties"]["ward_id"])
+                detail = map_routes.map_cell_detail("ARTIFICIAL-0")
+                self.assertIsNone(detail["ward_name"])
+                with self.assertRaises(HTTPException) as context:
+                    map_routes.map_ward_heat()
+                self.assertEqual(context.exception.status_code, 503)
+            map_data._verified_model.cache_clear()
+
     def test_missing_real_layers_report_unavailable(self):
         with self.assertRaises(HTTPException) as context:
             map_routes.map_wards()
@@ -81,7 +112,8 @@ class HeatMapApiTests(unittest.TestCase):
                   patch.object(services, "GRID", grid),
                   patch.object(services, "GRID_METADATA", grid_meta),
                   patch.object(services, "MODEL", model),
-                  patch.object(services, "MODEL_METADATA", metadata)):
+                  patch.object(services, "MODEL_METADATA", metadata),
+                  patch.object(services, "_require_ward_reporting", return_value=boundary)):
                 wards = map_routes.map_wards()
                 self.assertEqual({f["properties"]["ward_id"] for f in wards["features"]},
                                  {"PMC:1", "PCMC:2"})
@@ -123,11 +155,12 @@ class HeatMapApiTests(unittest.TestCase):
             map_data._ward_prediction_summary.cache_clear()
 
     def test_city_baseline_is_cell_weighted(self):
-        with (patch.object(map_data, "_signature", return_value=()),
-              patch.object(map_data, "_ward_prediction_summary", return_value={
-                  "a": {"predicted_lst_c": 30.0, "grid_cell_count": 1},
-                  "b": {"predicted_lst_c": 40.0, "grid_cell_count": 3}}),
-              patch.object(map_data, "_bundle", return_value=(None, (), {
+        class FakeModel:
+            def predict(self, matrix):
+                return np.array([30.0, 40.0, 40.0, 40.0])
+
+        with (patch.object(map_data, "_batches", return_value=iter([{"ndvi": [0.1] * 4}])),
+              patch.object(map_data, "_bundle", return_value=(FakeModel(), ("ndvi",), {
                   "dataset_date_range": "2025-03-01/2025-05-31"}))):
             context = map_data._map_context()
         self.assertEqual(context["city_baseline_c"], 37.5)

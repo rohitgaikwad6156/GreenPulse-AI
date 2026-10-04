@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 from scripts.import_municipal_boundaries import import_boundaries
+from scripts.import_municipal_outlines import import_outlines
 from scripts.acquire_real_sources import _validate_download
 
 
@@ -18,6 +19,23 @@ def _geojson(offset: float, id_key="number", name_key="label"):
 
 
 class BoundaryImportTests(unittest.TestCase):
+    def test_imports_municipal_outlines_without_ward_fields(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            pmc, pcmc, provenance = root / "pmc.geojson", root / "pcmc.geojson", root / "provenance.json"
+            for path, offset in ((pmc, 0), (pcmc, .1)):
+                document = _geojson(offset)
+                document["features"][0]["properties"] = {}
+                path.write_text(json.dumps(document), encoding="utf-8")
+            provenance.write_text(json.dumps({name: {"source_organization": f"SYNTHETIC TEST {name}",
+                "source_url": "https://example.invalid/test", "dataset_identifier": "TEST-ONLY",
+                "license": "TEST-ONLY", "effective_date": "2025-01-01"} for name in ("PMC", "PCMC")}), encoding="utf-8")
+            result = import_outlines(pmc, pcmc, provenance, output_dir=root / "out")
+            features = json.loads(result["boundary"].read_text(encoding="utf-8"))["features"]
+            self.assertEqual({f["properties"]["municipality"] for f in features}, {"PMC", "PCMC"})
+            self.assertTrue(all("ward_id" not in f["properties"] for f in features))
+            self.assertFalse((root / "out" / "pmc_pcmc_wards.geojson").exists())
+
     def test_imports_labelled_authority_inputs_idempotently(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

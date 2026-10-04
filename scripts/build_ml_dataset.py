@@ -8,21 +8,32 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from backend.app.geospatial.ml_dataset import build_ml_dataset  # noqa: E402
+from backend.app.data_intake.manifest import verified_ward_path  # noqa: E402
 
 
 def main() -> int:
     """Validate aligned inputs and write Parquet plus provenance/QC outputs."""
     parser = argparse.ArgumentParser(description="Build GreenPulse real-data 30 m ML grid without training")
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--wards", type=Path, default=ROOT / "data" / "boundaries" / "pmc_pcmc_wards.geojson")
+    parser.add_argument("--wards", type=Path, help="Optional verified ward GeoJSON; must match the source manifest")
     parser.add_argument("--albedo", type=Path, help="Optional documented, QA-masked 30 m albedo GeoTIFF")
     parser.add_argument("--output", type=Path, default=ROOT / "data" / "processed" / "greenpulse_ml_grid.parquet")
     parser.add_argument("--metadata", type=Path, default=ROOT / "data" / "processed" / "metadata.json")
     parser.add_argument("--csv-sample-rows", type=int, default=200)
+    parser.add_argument("--profile", choices=("full", "heat-map"), default="full")
     args = parser.parse_args()
     try:
-        report = build_ml_dataset(args.root, args.wards, args.output, args.metadata,
-                                  args.albedo, args.csv_sample_rows)
+        try:
+            verified_wards = verified_ward_path(args.root / "data" / "source_manifest.json", args.root)
+        except (OSError, ValueError) as exc:
+            if args.wards is not None:
+                raise
+            print(f"Ward reporting disabled: {exc}", file=sys.stderr)
+            verified_wards = None
+        if args.wards is not None and (verified_wards is None or args.wards.resolve() != verified_wards.resolve()):
+            raise ValueError("--wards must match the verified ward source in data/source_manifest.json")
+        report = build_ml_dataset(args.root, verified_wards, args.output, args.metadata,
+                                  args.albedo, args.csv_sample_rows, profile=args.profile)
     except (OSError, ValueError, ImportError) as exc:
         parser.exit(2, f"GreenPulse ML dataset build stopped: {exc}\n")
     print(f"Saved Parquet: {args.output}")

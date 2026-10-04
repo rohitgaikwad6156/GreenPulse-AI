@@ -11,7 +11,7 @@ The final acceptance review is [documented here](docs/final_acceptance_review.md
 | Readiness level | Status | Meaning |
 | --- | --- | --- |
 | Software-complete | **PASS** | The complete Python suite, frontend tests/build, API/OpenAPI checks, and desktop/mobile browser smoke checks pass. |
-| Data-complete | **BLOCKED** | WorldCover, OSM roads, and WorldPop are verified locally, and an official PCMC municipal outline is staged. Verified PMC/PCMC ward boundaries, Landsat/Sentinel scenes, OSM green spaces, the peri-urban reference, and the assembled 30 m grid are still absent. |
+| Data-complete | **BLOCKED** | WorldCover, OSM roads, and WorldPop are verified locally, and an official PCMC municipal outline is staged. Combined PMC/PCMC municipal boundaries and Landsat/Sentinel scenes are still absent, so the real 30 m grid cannot be built. Verified ward GIS is separately missing for ward reporting. |
 | Model-validated | **BLOCKED** | No real ML grid or trained XGBoost model exists, so no Pune/PCMC spatial-CV metrics, SHAP values, calibrated Heat Hazard Score, or model-backed scenario results can be reported. |
 | Field-validated | **BLOCKED** | No genuine pre/post intervention dataset or verified point-sensor dataset is locally available. |
 
@@ -83,6 +83,18 @@ npm run build
 
 The Heat Map now displays dated NASA MODIS surface-temperature imagery by default, with an observation-date selector and approximately 1 km source resolution. This independent satellite view does not require a trained model. No locally processed 30 m temperature grid, model metric, or intervention outcome is currently available. Verified WorldCover, OSM roads, and WorldPop source files are present, plus a staged official PCMC outline that is not a ward layer and is not yet combined with PMC. The dashboard requests production artifacts and shows explicit unavailable states when they are absent.
 
+## Real Heat Map build
+
+Run `.\.venv\Scripts\python.exe scripts\build_heat_map_pipeline.py --check-only --year 2025`,
+then the same command without `--check-only` once source validation passes.
+The [real Heat Map pipeline](docs/real_heat_map_pipeline.md) uses only Landsat LST,
+Sentinel-2 NDVI/NDBI, WorldCover tree/built fractions and OSM road density.
+It preserves the backend artifact contract and rejects explicitly labeled demo data.
+Real scene downloads currently require source authentication; verified combined
+PMC/PCMC municipal polygons are also missing. Ward polygons are a
+reporting dependency, not a cell-level model prerequisite. Existing synthetic
+artifacts are not real results.
+
 ## Real satellite pipelines
 
 - [Real-data intake contract](docs/data_intake_contract.md): authoritative required/optional/future source inventory plus provenance, date, CRS, checksum, and local-file validation before processing.
@@ -90,7 +102,7 @@ The Heat Map now displays dated NASA MODIS surface-temperature imagery by defaul
 - [Sentinel-2 NDVI/NDBI processing](docs/sentinel2_indices_pipeline.md): cloud-masked optical features aligned exactly to that LST grid. It requires the real LST raster, verified municipal boundary, and extracted L2A SAFE scenes.
 - [WorldCover, OSM, and WorldPop morphology processing](docs/urban_morphology_pipeline.md): real tree-cover and built-up fractions, road density, nearest green-space distance, and population density on the same 30 m grid. It requires the real LST reference and source datasets.
 - [Real-data acquisition status](docs/real_data_acquisition.md): reproducible official-source discovery/download commands, selected 2025 scenes, municipal-boundary importer, and exact credential/manual blockers.
-- [Final ML-grid assembly](docs/ml_dataset_pipeline.md): validates all aligned rasters and official ward polygons, applies missing-data QA, computes focal optical context, and writes a real-data Parquet table with metadata and correlation diagnostics. It requires all upstream real layers.
+- [Final ML-grid assembly](docs/ml_dataset_pipeline.md): validates aligned rasters and the official municipal mask, applies missing-data QA, computes focal optical context, and writes a real-data Parquet table. Ward labels remain null until verified ward GIS is available.
 - [Spatial block cross-validation](docs/spatial_cv_pipeline.md): assigns 5 km blocks to five held-out folds, checks block exclusivity, and creates a fold map from the real ML table. It trains no model.
 - [Baseline LST regression](docs/baseline_models.md): compares Linear Regression, Decision Tree, and Random Forest using those same saved folds. Real metrics require the upstream Parquet and fold map.
 - [Main XGBoost LST model](docs/xgboost_lst_pipeline.md): nested spatial Optuna tuning, held-out comparison with the three baselines, and final model persistence after real source data exist.

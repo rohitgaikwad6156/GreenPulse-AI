@@ -38,8 +38,8 @@ class WardsResponse(BaseModel):
 
 class GridCell(BaseModel):
     grid_id: str
-    ward_id: str
-    ward_name: str
+    ward_id: str | None
+    ward_name: str | None
     latitude: float
     longitude: float
     x: float

@@ -76,6 +76,25 @@ def _fixture(root):
 
 
 class MlDatasetTests(unittest.TestCase):
+    def test_heat_map_profile_requires_only_requested_features(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            ward_path, _, _, morphology = _fixture(root)
+            for name in ("distance_green_m", "population_density"):
+                (morphology / f"{name}_pune_30m.tif").unlink()
+            output = root / "data/processed/greenpulse_ml_grid.parquet"
+            metadata = output.with_name("metadata.json")
+            report = build_ml_dataset(root, ward_path, output, metadata, profile="heat-map")
+            self.assertEqual(report["features"], ["ndvi", "ndbi", "tree_canopy_pct", "built_pct", "road_density"])
+            table = pq.read_table(output)
+            self.assertEqual(table.num_rows, report["row_count"])
+            self.assertGreater(table.num_rows, 0)
+            self.assertNotIn("ndvi_mean_3x3", table.column_names)
+            self.assertNotIn("population_density", table.column_names)
+            self.assertTrue(np.isfinite(table.column("lst_c").to_numpy()).all())
+            with self.assertRaisesRegex(ValueError, "distance_green_m"):
+                build_ml_dataset(root, ward_path, output, metadata)
+
     def test_documented_optional_albedo_is_included(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -88,6 +107,25 @@ class MlDatasetTests(unittest.TestCase):
                                       albedo_path=albedo, csv_sample_rows=0)
             self.assertIn("albedo", pq.read_schema(output).names)
             self.assertEqual(report["row_count"], pq.read_metadata(output).num_rows)
+
+    def test_missing_wards_and_population_do_not_remove_eligible_cells(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            ward_path, _, _, morphology = _fixture(root)
+            (morphology / "population_density_pune_30m.tif").unlink()
+            output = root / "data" / "processed" / "greenpulse_ml_grid.parquet"
+            metadata = output.with_name("metadata.json")
+            with_wards = build_ml_dataset(root, ward_path, output, metadata, csv_sample_rows=0)
+            ward_path.unlink()
+            without_wards = build_ml_dataset(root, ward_path, output, metadata, csv_sample_rows=0)
+            table = pq.read_table(output)
+            self.assertEqual(without_wards["row_count"], with_wards["row_count"])
+            self.assertFalse(without_wards["ward_reporting_available"])
+            self.assertTrue(all(value is None for value in table.column("ward_id").to_pylist()))
+            self.assertTrue(all(value is None for value in table.column("ward_name").to_pylist()))
+            self.assertNotIn("population_density", without_wards["features"])
+            self.assertNotIn("elevation_m", without_wards["features"])
+            self.assertFalse({"ward_id", "ward_name"} & set(without_wards["features"]))
 
     def test_complete_case_parquet_metadata_and_no_fabrication(self):
         with tempfile.TemporaryDirectory() as temp:
