@@ -24,8 +24,7 @@ verification, downloads, training or source writes.
 Only selected fields are returned. Absolute paths and raw provenance documents are
 never sent to the browser. Evidence links point to repository documentation.
 Audit counts are explicitly historical evidence; they do not prove that all the
-same files are deployed alongside the API. Local checks read small file headers
-and reject empty files and Git LFS pointers. They do not rehash sources, decode
+same files are deployed alongside the API. Local checks use file metadata and only tiny non-raster headers; they reject empty files and typical Git LFS pointers. They do not rehash sources, decode
 rasters, validate GIS geometry, or check spatial coverage.
 
 ## Vocabulary
@@ -93,3 +92,64 @@ The implementation was also checked against the full Python suite and in a local
 browser at desktop and mobile widths. The API must have access to repository
 evidence files in deployment; missing deployment sources are shown as unavailable,
 even when a saved audit from the acquisition workstation passed.
+
+## Evidence / Audit Viewer
+
+The existing `/api/data-readiness` response now includes `audit_trail`,
+`evidence_chains`, `audit_disclaimer` and `audit_preservation_note`. The same
+validated audit projections also remain attached to their source cards. No new
+endpoint or separate readiness system is introduced. Source cards link to their
+supporting audits; native keyboard-accessible disclosures reveal audit type,
+UTC timestamp, saved result, scope and documentation.
+
+The four cards use the existing structured source, processing, extreme and
+Sentinel intake JSON files. Summary counts and diagnostic numbers come from
+these files, never frontend result constants. Dates without a valid timezone
+are shown as unavailable. Markdown is linked for context, not parsed as data.
+
+### Audit status semantics
+
+- **PASS**: saved checks passed; this is not production or municipal acceptance.
+- **PENDING**: Sentinel intake explicitly records PENDING and the saved counts
+  show missing SAFE products or required file slots. The underlying **FAIL** is
+  preserved and explained as missing-source acquisition work. Existing files may
+  still have validation problems; a complete but failing intake is **REVIEW**.
+- **REVIEW**: an audit failed checks, or the extreme diagnostic work passed but
+  the causes of the investigated values remain unresolved.
+- **UNAVAILABLE**: missing JSON, invalid schema, impossible counts, invalid
+  result state, nonfinite diagnostic values or inconsistent cluster evidence.
+
+The manifest remains authoritative. Audits cannot promote pending sources to
+verified. Evidence-chain completion is not invented from available inputs:
+municipal clipping and model-dataset completion require separate execution
+records. `NOT ESTABLISHED` is used when prerequisites alone are available.
+Sentinel selection is derived from valid unique product IDs in discovery JSON.
+
+### Scientific interpretation
+
+The March 10 comparison shows P99 versus the absolute maximum, threshold counts,
+8-neighbour cluster counts and the repeated maximum DN. The April 3 comparison
+shows P1 versus the minimum, cold threshold clusters and the recorded count of
+QA-invalid neighbours. A possible saturation/capping signal or QA-edge effect
+is described conditionally from the saved scalar evidence. Causes are not
+established; values are not labelled wrong, clipped or excluded.
+
+**These are full-scene diagnostics, not Pune/PMC/PCMC temperature results.**
+The extreme audit did not change production QA rules or alter source pixels.
+Raw neighbourhoods, QA arrays, coordinates and arbitrary JSON strings are not
+returned. The viewer only emits allowlisted numbers and controlled descriptions.
+
+### Lightweight, read-only behavior
+
+The earlier header check was narrowed: TIFF/JP2 sources are never opened by this
+API. Local presence uses filesystem metadata; raster files at most 1 KiB are
+unavailable (including typical LFS pointers). Only tiny non-raster metadata files
+are checked for LFS headers. Large files are not read or hashed. Saved audit JSON
+is parsed without rerunning audits or scientific processing. This is an evidence
+viewer, not a replacement for production checksum and raster preflight.
+
+Synthetic tests cover count consistency, missing and malformed reports,
+Sentinel pending/review distinctions, extreme field allowlisting, disclaimers,
+nonfinite values, read-only behavior and forbidden raster reads. Frontend tests
+cover audit statuses, disclosure labels, diagnostic formatting and unavailable
+fallbacks. Existing readiness tests still cover backend connection errors.

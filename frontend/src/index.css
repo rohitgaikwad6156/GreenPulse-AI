@@ -708,3 +708,36 @@ textarea {
   .dr-toolbar, .dr-gate > .dr-heading { flex-wrap: wrap; }
   .dr-counts { gap: 18px; }
 }
+
+/* Saved audit evidence: readable summaries with native keyboard disclosure. */
+.dr-audit-pass { background: #e7f1e7; color: #275638; }
+.dr-audit-pending, .dr-audit-review { background: #fff2d9; color: #795515; }
+.dr-audit-unavailable { background: #f0f0eb; color: #53564c; }
+.dr-evidence-section > .section-heading { margin-bottom: 18px; }
+.dr-evidence-section .section-heading p { max-width: 80ch; line-height: 1.7; }
+.dr-audit-card, .dr-diagnostic { scroll-margin-top: 100px; overflow-wrap: anywhere; }
+.dr-audit-card .dr-heading { align-items: flex-start; }
+.dr-audit-card ul { padding-left: 20px; }
+.dr-audit-card details { border-top: 1px solid #e5e9e1; margin-top: 18px; }
+.dr-audit-card summary { padding: 14px 0; cursor: pointer; color: #245440; font-size: .9rem; font-weight: 600; }
+.dr-audit-card summary:focus-visible { outline: 2px solid #245440; outline-offset: 3px; }
+.dr-audit-meta { display: grid; gap: 12px; font-size: .85rem; }
+.dr-audit-meta dt, .dr-comparison dt { color: #59665c; font-size: .8rem; }
+.dr-audit-meta dd { margin: 4px 0 0; }
+.dr-chain-grid { margin-top: 18px; }
+.dr-chain { list-style: none; padding: 0; margin: 18px 0 0; }
+.dr-chain li { border-left: 2px solid #dce3d7; padding: 0 0 18px 16px; display: grid; gap: 3px; position: relative; }
+.dr-chain li::before { content: ''; position: absolute; left: -5px; top: 8px; width: 8px; height: 8px; background: #557a61; border-radius: 50%; }
+.dr-chain li:last-child { padding-bottom: 0; }
+.dr-chain strong { font-size: .7rem; color: #59665c; letter-spacing: .035em; }
+.dr-diagnostic-note { border-left: 3px solid #b08740; background: #faf7ef; padding: 16px; font-size: .9rem; line-height: 1.65; margin-bottom: 24px; }
+.dr-panel .dr-comparison-heading { margin-top: 24px; }
+.dr-diagnostic { border-top: 1px solid #dce3d7; margin-top: 14px; }
+.dr-panel .dr-diagnostic h4 { font-size: .95rem; color: #193c30; }
+.dr-panel .dr-product-id { font-size: .7rem; color: #59665c; }
+.dr-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+.dr-comparison dd { font-size: clamp(1.1rem, 2.3vw, 1.65rem); margin: 5px 0 0; font-weight: 600; font-variant-numeric: tabular-nums; color: #193c30; }
+.dr-thresholds { list-style: none; padding: 0; }
+.dr-thresholds li { padding: 10px 0; border-bottom: 1px solid #eef0ea; }
+.dr-thresholds span { display: block; color: #59665c; font-size: .8rem; }
+@media (max-width: 400px) { .dr-audit-card .dr-heading { flex-wrap: wrap; } }

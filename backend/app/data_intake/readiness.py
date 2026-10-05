@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 
 from scripts.build_heat_map_pipeline import SOURCE_IDS
+from .audit_viewer import audit_template, decorate_audit, evidence_chains, DISCLAIMER, UNCHANGED
 
 ROOT = Path(__file__).resolve().parents[3]
 DOCS = "https://github.com/rohitgaikwad6156/GreenPulse-AI/blob/main/docs/"
@@ -54,10 +55,17 @@ def _available(path: Path | None) -> bool:
         if not files:
             return False
         for file in files:
-            with file.open("rb") as stream:
-                header = stream.read(128)
-            if not header or header.startswith(b"version https://git-lfs.github.com/spec/v1"):
+            size = file.stat().st_size
+            if not size:
                 return False
+            # Never open source rasters. Tiny raster files cannot be real scenes.
+            if file.suffix.lower() in {".tif", ".tiff", ".jp2"}:
+                if size <= 1024:
+                    return False
+            elif size <= 1024:
+                with file.open("rb") as stream:
+                    if stream.read(128).startswith(b"version https://git-lfs.github.com/spec/v1"):
+                        return False
         return True
     except OSError:
         return False
@@ -69,7 +77,7 @@ def _counts(document: dict, keys: tuple[str, ...]) -> bool:
 
 def _audit(root: Path, filename: str, label: str, kind: str) -> dict:
     raw = _json(root, "data/provenance/" + filename)
-    result = {"label": label, "status": "unavailable", "recorded_at": None, "details": []}
+    result = {**audit_template(kind), "label": label, "status": "unavailable", "recorded_at": None, "details": []}
     if not raw:
         return result
     data = raw.get("summary") if kind == "quality" else raw
@@ -93,13 +101,36 @@ def _audit(root: Path, filename: str, label: str, kind: str) -> dict:
         return result
     if data["overall_status"] == "PASS" and (passed != expected or failed or any(data[a] != data[b] for a, b, _ in pairs)):
         return result
+    if data["overall_status"] == "FAIL" and failed == 0:
+        return result
+    if pairs and passed > data[pairs[0][0]]:
+        return result
+    if kind == "quality" and (data["required_files_expected"] != expected * 4 or not passed * 4 <= data["required_files_found"] <= data["scenes_found"] * 4):
+        return result
+    if kind == "sentinel" and (data["minimum_required_files_expected"] != expected * 5 or not passed * 5 <= data["required_file_slots_found"] <= data["safe_directories_found"] * 5):
+        return result
+    # Older count-only summaries are supported, but any supplied row evidence
+    # must agree with the totals rather than silently contradicting a PASS.
+    row_key = "products" if kind == "sentinel" else "scenes"
+    status_key = "processing_status" if kind == "processing" else "status"
+    if row_key in raw:
+        records = raw[row_key]
+        if not isinstance(records, list) or len(records) != expected:
+            return result
+        if not all(isinstance(r, dict) and r.get(status_key) in ("PASS", "FAIL") for r in records):
+            return result
+        if sum(r[status_key] == "PASS" for r in records) != passed:
+            return result
     result.update(status=data["overall_status"].lower(), details=[f"{data[a]}/{data[b]} {label}" for a, b, label in pairs])
     stamp = raw.get("audited_at_utc")
     if isinstance(stamp, str):
         try:
-            result["recorded_at"] = datetime.fromisoformat(stamp).isoformat()
+            parsed = datetime.fromisoformat(stamp)
+            if parsed.tzinfo is not None:
+                result["recorded_at"] = parsed.astimezone(timezone.utc).isoformat()
         except ValueError:
             pass
+    decorate_audit(result, raw, kind)
     return result
 
 
@@ -175,7 +206,12 @@ def readiness(root: Path | None = None) -> dict:
     except (OSError, ValueError, TypeError, KeyError):
         count, detail = 0, "Evidence unavailable: field-validation registry could not be read."
     later.append({"name": "Field validation", "status": "staged" if count else "pending", "detail": detail})
-    return {"overall_status": "blocked" if blockers else "verified", "first_heat_map_ready": not blockers,
+    audits = [a for row in rows for a in row["audits"]]
+    trail = [{**a, "status": a["display_status"].lower()} for a in audits]
+    chains = evidence_chains(rows, audits, _json(root, "data/provenance/discovery_2025.json") or {}, blockers)
+    return {"audit_trail": trail, "evidence_chains": chains,
+            "audit_disclaimer": DISCLAIMER, "audit_preservation_note": UNCHANGED,
+            "overall_status": "blocked" if blockers else "verified", "first_heat_map_ready": not blockers,
             "required_sources_ready": len(required) - len(blockers), "required_sources_total": len(required),
             "required_sources": required, "first_heat_map_blockers": blockers, "sources": rows,
             "summary": dict(Counter(s["status"] for s in rows)), "later_stage_dependencies": later,

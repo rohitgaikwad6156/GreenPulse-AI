@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Circle, ExternalLink } from "lucide-react";
+import AuditTrail from "../components/AuditTrail.jsx";
 import PageIntro from "../components/PageIntro.jsx";
 import { getDataReadiness } from "../services/api.js";
 import {
@@ -169,28 +170,13 @@ export default function DataReadiness() {
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
-                  {source.audits?.map((audit) => (
-                    <div className="dr-audit" key={audit.label}>
-                      <strong>
-                        {audit.label}:{" "}
-                        {audit.status === "unavailable"
-                          ? "Evidence unavailable"
-                          : audit.status.toUpperCase()}
-                      </strong>
-                      {audit.details?.map((detail) => (
-                        <span key={detail}>{detail}</span>
-                      ))}
-                      {audit.recorded_at && (
-                        <small>
-                          Recorded{" "}
-                          {new Date(audit.recorded_at).toLocaleDateString(
-                            "en-GB",
-                            { timeZone: "UTC" },
-                          )}
-                        </small>
-                      )}
-                    </div>
-                  ))}
+                  {source.audits?.length > 0 && (
+                    <p>
+                      <a href={`#audit-${source.audits[0].id}`}>
+                        View supporting audits →
+                      </a>
+                    </p>
+                  )}
                   {source.blocked_reason && (
                     <div className="dr-issue">
                       <h4>Why not complete</h4>
@@ -215,6 +201,7 @@ export default function DataReadiness() {
               ))}
             </div>
           </section>
+          <AuditTrail data={data} />
           <section className="dr-panel" aria-labelledby="dr-later">
             <p className="eyebrow">Beyond the first heat map</p>
             <h2 id="dr-later">Later-stage project dependencies</h2>
