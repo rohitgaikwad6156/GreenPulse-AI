@@ -5,7 +5,8 @@ import { getBackendHealth } from "../services/api.js";
 const initialState = {
   kind: "loading",
   label: "Checking...",
-  detail: "Contacting FastAPI; a sleeping service can take about a minute",
+  detail:
+    "Connecting to the research service. Startup may take about a minute.",
 };
 
 export default function BackendStatus() {
@@ -17,13 +18,15 @@ export default function BackendStatus() {
     getBackendHealth(controller.signal)
       .then((result) => {
         if (result?.status !== "ok") {
-          throw new Error("The backend returned an unexpected health response.");
+          throw new Error(
+            "The backend returned an unexpected health response.",
+          );
         }
         if (controller.signal.aborted) return;
         setState({
           kind: "healthy",
-          label: "Healthy",
-          detail: "FastAPI is responding",
+          label: "Connected",
+          detail: "Research service is responding",
         });
       })
       .catch((error) => {
@@ -33,7 +36,7 @@ export default function BackendStatus() {
           label: "Connection Error",
           detail: error.response
             ? `Backend returned HTTP ${error.response.status}`
-            : "Cannot reach FastAPI. Use Refresh status to retry; the service may still be starting.",
+            : "Cannot reach the research service. Use Refresh status to retry; it may still be starting.",
         });
       });
 
@@ -45,18 +48,20 @@ export default function BackendStatus() {
       ? "text-[#2f8050]"
       : state.kind === "error"
         ? "text-[#b05749]"
-        : "text-[#9b8354]";
-
+        : "text-[#80652f]";
   return (
-    <section className="rounded-2xl border border-[#e4ebe3] bg-white p-5 shadow-[0_2px_14px_rgba(27,58,39,0.035)]">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold text-[#6f8274]">API connection</p>
-        <Activity size={17} className="text-[#6e9b79]" strokeWidth={1.8} aria-hidden="true" />
-      </div>
-      <p className={`mt-4 text-lg font-semibold leading-tight ${valueColor}`} role="status" aria-live="polite">
-        Backend Status: {state.label}
+    <section className="readiness-item">
+      <h3 className="flex items-center gap-2">
+        <Activity size={15} aria-hidden="true" /> Service connection
+      </h3>
+      <p
+        className={`readiness-value ${valueColor}`}
+        role="status"
+        aria-live="polite"
+      >
+        {state.label}
       </p>
-      <p className="mt-3 text-xs text-[#91a092]">{state.detail}</p>
+      <p className="readiness-detail">{state.detail}</p>
     </section>
   );
 }

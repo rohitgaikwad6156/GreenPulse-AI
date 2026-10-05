@@ -197,7 +197,7 @@ export default function HeatMap() {
   return <>
     <PageIntro eyebrow="Spatial analysis" title="Pune / PCMC heat map"
       description="Explore research-model LST, heat hazard and confidence across wards and 30 m cells. NASA MODIS observations are an optional source." />
-    <fieldset className="mb-5 flex flex-wrap gap-3 rounded-xl border border-[#dfe8de] bg-white p-4">
+    <fieldset className="source-picker mb-5 flex flex-wrap gap-3 rounded-xl border border-[#dfe8de] bg-white p-4">
       <legend className="px-1 text-xs font-semibold text-[#294a35]">Heat layer source</legend>
       {[ ["model", "Research Model · 30 m predictions"], ["satellite", "Optional · NASA MODIS"] ].map(([value, label]) =>
         <label key={value} className="flex items-center gap-2 text-sm text-[#36533d]">
@@ -205,14 +205,14 @@ export default function HeatMap() {
             onChange={() => { setMode(value); setSelected(null); if (value === "model" && wardHeat.status !== "ready") { setView("cells"); mapRef.current?.setZoom(Math.max(16, mapRef.current.getZoom())); } }} />{label}
         </label>)}
     </fieldset>
-    {!satelliteMode && <div className="mb-5 flex flex-wrap gap-4 rounded-xl border border-[#dfe8de] bg-white p-4 text-xs text-[#36533d]">
-      <label>Layer <select aria-label="Model layer" value={metric} onChange={(e) => setMetric(e.target.value)} className="ml-2 rounded border p-2">
+    {!satelliteMode && <div className="model-toolbar mb-5 grid gap-4 rounded-xl border border-[#dfe8de] bg-white p-4 text-xs text-[#36533d]">
+      <label>Layer <select aria-label="Model layer" value={metric} onChange={(e) => setMetric(e.target.value)} className="mt-2 block w-full min-w-0 rounded-lg border p-2">
         <option value="predicted_lst_c">LST</option><option value="heat_hazard_score">Heat Hazard</option><option value="spatial_cv_rmse_c">Confidence</option>
       </select></label>
-      <label>View <select aria-label="Spatial view" value={view} onChange={(e) => { setView(e.target.value); if (e.target.value === "cells") mapRef.current?.setZoom(Math.max(16, mapRef.current.getZoom())); }} className="ml-2 rounded border p-2">
+      <label>View <select aria-label="Spatial view" value={view} onChange={(e) => { setView(e.target.value); if (e.target.value === "cells") mapRef.current?.setZoom(Math.max(16, mapRef.current.getZoom())); }} className="mt-2 block w-full min-w-0 rounded-lg border p-2">
         <option value="auto">Auto · zoom to cells</option><option value="wards">Wards</option><option value="cells">30 m cells</option>
       </select></label>
-      <label>Season <select aria-label="Model season" value={season} onChange={(e) => { setSeason(e.target.value); setSelected(null); }} className="ml-2 rounded border p-2">
+      <label>Season <select aria-label="Model season" value={season} onChange={(e) => { setSeason(e.target.value); setSelected(null); }} className="mt-2 block w-full min-w-0 rounded-lg border p-2">
         <option value="dataset">{modelDateRange?.match(/^\d{4}-03-01\/\d{4}-05-31$/) ? `Peak Summer · ${modelDateRange}` : `Loaded model period · ${modelDateRange || "dates unavailable"}`}</option>
         {!modelDateRange?.match(/^\d{4}-03-01\/\d{4}-05-31$/) && <option value="summer">Peak Summer · unavailable</option>}
         <option value="monsoon">Monsoon · unavailable</option><option value="post-monsoon">Post-monsoon · unavailable</option><option value="winter">Winter · unavailable</option>

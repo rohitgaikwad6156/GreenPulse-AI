@@ -1,16 +1,14 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   Activity,
   BookOpenText,
   ChartNoAxesCombined,
   ChevronRight,
-  CircleHelp,
-  FlaskConical,
   LayoutDashboard,
   Map,
   Menu,
-  PanelLeftClose,
+  X,
   RadioTower,
   SlidersHorizontal,
   Sprout,
@@ -19,9 +17,21 @@ import {
 const navigation = [
   { label: "Overview", path: "/", icon: LayoutDashboard },
   { label: "Heat Map", path: "/heat-map", icon: Map },
-  { label: "Root Cause Analysis", path: "/root-cause", icon: ChartNoAxesCombined },
-  { label: "Scenario Simulator", path: "/scenario-simulator", icon: SlidersHorizontal },
-  { label: "Climate Action Optimizer", path: "/climate-action-optimizer", icon: Sprout },
+  {
+    label: "Root Cause Analysis",
+    path: "/root-cause",
+    icon: ChartNoAxesCombined,
+  },
+  {
+    label: "Scenario Simulator",
+    path: "/scenario-simulator",
+    icon: SlidersHorizontal,
+  },
+  {
+    label: "Climate Action Optimizer",
+    path: "/climate-action-optimizer",
+    icon: Sprout,
+  },
   { label: "Validation", path: "/validation", icon: Activity },
   { label: "Research Layers", path: "/research-layers", icon: RadioTower },
   { label: "Methodology", path: "/methodology", icon: BookOpenText },
@@ -29,56 +39,63 @@ const navigation = [
 
 function Sidebar({ onNavigate, onClose }) {
   return (
-    <div className="flex h-full flex-col border-r border-[#e5ebe4] bg-white">
-      <div className="flex h-20 items-center justify-between border-b border-[#edf1eb] px-5">
-        <Link to="/" onClick={onNavigate} className="flex items-center gap-3" aria-label="GreenPulse AI overview">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8f2e9] text-[#2e714c]">
-            <Sprout size={22} strokeWidth={2.1} aria-hidden="true" />
+    <div className="workspace-sidebar">
+      <div className="sidebar-brand">
+        <Link to="/" onClick={onNavigate} aria-label="GreenPulse AI overview">
+          <span className="brand-mark">
+            <Sprout size={25} aria-hidden="true" />
           </span>
-          <span className="leading-tight">
-            <span className="block text-[17px] font-bold tracking-tight text-[#193b2a]">GreenPulse AI</span>
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.17em] text-[#7b9181]">Climate planning</span>
+          <span>
+            <strong>GreenPulse AI</strong>
+            <small>Climate planning</small>
           </span>
         </Link>
-        <button onClick={onClose} className="rounded-lg p-2 text-[#698073] hover:bg-[#f2f6f1] lg:hidden" aria-label="Close menu">
-          <PanelLeftClose size={20} aria-hidden="true" />
-        </button>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="icon-button"
+            aria-label="Close menu"
+          >
+            <X size={21} />
+          </button>
+        )}
       </div>
-
-      <div className="flex-1 overflow-y-auto px-3 py-6">
-        <p className="px-3 pb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#9aaa9e]">Workspace</p>
-        <nav aria-label="Main navigation" className="space-y-1">
-          {navigation.map(({ label, path, icon: Icon }) => (
+      <nav aria-label="Main navigation" className="sidebar-navigation">
+        {navigation.map(({ label, path, icon: Icon }, index) => (
+          <div key={path}>
+            {[0, 3, 6].includes(index) && (
+              <p className="nav-group">
+                {index === 0
+                  ? "Explore"
+                  : index === 3
+                    ? "Plan & evaluate"
+                    : "Reference"}
+              </p>
+            )}
             <NavLink
-              key={path}
               to={path}
               end={path === "/"}
               onClick={onNavigate}
               className={({ isActive }) =>
-                `group flex min-h-11 items-center gap-3 rounded-lg px-3 text-[13px] font-medium transition-colors ${
-                  isActive
-                    ? "bg-[#eaf4eb] text-[#246442]"
-                    : "text-[#63766a] hover:bg-[#f3f7f2] hover:text-[#244a34]"
-                }`
+                `nav-item ${isActive ? "is-active" : ""}`
               }
             >
-              <Icon size={18} strokeWidth={1.9} aria-hidden="true" />
-              <span className="flex-1">{label}</span>
+              <Icon size={19} strokeWidth={1.7} aria-hidden="true" />
+              <span>{label}</span>
             </NavLink>
-          ))}
-        </nav>
-      </div>
-
-      <div className="border-t border-[#edf1eb] p-4">
-        <div className="rounded-xl border border-[#e4ebe2] bg-[#f7faf6] p-3.5">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#315f43]">
-            <CircleHelp size={15} aria-hidden="true" />
-            Research workspace
           </div>
-          <p className="mt-2 text-[11px] leading-5 text-[#728577]">
-            Follow the overview to check inputs, then explore heat, explanations, scenarios, planning and validation.
-          </p>
-        </div>
+        ))}
+      </nav>
+      <div className="sidebar-note">
+        <span className="eyebrow">Evidence before action</span>
+        <p>
+          A research workspace for understanding surface heat and exploring
+          climate interventions.
+        </p>
+        <Link to="/methodology" onClick={onNavigate}>
+          Our methods & limitations{" "}
+          <ChevronRight size={15} aria-hidden="true" />
+        </Link>
       </div>
     </div>
   );
@@ -86,57 +103,123 @@ function Sidebar({ onNavigate, onClose }) {
 
 export default function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const dialog = useRef(null);
+  const main = useRef(null);
+  const previousPath = useRef(null);
   const { pathname } = useLocation();
-  const currentPage = navigation.find((item) => item.path === pathname)?.label ?? "Overview";
-
+  const currentPage =
+    navigation.find((item) => item.path === pathname)?.label ?? "Overview";
+  useEffect(() => {
+    document.title = `${currentPage} · GreenPulse AI`;
+    if (previousPath.current !== null && previousPath.current !== pathname) {
+      window.scrollTo(0, 0);
+      main.current?.focus({ preventScroll: true });
+    }
+    previousPath.current = pathname;
+  }, [pathname, currentPage]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    dialog.current.showModal();
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const query = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => {
+      if (query.matches) setMenuOpen(false);
+    };
+    query.addEventListener("change", closeOnDesktop);
+    return () => {
+      dialog.current?.close();
+      document.body.style.overflow = overflow;
+      query.removeEventListener("change", closeOnDesktop);
+    };
+  }, [menuOpen]);
   return (
-    <div className="min-h-screen bg-[#f6f8f5]">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 lg:block">
-        <Sidebar onNavigate={() => setMenuOpen(false)} onClose={() => setMenuOpen(false)} />
+    <div className="workspace">
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
+      <aside className="desktop-sidebar">
+        <Sidebar />
       </aside>
-
-      {menuOpen && (
-        <div className="fixed inset-0 z-[2000] isolate lg:hidden">
-          <button
-            className="absolute inset-0 z-[2000] bg-[#153026]/35"
-            aria-label="Close navigation"
-            onClick={() => setMenuOpen(false)}
-          />
-          <aside className="relative z-[2100] h-full w-72 max-w-[85vw] shadow-xl">
-            <Sidebar onNavigate={() => setMenuOpen(false)} onClose={() => setMenuOpen(false)} />
-          </aside>
-        </div>
-      )}
-
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#e5ebe4] bg-white/95 px-4 backdrop-blur sm:px-7 lg:px-9">
+      <dialog
+        ref={dialog}
+        className="mobile-navigation"
+        aria-label="Workspace navigation"
+        onKeyDown={(event) => {
+          if (event.key !== "Tab") return;
+          const items = [
+            ...event.currentTarget.querySelectorAll(
+              "a[href], button:not([disabled])",
+            ),
+          ];
+          const first = items[0];
+          const last = items[items.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }}
+        onClose={() => setMenuOpen(false)}
+        onClick={(event) => {
+          if (event.target === dialog.current) setMenuOpen(false);
+        }}
+      >
+        <Sidebar
+          onNavigate={() => {
+            dialog.current.close();
+            setMenuOpen(false);
+          }}
+          onClose={() => setMenuOpen(false)}
+        />
+      </dialog>
+      <div className="workspace-body">
+        <header className="workspace-header">
           <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setMenuOpen(true)}
-              className="rounded-lg p-2 text-[#496453] hover:bg-[#f2f6f1] lg:hidden"
+              className="icon-button lg:hidden"
               aria-label="Open menu"
               aria-expanded={menuOpen}
+              aria-haspopup="dialog"
             >
-              <Menu size={21} aria-hidden="true" />
+              <Menu size={22} aria-hidden="true" />
             </button>
-            <span className="hidden text-xs font-medium text-[#8c9b91] sm:inline">Workspace</span>
-            <ChevronRight size={14} className="hidden text-[#b5c0b8] sm:inline" aria-hidden="true" />
-            <span className="truncate text-sm font-semibold text-[#314d3b]">{currentPage}</span>
+            <span className="hidden text-sm text-[#63736a] sm:inline">
+              Workspace
+            </span>
+            <ChevronRight
+              size={14}
+              className="hidden text-[#63736a] sm:inline"
+              aria-hidden="true"
+            />
+            <span className="truncate text-sm font-semibold">
+              {currentPage}
+            </span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden rounded-full border border-[#e7ede6] bg-[#f9fbf8] px-3 py-1.5 text-[11px] font-medium text-[#607467] sm:inline-flex">
+          <div className="flex shrink-0 items-center gap-5">
+            <span className="hidden text-xs text-[#63736a] xl:inline">
               Pune / PCMC study area
             </span>
-            <Link to="/" className="inline-flex items-center gap-2 rounded-full border border-[#e5ebe4] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#61776a]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#bb9b50]" />
-              Research status
+            <Link to="/" className="research-link">
+              Research workspace
             </Link>
           </div>
         </header>
-
-        <main id="main-content" className="mx-auto max-w-[1500px] px-4 py-7 sm:px-7 sm:py-9 lg:px-9">
+        <main
+          id="main-content"
+          ref={main}
+          tabIndex={-1}
+          className="workspace-content"
+        >
           <Outlet />
         </main>
+        <footer className="workspace-footer">
+          GreenPulse AI{" "}
+          <span>Research informs decisions. Evidence comes first.</span>
+        </footer>
       </div>
     </div>
   );
