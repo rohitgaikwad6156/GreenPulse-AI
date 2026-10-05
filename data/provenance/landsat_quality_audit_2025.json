@@ -1,0 +1,946 @@
+{
+  "audit_type": "source_integrity_only",
+  "audited_at_utc": "2026-10-05T07:28:05.699093+00:00",
+  "source_directory": "data/raw/landsat",
+  "expected_product_ids": [
+    "LC08_L2SP_147047_20250302_20250311_02_T1",
+    "LC09_L2SP_147047_20250310_20250311_02_T1",
+    "LC08_L2SP_147047_20250318_20250327_02_T1",
+    "LC09_L2SP_147047_20250326_20250327_02_T1",
+    "LC08_L2SP_147047_20250403_20250411_02_T1",
+    "LC09_L2SP_147047_20250411_20250412_02_T1",
+    "LC08_L2SP_147047_20250419_20250425_02_T1",
+    "LC09_L2SP_147047_20250427_20250428_02_T1",
+    "LC08_L2SP_147047_20250505_20250512_02_T1"
+  ],
+  "missing_product_ids": [],
+  "summary": {
+    "scenes_expected": 9,
+    "scenes_found": 9,
+    "required_files_expected": 36,
+    "required_files_found": 36,
+    "scenes_passed": 9,
+    "scenes_failed": 0,
+    "overall_status": "PASS"
+  },
+  "scenes": [
+    {
+      "product_id": "LC08_L2SP_147047_20250302_20250311_02_T1",
+      "acquisition_date": "2025-03-02",
+      "satellite": "Landsat 8",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 2.19,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC08_L2SP_147047_20250302_20250311_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250302_20250311_02_T1/LC08_L2SP_147047_20250302_20250311_02_T1_MTL.txt",
+          "bytes": 15407,
+          "sha256": "11f0055b53928417a5ecfc65ab657a67acf9712213b4575cedcd25964c6b309b"
+        },
+        "LC08_L2SP_147047_20250302_20250311_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250302_20250311_02_T1/LC08_L2SP_147047_20250302_20250311_02_T1_QA_PIXEL.TIF",
+          "bytes": 2014244,
+          "sha256": "36097b0ddb1ef68eba4e3e3a8624031fa5162a97d064d365577cd140454e4fab"
+        },
+        "LC08_L2SP_147047_20250302_20250311_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250302_20250311_02_T1/LC08_L2SP_147047_20250302_20250311_02_T1_QA_RADSAT.TIF",
+          "bytes": 224616,
+          "sha256": "5f5b312397b46a5755d993cd18ea5d0b4a82f75d414e05f3e01bd95d13114edd"
+        },
+        "LC08_L2SP_147047_20250302_20250311_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250302_20250311_02_T1/LC08_L2SP_147047_20250302_20250311_02_T1_ST_B10.TIF",
+          "bytes": 88821799,
+          "sha256": "5de9eb45551d267a8b395e1c7a44424584f84f444b4cb50c9d4c604e459952db"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC09_L2SP_147047_20250310_20250311_02_T1",
+      "acquisition_date": "2025-03-10",
+      "satellite": "Landsat 9",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 0.0,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC09_L2SP_147047_20250310_20250311_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250310_20250311_02_T1/LC09_L2SP_147047_20250310_20250311_02_T1_MTL.txt",
+          "bytes": 15253,
+          "sha256": "cb44c41faa71e0ba1abc97bed70a64ec3266f0e3c1ad524ce84fafd612093951"
+        },
+        "LC09_L2SP_147047_20250310_20250311_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250310_20250311_02_T1/LC09_L2SP_147047_20250310_20250311_02_T1_QA_PIXEL.TIF",
+          "bytes": 716698,
+          "sha256": "78c86625a57c19d4d09db6f30e33644fc8196b20e80a5daea42406b1647283b9"
+        },
+        "LC09_L2SP_147047_20250310_20250311_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250310_20250311_02_T1/LC09_L2SP_147047_20250310_20250311_02_T1_QA_RADSAT.TIF",
+          "bytes": 225825,
+          "sha256": "74adeb7823b205192b9d686e3a1791c86642669196525fb69bf8d0383a145cea"
+        },
+        "LC09_L2SP_147047_20250310_20250311_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250310_20250311_02_T1/LC09_L2SP_147047_20250310_20250311_02_T1_ST_B10.TIF",
+          "bytes": 89014375,
+          "sha256": "2e1fd4a947d4ced8723a5a2319417ee29d68c21f3f1b6e474f578bd3a7f8f33b"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC08_L2SP_147047_20250318_20250327_02_T1",
+      "acquisition_date": "2025-03-18",
+      "satellite": "Landsat 8",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 0.05,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC08_L2SP_147047_20250318_20250327_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250318_20250327_02_T1/LC08_L2SP_147047_20250318_20250327_02_T1_MTL.txt",
+          "bytes": 15407,
+          "sha256": "5390a48c2b8bd0d8efe46d6d6afbe0d3bcfaf5fb947c547a699ea5973a81803f"
+        },
+        "LC08_L2SP_147047_20250318_20250327_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250318_20250327_02_T1/LC08_L2SP_147047_20250318_20250327_02_T1_QA_PIXEL.TIF",
+          "bytes": 703986,
+          "sha256": "8ca8bd936daedeb9eba03c53f8f15d65c4ebf47860c75647e2a0f0830c998785"
+        },
+        "LC08_L2SP_147047_20250318_20250327_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250318_20250327_02_T1/LC08_L2SP_147047_20250318_20250327_02_T1_QA_RADSAT.TIF",
+          "bytes": 225516,
+          "sha256": "8ad9f37fd04cf78172dfcb2fa8dc434f7df0adb06c896e390a68ec040a790bce"
+        },
+        "LC08_L2SP_147047_20250318_20250327_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250318_20250327_02_T1/LC08_L2SP_147047_20250318_20250327_02_T1_ST_B10.TIF",
+          "bytes": 90125744,
+          "sha256": "55d12147eecbe77c1791f4816c6f445d86cca6e7227bbe8058696d93ffe854b1"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC09_L2SP_147047_20250326_20250327_02_T1",
+      "acquisition_date": "2025-03-26",
+      "satellite": "Landsat 9",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 0.0,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC09_L2SP_147047_20250326_20250327_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250326_20250327_02_T1/LC09_L2SP_147047_20250326_20250327_02_T1_MTL.txt",
+          "bytes": 15253,
+          "sha256": "2c3a2ef13a2aa3251405a15456d8d4806dbf0bc36706f506a43db8f00a4d3f70"
+        },
+        "LC09_L2SP_147047_20250326_20250327_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250326_20250327_02_T1/LC09_L2SP_147047_20250326_20250327_02_T1_QA_PIXEL.TIF",
+          "bytes": 665865,
+          "sha256": "335c0a85a984d43562a30e6a498cf2649e9384a4e6ab146ba95deb76197be11c"
+        },
+        "LC09_L2SP_147047_20250326_20250327_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250326_20250327_02_T1/LC09_L2SP_147047_20250326_20250327_02_T1_QA_RADSAT.TIF",
+          "bytes": 224740,
+          "sha256": "8af1c72b0e3008f34ffead1ea6759450cc93d7a4872f3930472486f6df176ef5"
+        },
+        "LC09_L2SP_147047_20250326_20250327_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250326_20250327_02_T1/LC09_L2SP_147047_20250326_20250327_02_T1_ST_B10.TIF",
+          "bytes": 89798028,
+          "sha256": "a0839cd3422800065edf432e515687ce0f5af3cdb16f1509b153f9e8e67b6be7"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC08_L2SP_147047_20250403_20250411_02_T1",
+      "acquisition_date": "2025-04-03",
+      "satellite": "Landsat 8",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 9.1,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC08_L2SP_147047_20250403_20250411_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250403_20250411_02_T1/LC08_L2SP_147047_20250403_20250411_02_T1_MTL.txt",
+          "bytes": 15407,
+          "sha256": "10e389deac0c09bbe3492c14b1b104e2df4a748b90bbd1023fb8c6fbe8fc70b0"
+        },
+        "LC08_L2SP_147047_20250403_20250411_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250403_20250411_02_T1/LC08_L2SP_147047_20250403_20250411_02_T1_QA_PIXEL.TIF",
+          "bytes": 2913483,
+          "sha256": "6fefbb8ad89bc8e15c7a5fdd0e2ea944f12adc0448295d195a8d6eff96a69d98"
+        },
+        "LC08_L2SP_147047_20250403_20250411_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250403_20250411_02_T1/LC08_L2SP_147047_20250403_20250411_02_T1_QA_RADSAT.TIF",
+          "bytes": 224597,
+          "sha256": "795c9f77d0cb5ba5b3b648b71feb15b8e71070b92b405c44fceab459e3f83db7"
+        },
+        "LC08_L2SP_147047_20250403_20250411_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250403_20250411_02_T1/LC08_L2SP_147047_20250403_20250411_02_T1_ST_B10.TIF",
+          "bytes": 90516193,
+          "sha256": "7c17d9346818e4e77aec8dc176ba5c65f94038607f73f4cf22c344c4b540ac4d"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7791,
+          "transform": [
+            30.0,
+            0.0,
+            271185.0,
+            0.0,
+            -30.0,
+            2194215.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7791,
+          "transform": [
+            30.0,
+            0.0,
+            271185.0,
+            0.0,
+            -30.0,
+            2194215.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7791,
+          "transform": [
+            30.0,
+            0.0,
+            271185.0,
+            0.0,
+            -30.0,
+            2194215.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC09_L2SP_147047_20250411_20250412_02_T1",
+      "acquisition_date": "2025-04-11",
+      "satellite": "Landsat 9",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 2.26,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC09_L2SP_147047_20250411_20250412_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250411_20250412_02_T1/LC09_L2SP_147047_20250411_20250412_02_T1_MTL.txt",
+          "bytes": 15253,
+          "sha256": "27a9453f5b1198c3749246ba5b0d30bc1329ba00d231fd6fc8ad6fbb69c12a56"
+        },
+        "LC09_L2SP_147047_20250411_20250412_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250411_20250412_02_T1/LC09_L2SP_147047_20250411_20250412_02_T1_QA_PIXEL.TIF",
+          "bytes": 1660834,
+          "sha256": "8a1b110690b50911baad117780eebf6ad8389276c455b79d23d0e9e5382015e9"
+        },
+        "LC09_L2SP_147047_20250411_20250412_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250411_20250412_02_T1/LC09_L2SP_147047_20250411_20250412_02_T1_QA_RADSAT.TIF",
+          "bytes": 224982,
+          "sha256": "39174ff4350b306e2353629a05bdf1ef640a01272843dd3fb98cceaae4ca59ae"
+        },
+        "LC09_L2SP_147047_20250411_20250412_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250411_20250412_02_T1/LC09_L2SP_147047_20250411_20250412_02_T1_ST_B10.TIF",
+          "bytes": 90582936,
+          "sha256": "00d7ac1c79b01c223318a44ccaafac322d5d3fd3ddccf2019aee6e90503db96f"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269385.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC08_L2SP_147047_20250419_20250425_02_T1",
+      "acquisition_date": "2025-04-19",
+      "satellite": "Landsat 8",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 0.35,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC08_L2SP_147047_20250419_20250425_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250419_20250425_02_T1/LC08_L2SP_147047_20250419_20250425_02_T1_MTL.txt",
+          "bytes": 15406,
+          "sha256": "ad8e73feea522a4545e6ded13560cccacb5f626ebd52ebb22cfb4e7a30e7dbea"
+        },
+        "LC08_L2SP_147047_20250419_20250425_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250419_20250425_02_T1/LC08_L2SP_147047_20250419_20250425_02_T1_QA_PIXEL.TIF",
+          "bytes": 723883,
+          "sha256": "a77b458b8d6f48eddd9756ac3f2362442e90285ee7dddc2eeaa752cfa685d75c"
+        },
+        "LC08_L2SP_147047_20250419_20250425_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250419_20250425_02_T1/LC08_L2SP_147047_20250419_20250425_02_T1_QA_RADSAT.TIF",
+          "bytes": 225186,
+          "sha256": "964c11ed4b4ded54af59baf533ecf2a6d77229af589fecf31f320cce5227788e"
+        },
+        "LC08_L2SP_147047_20250419_20250425_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250419_20250425_02_T1/LC08_L2SP_147047_20250419_20250425_02_T1_ST_B10.TIF",
+          "bytes": 89691456,
+          "sha256": "6fc8bc5dc301a579d23404e58c80626a9887f5d3d83356c58873ebc47429eee2"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272085.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272085.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            272085.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC09_L2SP_147047_20250427_20250428_02_T1",
+      "acquisition_date": "2025-04-27",
+      "satellite": "Landsat 9",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 0.24,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC09_L2SP_147047_20250427_20250428_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250427_20250428_02_T1/LC09_L2SP_147047_20250427_20250428_02_T1_MTL.txt",
+          "bytes": 15252,
+          "sha256": "bae6f2985b54137ee9a74450f4d6b87df8965b16dbc0ec6b5d8f9c0895674237"
+        },
+        "LC09_L2SP_147047_20250427_20250428_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250427_20250428_02_T1/LC09_L2SP_147047_20250427_20250428_02_T1_QA_PIXEL.TIF",
+          "bytes": 734867,
+          "sha256": "108a6d3b077143ba2af7dd45eb92b6d6ec132d341bf0e6f043c5a44669150002"
+        },
+        "LC09_L2SP_147047_20250427_20250428_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250427_20250428_02_T1/LC09_L2SP_147047_20250427_20250428_02_T1_QA_RADSAT.TIF",
+          "bytes": 226021,
+          "sha256": "5ef0d19f14401da4456ce1899eeb74f4112c9864f5ed310c12a53956fcaba28a"
+        },
+        "LC09_L2SP_147047_20250427_20250428_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC09_L2SP_147047_20250427_20250428_02_T1/LC09_L2SP_147047_20250427_20250428_02_T1_ST_B10.TIF",
+          "bytes": 90364980,
+          "sha256": "b586a3acce00597670dc6a1e3796fe28a0b03f5725e2e8a45ac944809cebf4b0"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7631,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC08_L2SP_147047_20250505_20250512_02_T1",
+      "acquisition_date": "2025-05-05",
+      "satellite": "Landsat 8",
+      "processing_level": "L2SP",
+      "collection_number": "02",
+      "collection_category": "T1",
+      "wrs_path": "147",
+      "wrs_row": "47",
+      "temperature_multiplier": 0.00341802,
+      "temperature_offset": 149.0,
+      "cloud_cover_percent": 0.15,
+      "required_files": {
+        "MTL.txt": true,
+        "ST_B10.TIF": true,
+        "QA_PIXEL.TIF": true,
+        "QA_RADSAT.TIF": true
+      },
+      "files": {
+        "LC08_L2SP_147047_20250505_20250512_02_T1_MTL.txt": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250505_20250512_02_T1/LC08_L2SP_147047_20250505_20250512_02_T1_MTL.txt",
+          "bytes": 15439,
+          "sha256": "56ae7c76ccbe80afb2678ef135aeb7cb8cf978907fe9946763d5c27e881f4e38"
+        },
+        "LC08_L2SP_147047_20250505_20250512_02_T1_QA_PIXEL.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250505_20250512_02_T1/LC08_L2SP_147047_20250505_20250512_02_T1_QA_PIXEL.TIF",
+          "bytes": 564037,
+          "sha256": "6fedcd8c03fe750c42be5e5569e139850fe94a59f52c212f987babbc9fef4427"
+        },
+        "LC08_L2SP_147047_20250505_20250512_02_T1_QA_RADSAT.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250505_20250512_02_T1/LC08_L2SP_147047_20250505_20250512_02_T1_QA_RADSAT.TIF",
+          "bytes": 224381,
+          "sha256": "77796210cdec1278f81723d866ba3115a2d9d10abf8c966f08d4e0c6668caacb"
+        },
+        "LC08_L2SP_147047_20250505_20250512_02_T1_ST_B10.TIF": {
+          "path": "data/raw/landsat/LC08_L2SP_147047_20250505_20250512_02_T1/LC08_L2SP_147047_20250505_20250512_02_T1_ST_B10.TIF",
+          "bytes": 90141453,
+          "sha256": "578eb7f04b78d450f82ff5aa4e315ece03fa4d31952fa62544adcbf0904cc1e0"
+        }
+      },
+      "rasters": {
+        "ST_B10.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_PIXEL.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        },
+        "QA_RADSAT.TIF": {
+          "driver": "GTiff",
+          "crs": "EPSG:32643",
+          "resolution_m": [
+            30.0,
+            30.0
+          ],
+          "width": 7641,
+          "height": 7781,
+          "transform": [
+            30.0,
+            0.0,
+            269985.0,
+            0.0,
+            -30.0,
+            2193915.0
+          ],
+          "dtype": "uint16"
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    }
+  ]
+}
