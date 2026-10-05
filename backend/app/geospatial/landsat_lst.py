@@ -67,7 +67,9 @@ def parse_mtl(metadata_path: Path) -> dict[str, str]:
     for line in metadata_path.read_text(encoding="utf-8").splitlines():
         match = pattern.match(line)
         if match:
-            fields[match.group(1)] = match.group(2).strip('"')
+            # USGS L2 MTL repeats product/processing keys in a later Level-1
+            # processing record. Keep the earlier Level-2 product contents.
+            fields.setdefault(match.group(1), match.group(2).strip('"'))
     if not fields:
         raise ValueError(f"No Landsat metadata fields found: {metadata_path}")
     return fields

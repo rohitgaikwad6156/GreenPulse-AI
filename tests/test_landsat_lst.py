@@ -29,6 +29,31 @@ from backend.app.geospatial.landsat_lst import (
 class MetadataTests(unittest.TestCase):
     """Test original-MTL parsing and acquisition-season selection."""
 
+    def test_level2_identity_is_not_overwritten_by_embedded_level1_record(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            product_id = "LC08_L2SP_147047_20250302_20250311_02_T1"
+            metadata = Path(temporary) / f"{product_id}_MTL.txt"
+            metadata.write_text(
+                "GROUP = PRODUCT_CONTENTS\n"
+                f'LANDSAT_PRODUCT_ID = "{product_id}"\n'
+                'PROCESSING_LEVEL = "L2SP"\n'
+                f'FILE_NAME_BAND_ST_B10 = "{product_id}_ST_B10.TIF"\n'
+                "END_GROUP = PRODUCT_CONTENTS\n"
+                "COLLECTION_NUMBER = 02\n"
+                "DATE_ACQUIRED = 2025-03-02\n"
+                "TEMPERATURE_MULT_BAND_ST_B10 = 0.00341802\n"
+                "TEMPERATURE_ADD_BAND_ST_B10 = 149.0\n"
+                "GROUP = LEVEL1_PROCESSING_RECORD\n"
+                'LANDSAT_PRODUCT_ID = "LC08_L1TP_147047_20250302_20250311_02_T1"\n'
+                'PROCESSING_LEVEL = "L1TP"\n'
+                "END_GROUP = LEVEL1_PROCESSING_RECORD\n",
+                encoding="utf-8",
+            )
+            fields = parse_mtl(metadata)
+            self.assertEqual(fields["LANDSAT_PRODUCT_ID"], product_id)
+            self.assertEqual(fields["PROCESSING_LEVEL"], "L2SP")
+            self.assertEqual(fields["TEMPERATURE_MULT_BAND_ST_B10"], "0.00341802")
+
     def test_metadata_scale_offset_and_season(self) -> None:
         """Calibration is read from file; a June product is excluded."""
         with tempfile.TemporaryDirectory() as temporary:
