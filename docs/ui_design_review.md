@@ -109,3 +109,35 @@ not converted into generic render errors.
 - The fallback was visually inspected at 1440, 390, and 320 px; the narrow
   layouts had no horizontal overflow. Ordinary unavailable API states continued
   to display within their pages.
+
+
+## Judge/demo status presentation
+
+Methodology now places **Project status / How to demo GreenPulse today** after
+its claim-boundary introduction. Implemented software is listed separately from
+verified source and artifact evidence. The pure `demoStatusPresentation` helper
+reuses the existing model-readiness projection of `GET /api/readiness`; source
+counts come from `first_heat_map`, and model, planning and field evidence remain
+independent. Methodology's former legacy artifact chips have been replaced by
+this canonical summary. Its separate methodology request cannot block the static
+research content or readiness request.
+
+The section links a short walkthrough: Heat Map's historical NASA MODIS layer,
+Research Model readiness, Data Readiness, the research methods, Scenario Simulator,
+Optimizer, then Project Status. MODIS is explicitly an independent approximately
+1 km observation layer, subject to external service availability, and never a
+GreenPulse 30 m prediction. Data and Model Card links point to the public repository.
+No demo climate values, source verification changes, or model calculations were added.
+
+Verified locally in Chromium: 1440, 390 and 320 px layouts, with no horizontal
+page overflow; Methodology → Heat Map → MODIS → Research Model → Data Readiness
+→ Methodology, plus the scenario and optimizer links. Methodology and Heat Map
+both show the canonical 3/5 source gate. A blocked readiness request shows
+**Not checked**, no assumed current blockers, and a labelled Retry button;
+unblocking and retrying restores the canonical evidence. The documented scientific
+limitations stay visible. The scenario page shows calibration-required assumptions;
+these are not cooling results. Planning evidence remains unavailable.
+
+Validation: frontend lint (ESLint and configured Prettier checks), all frontend
+unit tests, production build, and `git diff --check`. Browser screenshots were kept
+in ignored local `tmp/` files. No backend code was changed or model pipeline run.

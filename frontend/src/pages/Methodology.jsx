@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, BookOpenText, CircleHelp, FlaskConical, Layers3, ShieldCheck } from "lucide-react";
 import PageIntro from "../components/PageIntro.jsx";
-import { getMethodology } from "../services/api.js";
+import ProjectStatus from "../components/ProjectStatus.jsx";
+import { demoStatusPresentation } from "../utils/demoStatus.js";
+import { getReadiness, getMethodology } from "../services/api.js";
 
 const stages = [
   "Satellite + GIS", "30 m grid", "Feature engineering", "XGBoost LST",
@@ -164,18 +166,33 @@ function EquationCard({ item }) {
 }
 
 export default function Methodology() {
+  const [readiness, setReadiness] = useState({ loading: true });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    const controller = new AbortController();
+    setReadiness({ loading: true });
+    getReadiness(controller.signal).then((data) => {
+      if (!controller.signal.aborted) setReadiness({ data });
+    }).catch(() => {
+      if (!controller.signal.aborted) setReadiness({ error: true });
+    });
+    return () => controller.abort();
+  }, [attempt]);
+  const view = demoStatusPresentation(readiness);
   const [status, setStatus] = useState({ loading: true, data: null, error: "" });
   useEffect(() => {
     const controller = new AbortController();
     getMethodology(controller.signal)
-      .then((data) => setStatus({ loading: false, data, error: "" }))
+      .then((data) => {
+        if (!controller.signal.aborted) setStatus({ loading: false, data, error: "" });
+      })
       .catch((error) => {
-        if (error.name !== "CanceledError") setStatus({ loading: false, data: null, error: "Live artifact status is unavailable. Check the backend connection." });
+        if (!controller.signal.aborted && error.name !== "CanceledError") setStatus({ loading: false, data: null, error: "Live artifact status is unavailable. Check the backend connection." });
       });
     return () => controller.abort();
   }, []);
 
-  const files = status.data?.data_status;
+
   return <>
     <PageIntro eyebrow="Research foundation" title="Methodology & Limitations"
       description="The data, equations, validation rules, and scientific boundaries behind GreenPulse AI — An AI-powered Urban Climate Decision-Support System." />
@@ -183,21 +200,18 @@ export default function Methodology() {
     <section className="rounded-2xl border border-[#dbe8dc] bg-[#f1f7f0] p-5 sm:p-6">
       <div className="flex items-center gap-2 text-[#397a50]"><ShieldCheck size={20} aria-hidden="true" /><h2 className="text-sm font-semibold text-[#294532]">What can be claimed today?</h2></div>
       <p className="mt-2 max-w-4xl text-sm leading-6 text-[#536d59]">The processing, model-training, simulation, optimization, and validation methods are implemented. A real Pune/PCMC result requires verified boundary and satellite inputs, a trained model, calibrated intervention benefits, and follow-up observations. DEMO / SYNTHETIC DATA is never reported as measured climate evidence.</p>
-      {status.loading ? <p role="status" className="mt-3 text-xs text-[#69806d]">Checking local artifact availability…</p>
-        : status.error ? <p role="status" className="mt-3 text-xs text-[#8d683a]">{status.error}</p>
-          : <div className="mt-4 flex flex-wrap gap-2 text-xs">
-            <span className="rounded-full border border-[#cddfcf] bg-white px-3 py-1.5 text-[#31543b]">Real ML grid: {files.real_ml_grid_available ? "file present" : "not available"}</span>
-            <span className="rounded-full border border-[#cddfcf] bg-white px-3 py-1.5 text-[#31543b]">Trained model: {files.trained_model_available ? "file present" : "not available"}</span>
-            <span className="rounded-full border border-[#cddfcf] bg-white px-3 py-1.5 text-[#31543b]">Planning catalog: {!files.intervention_catalog_available ? "not available" : files.optimizer_location_available ? "evidence-complete location available" : "loaded; no evidence-complete locations"}</span>
-          </div>}
+
     </section>
 
+    <ProjectStatus view={view} retry={() => setAttempt((value) => value + 1)} />
+
     <nav aria-label="Methodology sections" className="mt-5 flex flex-wrap gap-2">
-      {[["#data", "Data"], ["#mathematics", "Mathematics"], ["#model", "Model"], ["#validation", "Validation"],
+      {[["#project-status", "Status"], ["#data", "Data"], ["#mathematics", "Mathematics"], ["#model", "Model"], ["#validation", "Validation"],
         ["#limitations", "Limitations"], ["#judge-questions", "Judge questions"], ["#references", "References"]]
         .map(([href, label]) => <a key={href} href={href} className="rounded-lg border border-[#dce7dc] bg-white px-3 py-2 text-xs font-semibold text-[#3e6e4c] hover:bg-[#edf5ec]">{label}</a>)}
     </nav>
 
+    {status.error && <p className="mt-4 text-sm text-[#6e8072]">Methodology service unavailable; the documented methods below remain available.</p>}
     <section className="mt-7 rounded-2xl border border-[#e4ebe3] bg-white p-5 sm:p-6">
       <div className="flex items-center gap-2 text-[#397a50]"><Layers3 size={18} aria-hidden="true" /><h2 className="text-sm font-semibold text-[#294532]">End-to-end research pipeline</h2></div>
       <ol className="mt-4 flex flex-wrap items-center gap-2">
