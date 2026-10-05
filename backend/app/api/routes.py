@@ -244,3 +244,9 @@ def get_nearby_sensor_context(
 def get_methodology() -> dict:
     """Describe the system and actual local artifact availability."""
     return services.methodology()
+
+@router.get("/data-readiness", tags=["Data readiness"])
+def get_data_readiness() -> dict:
+    """Summarize recorded source evidence without processing production datasets."""
+    from backend.app.data_intake.readiness import readiness
+    return readiness(services.ROOT)

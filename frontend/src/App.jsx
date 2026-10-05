@@ -4,6 +4,7 @@ import AppShell from "./components/AppShell.jsx";
 import PageLoading from "./components/PageLoading.jsx";
 import Overview from "./pages/Overview.jsx";
 
+const DataReadiness = lazy(() => import("./pages/DataReadiness.jsx"));
 const HeatMap = lazy(() => import("./pages/HeatMap.jsx"));
 const RootCauseAnalysis = lazy(() => import("./pages/RootCauseAnalysis.jsx"));
 const ScenarioSimulator = lazy(() => import("./pages/ScenarioSimulator.jsx"));
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/climate-action-optimizer" element={<Suspense fallback={<PageLoading label="Loading optimizer…" />}><ClimateActionOptimizer /></Suspense>} />
         <Route path="/validation" element={<Suspense fallback={<PageLoading label="Loading validation…" />}><Validation /></Suspense>} />
         <Route path="/research-layers" element={<Suspense fallback={<PageLoading label="Loading research layers…" />}><ResearchLayers /></Suspense>} />
+        <Route path="/data-readiness" element={<Suspense fallback={<PageLoading label="Loading source evidence…" />}><DataReadiness /></Suspense>} />
         <Route path="/methodology" element={<Suspense fallback={<PageLoading label="Loading methodology…" />}><Methodology /></Suspense>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -123,3 +123,8 @@ export async function getNearbySensorContext(params, signal) {
   const response = await api.get("/api/research/sensors/nearby", { params, signal });
   return response.data;
 }
+
+export async function getDataReadiness(signal) {
+  const response = await api.get('/api/data-readiness', { signal });
+  return response.data;
+}

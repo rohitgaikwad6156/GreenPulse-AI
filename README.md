@@ -157,3 +157,8 @@ artifacts are not real results.
 No production pipeline substitutes synthetic climate values for missing source data. Automated tests use only temporary, labelled artificial fixtures; the separately labelled demo files are never a production API fallback.
 
 Real accuracy requires real spatial validation. SHAP is model attribution, not causation; scenario outputs are model sensitivity estimates, not observed cooling.
+
+### Source readiness
+
+The [Data Readiness page](docs/data_readiness_ui.md) at `/data-readiness` shows
+recorded source evidence, first heat-map blockers and later research dependencies.

@@ -78,7 +78,7 @@ export default function Overview() {
         <div className="section-heading">
           <div>
             <p className="eyebrow">Before you begin</p>
-            <h2 id="readiness-heading">Research readiness</h2>
+            <h2 id="readiness-heading">Research readiness</h2><Link to="/data-readiness">View source evidence →</Link>
           </div>
           <button
             type="button"

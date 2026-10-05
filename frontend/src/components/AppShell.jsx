@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   Activity,
+  ClipboardCheck,
   BookOpenText,
   ChartNoAxesCombined,
   ChevronRight,
@@ -34,6 +35,7 @@ const navigation = [
   },
   { label: "Validation", path: "/validation", icon: Activity },
   { label: "Research Layers", path: "/research-layers", icon: RadioTower },
+  { label: "Data Readiness", path: "/data-readiness", icon: ClipboardCheck },
   { label: "Methodology", path: "/methodology", icon: BookOpenText },
 ];
 
