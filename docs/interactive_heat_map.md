@@ -30,6 +30,34 @@ research training data. No numerical temperatures are inferred from RGB colors.
 
 When verified ward GIS is available, city scale colors ward polygons by the mean XGBoost-predicted **land surface temperature (LST, °C)** across complete-case 30 m cells. Independently, at zoom 16 or greater the cell view requests cells in the current viewport. Clicking a ward or cell calls FastAPI for its prediction, Heat Hazard Score if calibrated, confidence status, and descriptive TreeSHAP factors. No fake markers or fallback climate readings are added.
 
+### Research-model readiness UX
+
+On page load, the Heat Map reads the canonical `GET /api/readiness` contract.
+It refreshes that evidence only when the user requests a status refresh, not on
+map movement. Its required-source checklist comes directly from
+`required_sources`; display labels do not define which groups are required.
+The source gate (`first_heat_map`) and the real grid/XGBoost artifact statuses
+(`artifacts`) are shown as separate steps. A ready source gate still requires
+real processing, training and spatial validation; source readiness does not
+establish model accuracy.
+
+When sources or artifacts are missing, Research Model mode shows an explanatory
+panel with current blockers, next actions, an artifact summary and a link to
+the full Data Readiness evidence. The layer, view and season controls are
+disabled until the model is ready. The geographic basemap remains visible,
+without a model legend, hotspot ranking or fabricated selection values.
+Malformed readiness evidence or an unreachable API produces an unknown state
+with a retry action; it never displays presumed pending sources.
+
+Verified ward GIS remains a reporting/UI dependency. If the cell model is
+ready but ward GIS is not, the map explains that ward reporting is unavailable
+and keeps the cell view distinct from the first-build source gate. An initial
+failed model load may still select MODIS automatically. Choosing Research Model
+explicitly keeps that choice visible so the user can read the readiness panel
+and switch to MODIS deliberately. NASA MODIS is an independent historical
+observation layer at approximately 1 km source resolution, never a 30 m
+GreenPulse prediction.
+
 ## Required real artifacts
 
 | File | Role |
@@ -39,7 +67,7 @@ When verified ward GIS is available, city scale colors ward polygons by the mean
 | `data/processed/greenpulse_ml_grid.parquet` and `metadata.json` | Real, aligned complete-case 30 m cells and their features. |
 | `models/xgboost_lst.joblib` and `model_metadata.json` | Matching trained continuous-LST model and held-out spatial metrics. |
 
-The combined municipal outline, real grid and trained model are **not currently present**. The research-model view therefore shows geographic context and an explicit missing-input state; the default NASA view remains independently usable. Missing ward GIS blocks ward views only. The demo CSV is never used in the map API. A numeric Heat Hazard Score also needs calibrated reference values in model metadata. Without them, the selection panel says `Unavailable`. The confidence panel reports that no cell-level interval is calibrated; where available, it shows held-out spatial RMSE separately.
+The combined municipal outline is not yet verified, and current grid/model files are not accepted real production artifacts. The research-model view therefore shows geographic context and an explicit readiness panel; the default NASA view remains independently usable. Missing ward GIS blocks ward views only. The demo CSV is never used in the map API. A numeric Heat Hazard Score also needs calibrated reference values in model metadata. Without them, the selection panel says `Unavailable`. The confidence panel reports that no cell-level interval is calibrated; where available, it shows held-out spatial RMSE separately.
 
 ## Map API
 
@@ -66,7 +94,7 @@ Set-Location frontend
 npm run dev -- --host localhost --port 5173 --strictPort
 ```
 
-Open `http://localhost:5173/heat-map`. Expect NASA satellite heat colors, source/date/resolution labels, a date input, opacity control and the NASA legend. Check date changes, zooming, opacity and Refresh. Switch to Research model to see `Awaiting data` for missing local boundary/model layers. Switch back to restore satellite imagery. In Swagger at `http://127.0.0.1:8000/docs`, all five `/api/map/...` routes appear; they return 503 until real artifacts exist. Once the verified inputs are prepared, expect ward outlines and a ward heat layer, then 30 m cells on zooming in. Click a ward or cell and compare the selection panel to its corresponding API response.
+Open `http://localhost:5173/heat-map`. Expect NASA satellite heat colors, source/date/resolution labels, a date input, opacity control and the NASA legend. Check date changes, zooming, opacity and Refresh. Switch to Research Model to inspect the canonical source checklist, blockers and artifact states; the radio choice should remain selected. Use the in-page MODIS button to switch back. In Swagger at `http://127.0.0.1:8000/docs`, all five `/api/map/...` routes appear; they return 503 until real artifacts exist. Once the verified inputs are prepared, expect ward outlines and a ward heat layer, then 30 m cells on zooming in. Click a ward or cell and compare the selection panel to its corresponding API response.
 
 To run the labelled artificial fixture tests and frontend build:
 
