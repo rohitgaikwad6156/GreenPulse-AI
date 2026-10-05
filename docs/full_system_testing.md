@@ -93,6 +93,11 @@ state as a successful climate result.
   intervention; expect clear 404/422 or 503 responses, never fabricated data.
 - [ ] **Responsive layout:** Repeat the navigation and one scenario on a
   narrow browser window; verify controls, charts, and map remain usable.
+- [ ] **Route recovery:** In development only, make one page component throw
+  during render. Confirm its recovery card receives focus while the shell stays
+  usable. Retry should remount the page; navigating to another page or using
+  Return to Overview should clear the error. Remove the controlled throw after
+  testing. Repeat at desktop, 390 px, and 320 px widths.
 
 ### Current project gate
 

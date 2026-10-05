@@ -72,3 +72,40 @@ coverage remains dependent on the external imagery service.
    with Escape, and follow a link to confirm focus and scroll behavior.
 5. Block the API in browser developer tools, refresh readiness, then restore it
    and retry. A failed request must remain distinct from absent inputs.
+
+## Route error recovery
+
+Each of the nine page routes, including Overview, renders inside a reusable error
+boundary within `AppShell`. A render or lifecycle exception replaces only the
+page content with a calm recovery card; the sidebar, header, and footer remain
+available. The boundary sits outside each route's existing `Suspense` fallback.
+It does not handle event-handler exceptions or asynchronous request failures.
+
+Retry resets the boundary and remounts the failed page subtree. For recognized
+lazy-chunk import failures, Retry reloads the document once on user action so a
+stale deployment can fetch fresh assets. A route change gives the destination a
+new boundary, so an error on one page cannot follow the user to another. The
+fallback uses a heading and alert semantics, moves focus to that heading on a
+crash, and offers a button plus a normal router link back to Overview. AppShell
+continues to manage focus when the route itself changes.
+
+Expected evidence and API states, including unavailable models, missing source
+data, and service errors, keep their existing page-specific messages. They are
+not converted into generic render errors.
+
+### Recovery verification
+
+- All nine normal routes and the unknown-path redirect were checked in Chromium.
+- A temporary development render throw in Heat Map and Overview showed the
+  recovery card without removing AppShell. The heading received focus and no
+  error message or stack appeared in the card. The temporary throws were removed.
+- Clearing the throw and choosing Retry restored Heat Map. With the throw still
+  active, navigation to Data Readiness and Return to Overview both cleared the
+  route error. Overview's own Return to Overview action also recovered after
+  the throw was cleared.
+- A temporarily blocked lazy module showed the recovery card; after unblocking,
+  Retry loaded the page. A delayed lazy import showed the existing PageLoading
+  status before the page rendered. The network block and delay were removed.
+- The fallback was visually inspected at 1440, 390, and 320 px; the narrow
+  layouts had no horizontal overflow. Ordinary unavailable API states continued
+  to display within their pages.

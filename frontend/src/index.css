@@ -328,6 +328,54 @@ textarea {
 .button-secondary:disabled {
   opacity: 0.6;
 }
+.route-error {
+  max-width: 690px;
+  margin: clamp(20px, 5vw, 64px) auto;
+  padding: clamp(24px, 5vw, 48px);
+  border: 1px solid #dce3d7;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 28px #193c300a;
+}
+.route-error-icon {
+  color: #a66b20;
+  margin-bottom: 22px;
+}
+.route-error .eyebrow {
+  margin: 0 0 10px;
+}
+.route-error h1 {
+  margin: 0 0 14px;
+  color: #203e30;
+  font-size: clamp(25px, 3vw, 34px);
+  line-height: 1.2;
+  letter-spacing: -0.8px;
+  font-weight: 650;
+}
+.route-error h1:focus-visible {
+  outline: 3px solid #b67827;
+  outline-offset: 5px;
+}
+.route-error > p:not(.eyebrow) {
+  max-width: 54ch;
+  color: #596e60;
+  line-height: 1.65;
+}
+.route-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 26px 0 22px;
+}
+.route-error .route-error-note {
+  margin-bottom: 0;
+  font-size: 13px;
+}
+@media (max-width: 374px) {
+  .route-error-actions > * {
+    width: 100%;
+  }
+}
 .readiness-panel,
 .workflow-panel {
   border: 1px solid #dce3d7;

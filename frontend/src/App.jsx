@@ -1,7 +1,8 @@
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import AppShell from "./components/AppShell.jsx";
 import PageLoading from "./components/PageLoading.jsx";
+import RouteErrorBoundary from "./components/RouteErrorBoundary.jsx";
 import Overview from "./pages/Overview.jsx";
 
 const DataReadiness = lazy(() => import("./pages/DataReadiness.jsx"));
@@ -13,19 +14,26 @@ const Validation = lazy(() => import("./pages/Validation.jsx"));
 const ResearchLayers = lazy(() => import("./pages/ResearchLayers.jsx"));
 const Methodology = lazy(() => import("./pages/Methodology.jsx"));
 
+function RoutePage({ children, loadingLabel }) {
+  const { pathname } = useLocation();
+  return <RouteErrorBoundary key={pathname} pathname={pathname}>
+    <Suspense fallback={<PageLoading label={loadingLabel} />}>{children}</Suspense>
+  </RouteErrorBoundary>;
+}
+
 export default function App() {
   return (
     <Routes>
       <Route element={<AppShell />}>
-        <Route path="/" element={<Overview />} />
-        <Route path="/heat-map" element={<Suspense fallback={<PageLoading label="Loading heat map…" />}><HeatMap /></Suspense>} />
-        <Route path="/root-cause" element={<Suspense fallback={<PageLoading label="Loading explanation…" />}><RootCauseAnalysis /></Suspense>} />
-        <Route path="/scenario-simulator" element={<Suspense fallback={<PageLoading label="Loading simulator…" />}><ScenarioSimulator /></Suspense>} />
-        <Route path="/climate-action-optimizer" element={<Suspense fallback={<PageLoading label="Loading optimizer…" />}><ClimateActionOptimizer /></Suspense>} />
-        <Route path="/validation" element={<Suspense fallback={<PageLoading label="Loading validation…" />}><Validation /></Suspense>} />
-        <Route path="/research-layers" element={<Suspense fallback={<PageLoading label="Loading research layers…" />}><ResearchLayers /></Suspense>} />
-        <Route path="/data-readiness" element={<Suspense fallback={<PageLoading label="Loading source evidence…" />}><DataReadiness /></Suspense>} />
-        <Route path="/methodology" element={<Suspense fallback={<PageLoading label="Loading methodology…" />}><Methodology /></Suspense>} />
+        <Route path="/" element={<RoutePage loadingLabel="Loading overview…"><Overview /></RoutePage>} />
+        <Route path="/heat-map" element={<RoutePage loadingLabel="Loading heat map…"><HeatMap /></RoutePage>} />
+        <Route path="/root-cause" element={<RoutePage loadingLabel="Loading explanation…"><RootCauseAnalysis /></RoutePage>} />
+        <Route path="/scenario-simulator" element={<RoutePage loadingLabel="Loading simulator…"><ScenarioSimulator /></RoutePage>} />
+        <Route path="/climate-action-optimizer" element={<RoutePage loadingLabel="Loading optimizer…"><ClimateActionOptimizer /></RoutePage>} />
+        <Route path="/validation" element={<RoutePage loadingLabel="Loading validation…"><Validation /></RoutePage>} />
+        <Route path="/research-layers" element={<RoutePage loadingLabel="Loading research layers…"><ResearchLayers /></RoutePage>} />
+        <Route path="/data-readiness" element={<RoutePage loadingLabel="Loading source evidence…"><DataReadiness /></RoutePage>} />
+        <Route path="/methodology" element={<RoutePage loadingLabel="Loading methodology…"><Methodology /></RoutePage>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
