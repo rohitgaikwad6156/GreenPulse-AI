@@ -1,0 +1,5371 @@
+{
+  "audit_type": "read_only_full_scene_extreme_diagnostic",
+  "audited_at_utc": "2026-10-05T08:20:54.345447+00:00",
+  "disclaimer": "These are full-scene diagnostic observations and are not Pune, PMC, or PCMC temperature results.",
+  "source_directory": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\landsat",
+  "scenes_expected": 9,
+  "scenes_passed": 9,
+  "scenes_failed": 0,
+  "overall_status": "PASS",
+  "scenes": [
+    {
+      "product_id": "LC08_L2SP_147047_20250302_20250311_02_T1",
+      "acquisition_date": "2025-03-02",
+      "satellite": "Landsat 8",
+      "qa_valid_pixel_count": 37718969,
+      "statistics_celsius": {
+        "minimum": 16.97320976000003,
+        "maximum": 68.01450241999999,
+        "mean": 37.938108662049785,
+        "p01": 28.779050840000025,
+        "p05": 31.161410779999983,
+        "p25": 35.19809240000001,
+        "median": 38.086319300000014,
+        "p75": 40.78313708000002,
+        "p95": 44.25242738000003,
+        "p99": 46.292985320000014
+      },
+      "threshold_counts": {
+        "below_0": 0,
+        "from_0_to_10": 0,
+        "above_60": 17,
+        "above_70": 0,
+        "above_80": 0,
+        "above_90": 0
+      },
+      "minimum_pixel": {
+        "row": 5480,
+        "column": 3616,
+        "st_dn": 41288,
+        "celsius": 16.97320976000003,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 380880.0,
+        "y": 2029500.0,
+        "longitude": 73.87256857282487,
+        "latitude": 18.352007195932934,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 5478,
+              "column": 3614,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 19.181250680000005,
+              "st_dn": 41934,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5478,
+              "column": 3615,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 18.357507860000055,
+              "st_dn": 41693,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5478,
+              "column": 3616,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.940509420000012,
+              "st_dn": 41571,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5478,
+              "column": 3617,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 18.58309717999998,
+              "st_dn": 41759,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5478,
+              "column": 3618,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 19.97081330000003,
+              "st_dn": 42165,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5479,
+              "column": 3614,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 18.624113420000015,
+              "st_dn": 41771,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5479,
+              "column": 3615,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.800370600000008,
+              "st_dn": 41530,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5479,
+              "column": 3616,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.25690542000001,
+              "st_dn": 41371,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5479,
+              "column": 3617,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.800370600000008,
+              "st_dn": 41530,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5479,
+              "column": 3618,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 19.18466870000003,
+              "st_dn": 41935,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5480,
+              "column": 3614,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 19.249611080000022,
+              "st_dn": 41954,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5480,
+              "column": 3615,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.605543460000035,
+              "st_dn": 41473,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5480,
+              "column": 3616,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 16.97320976000003,
+              "st_dn": 41288,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5480,
+              "column": 3617,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.414134340000032,
+              "st_dn": 41417,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5480,
+              "column": 3618,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 18.873628880000012,
+              "st_dn": 41844,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5481,
+              "column": 3614,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 19.49912654000002,
+              "st_dn": 42027,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5481,
+              "column": 3615,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.814042680000057,
+              "st_dn": 41534,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5481,
+              "column": 3616,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 16.99371788000002,
+              "st_dn": 41294,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5481,
+              "column": 3617,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.414134340000032,
+              "st_dn": 41417,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5481,
+              "column": 3618,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 18.836030660000006,
+              "st_dn": 41833,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5482,
+              "column": 3614,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 20.31261530000006,
+              "st_dn": 42265,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5482,
+              "column": 3615,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 18.76425224000002,
+              "st_dn": 41812,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5482,
+              "column": 3616,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.86189496000003,
+              "st_dn": 41548,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5482,
+              "column": 3617,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.97468962000005,
+              "st_dn": 41581,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5482,
+              "column": 3618,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 18.935153239999977,
+              "st_dn": 41862,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "maximum_pixel": {
+        "row": 2696,
+        "column": 1503,
+        "st_dn": 56221,
+        "celsius": 68.01450241999999,
+        "qa_pixel": 21824,
+        "qa_radsat": 96,
+        "x": 317490.0,
+        "y": 2113020.0,
+        "longitude": 73.26508609381618,
+        "latitude": 19.1020176790959,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 2694,
+              "column": 1501,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 43.603003580000006,
+              "st_dn": 49079,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2694,
+              "column": 1502,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 49.140195980000044,
+              "st_dn": 50699,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2694,
+              "column": 1503,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 51.90537416000001,
+              "st_dn": 51508,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2694,
+              "column": 1504,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 51.091885400000024,
+              "st_dn": 51270,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2694,
+              "column": 1505,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 46.094740160000015,
+              "st_dn": 49808,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2695,
+              "column": 1501,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 47.91996284000004,
+              "st_dn": 50342,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2695,
+              "column": 1502,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.087092480000024,
+              "st_dn": 53024,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2695,
+              "column": 1503,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.48756408000003,
+              "st_dn": 54604,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2695,
+              "column": 1504,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.25707688,
+              "st_dn": 54244,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2695,
+              "column": 1505,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 53.65881841999999,
+              "st_dn": 52021,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2696,
+              "column": 1501,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 50.47322378000001,
+              "st_dn": 51089,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2696,
+              "column": 1502,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.33910936000001,
+              "st_dn": 54268,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 2696,
+              "column": 1503,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.01450241999999,
+              "st_dn": 56221,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 2696,
+              "column": 1504,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.17560766000003,
+              "st_dn": 55683,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2696,
+              "column": 1505,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.38787824000002,
+              "st_dn": 53112,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2697,
+              "column": 1501,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 50.42537149999998,
+              "st_dn": 51075,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2697,
+              "column": 1502,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.74437388000001,
+              "st_dn": 54094,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 2697,
+              "column": 1503,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.23371400000002,
+              "st_dn": 55700,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 2697,
+              "column": 1504,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 63.99149288000001,
+              "st_dn": 55044,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 2697,
+              "column": 1505,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 55.84635122000003,
+              "st_dn": 52661,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            }
+          ],
+          [
+            {
+              "row": 2698,
+              "column": 1501,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 48.70268942000001,
+              "st_dn": 50571,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2698,
+              "column": 1502,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.04607624000005,
+              "st_dn": 53012,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2698,
+              "column": 1503,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.30686732000004,
+              "st_dn": 53966,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            },
+            {
+              "row": 2698,
+              "column": 1504,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.78778657999999,
+              "st_dn": 53229,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            },
+            {
+              "row": 2698,
+              "column": 1505,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 51.76865336000003,
+              "st_dn": 51468,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {},
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC09_L2SP_147047_20250310_20250311_02_T1",
+      "acquisition_date": "2025-03-10",
+      "satellite": "Landsat 9",
+      "qa_valid_pixel_count": 39546962,
+      "statistics_celsius": {
+        "minimum": 25.460153419999983,
+        "maximum": 99.84994070000005,
+        "mean": 42.48385530373628,
+        "p01": 33.09259208000003,
+        "p05": 35.625344900000016,
+        "p25": 39.52188769999998,
+        "median": 42.52974530000006,
+        "p75": 45.34619378000002,
+        "p95": 49.39654747999998,
+        "p99": 52.48643756000001
+      },
+      "threshold_counts": {
+        "below_0": 0,
+        "from_0_to_10": 0,
+        "above_60": 262,
+        "above_70": 84,
+        "above_80": 42,
+        "above_90": 31
+      },
+      "minimum_pixel": {
+        "row": 2702,
+        "column": 3244,
+        "st_dn": 43771,
+        "celsius": 25.460153419999983,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 367320.0,
+        "y": 2112840.0,
+        "longitude": 73.73867415174138,
+        "latitude": 19.10424472022674,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 2700,
+              "column": 3242,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43701,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2700,
+              "column": 3243,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43705,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2700,
+              "column": 3244,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43704,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2700,
+              "column": 3245,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43701,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2700,
+              "column": 3246,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43694,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2701,
+              "column": 3242,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43729,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2701,
+              "column": 3243,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43734,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2701,
+              "column": 3244,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43738,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2701,
+              "column": 3245,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43738,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2701,
+              "column": 3246,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43732,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2702,
+              "column": 3242,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43756,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2702,
+              "column": 3243,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43765,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2702,
+              "column": 3244,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 25.460153419999983,
+              "st_dn": 43771,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2702,
+              "column": 3245,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 25.473825500000032,
+              "st_dn": 43775,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2702,
+              "column": 3246,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43770,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2703,
+              "column": 3242,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43775,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2703,
+              "column": 3243,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43787,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2703,
+              "column": 3244,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43796,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2703,
+              "column": 3245,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43803,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2703,
+              "column": 3246,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43796,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2704,
+              "column": 3242,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43800,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2704,
+              "column": 3243,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43804,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2704,
+              "column": 3244,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43811,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2704,
+              "column": 3245,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 25.61054630000001,
+              "st_dn": 43815,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2704,
+              "column": 3246,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43803,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 22,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "maximum_pixel": {
+        "row": 6438,
+        "column": 1286,
+        "st_dn": 65535,
+        "celsius": 99.84994070000005,
+        "qa_pixel": 21824,
+        "qa_radsat": 96,
+        "x": 308580.0,
+        "y": 2000760.0,
+        "longitude": 73.19116149822689,
+        "latitude": 18.087097282299734,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 6436,
+              "column": 1284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.01873208000001,
+              "st_dn": 53004,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6436,
+              "column": 1285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.75952582000002,
+              "st_dn": 54391,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6436,
+              "column": 1286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.31676804000006,
+              "st_dn": 56602,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6436,
+              "column": 1287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 72.96379538000002,
+              "st_dn": 57669,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6436,
+              "column": 1288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 73.07317202000002,
+              "st_dn": 57701,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6437,
+              "column": 1284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.50909376000004,
+              "st_dn": 55488,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6437,
+              "column": 1285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 75.14791016000004,
+              "st_dn": 58308,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6437,
+              "column": 1286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 87.79116614000003,
+              "st_dn": 62007,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 6437,
+              "column": 1287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 95.83034917999998,
+              "st_dn": 64359,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 6437,
+              "column": 1288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 98.87580500000001,
+              "st_dn": 65250,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            }
+          ],
+          [
+            {
+              "row": 6438,
+              "column": 1284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.10097447999999,
+              "st_dn": 57124,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 6438,
+              "column": 1285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 84.12021265999999,
+              "st_dn": 60933,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 6438,
+              "column": 1286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 99.84994070000005,
+              "st_dn": 65535,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 6438,
+              "column": 1287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 99.84994070000005,
+              "st_dn": 65535,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            },
+            {
+              "row": 6438,
+              "column": 1288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 99.84994070000005,
+              "st_dn": 65535,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            }
+          ],
+          [
+            {
+              "row": 6439,
+              "column": 1284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 73.42522808000001,
+              "st_dn": 57804,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 6439,
+              "column": 1285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 85.73351810000003,
+              "st_dn": 61405,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 6439,
+              "column": 1286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 99.84994070000005,
+              "st_dn": 65535,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 6439,
+              "column": 1287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 99.84994070000005,
+              "st_dn": 65535,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 6439,
+              "column": 1288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 99.84994070000005,
+              "st_dn": 65535,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            }
+          ],
+          [
+            {
+              "row": 6440,
+              "column": 1284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 72.44767436000001,
+              "st_dn": 57518,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 6440,
+              "column": 1285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 80.93461802000002,
+              "st_dn": 60001,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 6440,
+              "column": 1286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 92.35422284000003,
+              "st_dn": 63342,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 6440,
+              "column": 1287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 99.84994070000005,
+              "st_dn": 65535,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 6440,
+              "column": 1288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 99.84994070000005,
+              "st_dn": 65535,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 21,
+        "at_uint16_max": true,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {
+        "above_80": {
+          "pixel_count": 42,
+          "cluster_count": 1,
+          "largest_cluster_size": 42,
+          "largest_cluster_bounds": {
+            "min_row": 6437,
+            "max_row": 6442,
+            "min_column": 1285,
+            "max_column": 1292,
+            "projected_pixel_center_bounds": {
+              "min_x": 308550.0,
+              "min_y": 2000640.0,
+              "max_x": 308760.0,
+              "max_y": 2000790.0
+            },
+            "longitude_latitude_pixel_center_bounds": {
+              "min_longitude": 73.19087533570571,
+              "min_latitude": 18.086010541356995,
+              "max_longitude": 73.19287290383667,
+              "max_latitude": 18.087384239576426
+            }
+          }
+        },
+        "above_90": {
+          "pixel_count": 31,
+          "cluster_count": 1,
+          "largest_cluster_size": 31,
+          "largest_cluster_bounds": {
+            "min_row": 6437,
+            "max_row": 6442,
+            "min_column": 1286,
+            "max_column": 1292,
+            "projected_pixel_center_bounds": {
+              "min_x": 308580.0,
+              "min_y": 2000640.0,
+              "max_x": 308760.0,
+              "max_y": 2000790.0
+            },
+            "longitude_latitude_pixel_center_bounds": {
+              "min_longitude": 73.19115871972069,
+              "min_latitude": 18.08601319866447,
+              "max_longitude": 73.19287290383667,
+              "max_latitude": 18.087384239576426
+            }
+          }
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC08_L2SP_147047_20250318_20250327_02_T1",
+      "acquisition_date": "2025-03-18",
+      "satellite": "Landsat 8",
+      "qa_valid_pixel_count": 39479488,
+      "statistics_celsius": {
+        "minimum": 6.859288579999998,
+        "maximum": 72.02042186000006,
+        "mean": 44.702949212446924,
+        "p01": 34.34016938000002,
+        "p05": 37.24206836000002,
+        "p25": 41.68891238000003,
+        "median": 44.93603138000003,
+        "p75": 47.93705294000006,
+        "p95": 51.28671254000005,
+        "p99": 53.600712079999994
+      },
+      "threshold_counts": {
+        "below_0": 0,
+        "from_0_to_10": 6,
+        "above_60": 1184,
+        "above_70": 3,
+        "above_80": 0,
+        "above_90": 0
+      },
+      "minimum_pixel": {
+        "row": 6745,
+        "column": 5385,
+        "st_dn": 38329,
+        "celsius": 6.859288579999998,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 434550.0,
+        "y": 1991550.0,
+        "longitude": 74.38171611200012,
+        "latitude": 18.011345859846738,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 6743,
+              "column": 5383,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 12.68701268000001,
+              "st_dn": 40034,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6743,
+              "column": 5384,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 10.400357299999996,
+              "st_dn": 39365,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6743,
+              "column": 5385,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38875,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6743,
+              "column": 5386,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38430,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6743,
+              "column": 5387,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38049,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6744,
+              "column": 5383,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 11.32664072,
+              "st_dn": 39636,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6744,
+              "column": 5384,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 9.463819820000026,
+              "st_dn": 39091,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6744,
+              "column": 5385,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38636,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6744,
+              "column": 5386,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38246,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6744,
+              "column": 5387,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37926,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6745,
+              "column": 5383,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 9.952596680000056,
+              "st_dn": 39234,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6745,
+              "column": 5384,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 8.274348860000032,
+              "st_dn": 38743,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6745,
+              "column": 5385,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 6.859288579999998,
+              "st_dn": 38329,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6745,
+              "column": 5386,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37993,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6745,
+              "column": 5387,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37752,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6746,
+              "column": 5383,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38844,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6746,
+              "column": 5384,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38377,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6746,
+              "column": 5385,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37951,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6746,
+              "column": 5386,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37582,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6746,
+              "column": 5387,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37492,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6747,
+              "column": 5383,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38495,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6747,
+              "column": 5384,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 38031,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6747,
+              "column": 5385,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37617,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6747,
+              "column": 5386,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37295,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6747,
+              "column": 5387,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 37210,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 18,
+        "dilated_cloud_neighbor_count": 18
+      },
+      "maximum_pixel": {
+        "row": 136,
+        "column": 2002,
+        "st_dn": 57393,
+        "celsius": 72.02042186000006,
+        "qa_pixel": 21824,
+        "qa_radsat": 64,
+        "x": 333060.0,
+        "y": 2189820.0,
+        "longitude": 73.40628633650019,
+        "latitude": 19.797143815746452,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 134,
+              "column": 2000,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 53959,
+              "qa_pixel": 21952,
+              "qa_radsat": 0
+            },
+            {
+              "row": 134,
+              "column": 2001,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.91333672000002,
+              "st_dn": 54436,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 134,
+              "column": 2002,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.590104680000024,
+              "st_dn": 54634,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 134,
+              "column": 2003,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.06566776,
+              "st_dn": 54188,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 134,
+              "column": 2004,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.150096700000006,
+              "st_dn": 53335,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            }
+          ],
+          [
+            {
+              "row": 135,
+              "column": 2000,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.25809844000003,
+              "st_dn": 55122,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 135,
+              "column": 2001,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.61995026,
+              "st_dn": 55813,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 135,
+              "column": 2002,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.78549508000003,
+              "st_dn": 56154,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 135,
+              "column": 2003,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.88359609999998,
+              "st_dn": 55305,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 135,
+              "column": 2004,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 59.80100035999999,
+              "st_dn": 53818,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            }
+          ],
+          [
+            {
+              "row": 136,
+              "column": 2000,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.64729441999998,
+              "st_dn": 55821,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 136,
+              "column": 2001,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 70.30799384,
+              "st_dn": 56892,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 136,
+              "column": 2002,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 72.02042186000006,
+              "st_dn": 57393,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 136,
+              "column": 2003,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.45736516,
+              "st_dn": 56058,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 136,
+              "column": 2004,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.12229424000003,
+              "st_dn": 53912,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            }
+          ],
+          [
+            {
+              "row": 137,
+              "column": 2000,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.44415138,
+              "st_dn": 55469,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            },
+            {
+              "row": 137,
+              "column": 2001,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.85681520000003,
+              "st_dn": 56760,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 137,
+              "column": 2002,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.79483254000002,
+              "st_dn": 57327,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 137,
+              "column": 2003,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.47981144000005,
+              "st_dn": 55772,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            },
+            {
+              "row": 137,
+              "column": 2004,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.58418524000001,
+              "st_dn": 53462,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 138,
+              "column": 2000,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.002663540000015,
+              "st_dn": 53877,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 138,
+              "column": 2001,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.45292558000006,
+              "st_dn": 55179,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 138,
+              "column": 2002,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.58087218000003,
+              "st_dn": 55509,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 138,
+              "column": 2003,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.39037966000001,
+              "st_dn": 54283,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 138,
+              "column": 2004,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 55.21401752000003,
+              "st_dn": 52476,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 1,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {},
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC09_L2SP_147047_20250326_20250327_02_T1",
+      "acquisition_date": "2025-03-26",
+      "satellite": "Landsat 9",
+      "qa_valid_pixel_count": 39701103,
+      "statistics_celsius": {
+        "minimum": 26.10274118000001,
+        "maximum": 69.41589062000003,
+        "mean": 44.589836245271556,
+        "p01": 33.01397761999999,
+        "p05": 36.53453822000006,
+        "p25": 41.76410882000005,
+        "median": 44.8881791,
+        "p75": 47.865274520000014,
+        "p95": 51.14657371999999,
+        "p99": 53.23156591999998
+      },
+      "threshold_counts": {
+        "below_0": 0,
+        "from_0_to_10": 0,
+        "above_60": 372,
+        "above_70": 0,
+        "above_80": 0,
+        "above_90": 0
+      },
+      "minimum_pixel": {
+        "row": 6891,
+        "column": 2757,
+        "st_dn": 43959,
+        "celsius": 26.10274118000001,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 355110.0,
+        "y": 1987170.0,
+        "longitude": 73.63169264991943,
+        "latitude": 17.967918912049996,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 6889,
+              "column": 2755,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 29.03540234000002,
+              "st_dn": 44817,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6889,
+              "column": 2756,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.27854006000001,
+              "st_dn": 44303,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6889,
+              "column": 2757,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.85470558000003,
+              "st_dn": 44179,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6889,
+              "column": 2758,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.52657566000005,
+              "st_dn": 44083,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6889,
+              "column": 2759,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.372764759999995,
+              "st_dn": 44038,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6890,
+              "column": 2755,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 28.437248840000052,
+              "st_dn": 44642,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6890,
+              "column": 2756,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.639370320000012,
+              "st_dn": 44116,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6890,
+              "column": 2757,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.324912480000023,
+              "st_dn": 44024,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6890,
+              "column": 2758,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.13008534000005,
+              "st_dn": 43967,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6890,
+              "column": 2759,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.140339400000016,
+              "st_dn": 43970,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6891,
+              "column": 2755,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.683804580000015,
+              "st_dn": 44129,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6891,
+              "column": 2756,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.290732280000043,
+              "st_dn": 44014,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6891,
+              "column": 2757,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.10274118000001,
+              "st_dn": 43959,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6891,
+              "column": 2758,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.85128756000006,
+              "st_dn": 44178,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6891,
+              "column": 2759,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.632534280000016,
+              "st_dn": 44114,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6892,
+              "column": 2755,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.499231500000008,
+              "st_dn": 44075,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6892,
+              "column": 2756,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.158909360000052,
+              "st_dn": 44268,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6892,
+              "column": 2757,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.861541620000025,
+              "st_dn": 44181,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6892,
+              "column": 2758,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.653042400000004,
+              "st_dn": 44120,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6892,
+              "column": 2759,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.69405863999998,
+              "st_dn": 44132,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6893,
+              "column": 2755,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.196507580000002,
+              "st_dn": 44279,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6893,
+              "column": 2756,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.01535252000002,
+              "st_dn": 44226,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6893,
+              "column": 2757,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.882049740000014,
+              "st_dn": 44187,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6893,
+              "column": 2758,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.916229939999994,
+              "st_dn": 44197,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6893,
+              "column": 2759,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.032442619999983,
+              "st_dn": 44231,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "maximum_pixel": {
+        "row": 2383,
+        "column": 4286,
+        "st_dn": 56631,
+        "celsius": 69.41589062000003,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 400980.0,
+        "y": 2122410.0,
+        "longitude": 74.0581357323375,
+        "latitude": 19.19263602195919,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 2381,
+              "column": 4284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 55.68570427999998,
+              "st_dn": 52614,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2381,
+              "column": 4285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.48950223999998,
+              "st_dn": 54312,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2381,
+              "column": 4286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.4909821,
+              "st_dn": 54605,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2381,
+              "column": 4287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.90889714000002,
+              "st_dn": 53557,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2381,
+              "column": 4288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 54.97817414000002,
+              "st_dn": 52407,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2382,
+              "column": 4284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.83324240000002,
+              "st_dn": 54120,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2382,
+              "column": 4285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.43833690000002,
+              "st_dn": 56345,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2382,
+              "column": 4286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.20397337999998,
+              "st_dn": 56569,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2382,
+              "column": 4287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.29375850000002,
+              "st_dn": 55425,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2382,
+              "column": 4288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.74779190000004,
+              "st_dn": 54095,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2383,
+              "column": 4284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.592042839999976,
+              "st_dn": 54342,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2383,
+              "column": 4285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.25524368000004,
+              "st_dn": 56584,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2383,
+              "column": 4286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.41589062000003,
+              "st_dn": 56631,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2383,
+              "column": 4287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.33283658000005,
+              "st_dn": 55729,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2383,
+              "column": 4288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.53541636,
+              "st_dn": 54618,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2384,
+              "column": 4284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.51582484000005,
+              "st_dn": 53442,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2384,
+              "column": 4285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.15897586000006,
+              "st_dn": 55093,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2384,
+              "column": 4286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.09403348000001,
+              "st_dn": 55074,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2384,
+              "column": 4287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.97144306000001,
+              "st_dn": 54453,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2384,
+              "column": 4288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 59.428436180000006,
+              "st_dn": 53709,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2385,
+              "column": 4284,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 53.744268920000025,
+              "st_dn": 52046,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2385,
+              "column": 4285,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.008478019999984,
+              "st_dn": 53001,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2385,
+              "column": 4286,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.302427739999985,
+              "st_dn": 53087,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2385,
+              "column": 4287,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 55.92838370000004,
+              "st_dn": 52685,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2385,
+              "column": 4288,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 54.120251120000034,
+              "st_dn": 52156,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {},
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC08_L2SP_147047_20250403_20250411_02_T1",
+      "acquisition_date": "2025-04-03",
+      "satellite": "Landsat 8",
+      "qa_valid_pixel_count": 32956060,
+      "statistics_celsius": {
+        "minimum": -10.948595619999992,
+        "maximum": 69.7200944,
+        "mean": 42.40934349532438,
+        "p01": 31.86552290000003,
+        "p05": 34.367513540000004,
+        "p25": 38.84511974000003,
+        "median": 42.70064630000002,
+        "p75": 45.978527480000025,
+        "p95": 49.844308100000035,
+        "p99": 52.47618350000005
+      },
+      "threshold_counts": {
+        "below_0": 32,
+        "from_0_to_10": 111,
+        "above_60": 182,
+        "above_70": 0,
+        "above_80": 0,
+        "above_90": 0
+      },
+      "minimum_pixel": {
+        "row": 7475,
+        "column": 4858,
+        "st_dn": 33119,
+        "celsius": -10.948595619999992,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 416940.0,
+        "y": 1969950.0,
+        "longitude": 74.21622917025651,
+        "latitude": 17.81552536842465,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 7473,
+              "column": 4856,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 33251,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7473,
+              "column": 4857,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -9.36605235999997,
+              "st_dn": 33582,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7473,
+              "column": 4858,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -7.650206319999995,
+              "st_dn": 34084,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7473,
+              "column": 4859,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -5.698516899999959,
+              "st_dn": 34655,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7473,
+              "column": 4860,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -3.5178201399999693,
+              "st_dn": 35293,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 7474,
+              "column": 4856,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 32756,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7474,
+              "column": 4857,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 33031,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7474,
+              "column": 4858,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -9.892427440000006,
+              "st_dn": 33428,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7474,
+              "column": 4859,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -8.097966939999992,
+              "st_dn": 33953,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7474,
+              "column": 4860,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -5.965122459999975,
+              "st_dn": 34577,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 7475,
+              "column": 4856,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 32465,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7475,
+              "column": 4857,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 32781,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7475,
+              "column": 4858,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -10.948595619999992,
+              "st_dn": 33119,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7475,
+              "column": 4859,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -9.639493959999982,
+              "st_dn": 33502,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7475,
+              "column": 4860,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": -7.455379179999966,
+              "st_dn": 34141,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 7476,
+              "column": 4856,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 32121,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7476,
+              "column": 4857,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 32542,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7476,
+              "column": 4858,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 32930,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7476,
+              "column": 4859,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 33311,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7476,
+              "column": 4860,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 33986,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 7477,
+              "column": 4856,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 31903,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7477,
+              "column": 4857,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 32460,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7477,
+              "column": 4858,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 32972,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7477,
+              "column": 4859,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 33499,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 7477,
+              "column": 4860,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 34281,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 15,
+        "dilated_cloud_neighbor_count": 15
+      },
+      "maximum_pixel": {
+        "row": 1612,
+        "column": 1863,
+        "st_dn": 56720,
+        "celsius": 69.7200944,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 327090.0,
+        "y": 2145840.0,
+        "longitude": 73.35335750479192,
+        "latitude": 19.399340540551194,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 1610,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 59.869360760000006,
+              "st_dn": 53838,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1610,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 63.97782080000002,
+              "st_dn": 55040,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 1610,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.21468574000005,
+              "st_dn": 55987,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1610,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.50521744000002,
+              "st_dn": 56072,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 1610,
+              "column": 1865,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 63.51980612,
+              "st_dn": 54906,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 1611,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.41772381999999,
+              "st_dn": 54291,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1611,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.85089576000001,
+              "st_dn": 55588,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1611,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.88951554000005,
+              "st_dn": 56477,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 1611,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.16489530000001,
+              "st_dn": 56265,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 1611,
+              "column": 1865,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 63.28054472000002,
+              "st_dn": 54836,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 1612,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.51149022000004,
+              "st_dn": 54611,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1612,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.92757205999999,
+              "st_dn": 55903,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1612,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.7200944,
+              "st_dn": 56720,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1612,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.16831332000004,
+              "st_dn": 56266,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 1612,
+              "column": 1865,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.76784171999998,
+              "st_dn": 54686,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            }
+          ],
+          [
+            {
+              "row": 1613,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.193614360000026,
+              "st_dn": 54518,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 1613,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.85431377999998,
+              "st_dn": 55589,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1613,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.42808284,
+              "st_dn": 56342,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 1613,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.52424570000005,
+              "st_dn": 55785,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 1613,
+              "column": 1865,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.311765200000025,
+              "st_dn": 54260,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 1614,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.53587465999999,
+              "st_dn": 54033,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 1614,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.32008110000004,
+              "st_dn": 54555,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 1614,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.48368776000001,
+              "st_dn": 55188,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 1614,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 63.07546352000003,
+              "st_dn": 54776,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 1614,
+              "column": 1865,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.85079080000003,
+              "st_dn": 53540,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {
+        "below_10": {
+          "pixel_count": 143,
+          "cluster_count": 9,
+          "largest_cluster_size": 55,
+          "largest_cluster_bounds": {
+            "min_row": 7464,
+            "max_row": 7475,
+            "min_column": 4849,
+            "max_column": 4860,
+            "projected_pixel_center_bounds": {
+              "min_x": 416670.0,
+              "min_y": 1969950.0,
+              "max_x": 417000.0,
+              "max_y": 1970280.0
+            },
+            "longitude_latitude_pixel_center_bounds": {
+              "min_longitude": 74.21366849538603,
+              "min_latitude": 17.815515138123338,
+              "max_longitude": 74.2167953035238,
+              "max_latitude": 17.818510164228368
+            }
+          }
+        },
+        "below_0": {
+          "pixel_count": 32,
+          "cluster_count": 5,
+          "largest_cluster_size": 19,
+          "largest_cluster_bounds": {
+            "min_row": 7471,
+            "max_row": 7475,
+            "min_column": 4854,
+            "max_column": 4860,
+            "projected_pixel_center_bounds": {
+              "min_x": 416820.0,
+              "min_y": 1969950.0,
+              "max_x": 417000.0,
+              "max_y": 1970070.0
+            },
+            "longitude_latitude_pixel_center_bounds": {
+              "min_longitude": 74.21509215784049,
+              "min_latitude": 17.81552082572176,
+              "max_longitude": 74.2167953035238,
+              "max_latitude": 17.816612192664024
+            }
+          }
+        }
+      },
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC09_L2SP_147047_20250411_20250412_02_T1",
+      "acquisition_date": "2025-04-11",
+      "satellite": "Landsat 9",
+      "qa_valid_pixel_count": 37073680,
+      "statistics_celsius": {
+        "minimum": 16.528867160000004,
+        "maximum": 64.59990044000006,
+        "mean": 45.29641019572989,
+        "p01": 32.808896419999996,
+        "p05": 36.28502276000006,
+        "p25": 42.259721720000016,
+        "median": 45.66065162000001,
+        "p75": 48.829156160000025,
+        "p95": 52.63683044000004,
+        "p99": 55.002100280000036
+      },
+      "threshold_counts": {
+        "below_0": 0,
+        "from_0_to_10": 0,
+        "above_60": 260,
+        "above_70": 0,
+        "above_80": 0,
+        "above_90": 0
+      },
+      "minimum_pixel": {
+        "row": 6799,
+        "column": 1862,
+        "st_dn": 41158,
+        "celsius": 16.528867160000004,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 325260.0,
+        "y": 1989930.0,
+        "longitude": 73.34964296239096,
+        "latitude": 17.990663230230332,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 6797,
+              "column": 1860,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43021,
+              "qa_pixel": 23888,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6797,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43354,
+              "qa_pixel": 23888,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6797,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43616,
+              "qa_pixel": 23888,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6797,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43924,
+              "qa_pixel": 23888,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6797,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43755,
+              "qa_pixel": 23888,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6798,
+              "column": 1860,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 18.227623100000017,
+              "st_dn": 41655,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6798,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 19.45127425999999,
+              "st_dn": 42013,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6798,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 20.48351630000002,
+              "st_dn": 42315,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6798,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 42618,
+              "qa_pixel": 23888,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6798,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 42695,
+              "qa_pixel": 23888,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6799,
+              "column": 1860,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6799,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6799,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 16.528867160000004,
+              "st_dn": 41158,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6799,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.574781280000025,
+              "st_dn": 41464,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6799,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.899493180000036,
+              "st_dn": 41559,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6800,
+              "column": 1860,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6800,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6800,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6800,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6800,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6801,
+              "column": 1860,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6801,
+              "column": 1861,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6801,
+              "column": 1862,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6801,
+              "column": 1863,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6801,
+              "column": 1864,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 0,
+              "qa_pixel": 1,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 19,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "maximum_pixel": {
+        "row": 2598,
+        "column": 3912,
+        "st_dn": 55222,
+        "celsius": 64.59990044000006,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 386760.0,
+        "y": 2115960.0,
+        "longitude": 73.92327217308737,
+        "latitude": 19.13361001666293,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 2596,
+              "column": 3910,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 51.93613634000002,
+              "st_dn": 51517,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2596,
+              "column": 3911,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 55.37808247999999,
+              "st_dn": 52524,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2596,
+              "column": 3912,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 56.90593741999999,
+              "st_dn": 52971,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2596,
+              "column": 3913,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 54.21253766000001,
+              "st_dn": 52183,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2596,
+              "column": 3914,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 48.54546049999999,
+              "st_dn": 50525,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2597,
+              "column": 3910,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 56.311201940000046,
+              "st_dn": 52797,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            },
+            {
+              "row": 2597,
+              "column": 3911,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.180400580000025,
+              "st_dn": 53929,
+              "qa_pixel": 21824,
+              "qa_radsat": 96
+            },
+            {
+              "row": 2597,
+              "column": 3912,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.23804862000003,
+              "st_dn": 54531,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2597,
+              "column": 3913,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.71065198000002,
+              "st_dn": 53499,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2597,
+              "column": 3914,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 51.44052343999999,
+              "st_dn": 51372,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2598,
+              "column": 3910,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.46991072000003,
+              "st_dn": 53136,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2598,
+              "column": 3911,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.94409890000003,
+              "st_dn": 54445,
+              "qa_pixel": 21824,
+              "qa_radsat": 32
+            },
+            {
+              "row": 2598,
+              "column": 3912,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.59990044000006,
+              "st_dn": 55222,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2598,
+              "column": 3913,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.69310358000001,
+              "st_dn": 54079,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2598,
+              "column": 3914,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 53.04357482,
+              "st_dn": 51841,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2599,
+              "column": 3910,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 54.24671785999999,
+              "st_dn": 52193,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2599,
+              "column": 3911,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.24238323999998,
+              "st_dn": 53362,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2599,
+              "column": 3912,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.966545180000026,
+              "st_dn": 54159,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2599,
+              "column": 3913,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.94501550000001,
+              "st_dn": 53275,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2599,
+              "column": 3914,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 51.51230185999998,
+              "st_dn": 51393,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2600,
+              "column": 3910,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 50.01862712000002,
+              "st_dn": 50956,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2600,
+              "column": 3911,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 52.42491319999999,
+              "st_dn": 51660,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2600,
+              "column": 3912,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 54.010874479999984,
+              "st_dn": 52124,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2600,
+              "column": 3913,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 52.63683044000004,
+              "st_dn": 51722,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2600,
+              "column": 3914,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 48.418993760000035,
+              "st_dn": 50488,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {},
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC08_L2SP_147047_20250419_20250425_02_T1",
+      "acquisition_date": "2025-04-19",
+      "satellite": "Landsat 8",
+      "qa_valid_pixel_count": 39361599,
+      "statistics_celsius": {
+        "minimum": 15.489789080000037,
+        "maximum": 69.60046369999998,
+        "mean": 47.24711893883949,
+        "p01": 34.86996248000003,
+        "p05": 38.609276360000024,
+        "p25": 44.38231214000001,
+        "median": 47.71146362000002,
+        "p75": 50.65779686000002,
+        "p95": 53.90491586000002,
+        "p99": 55.81900705999999
+      },
+      "threshold_counts": {
+        "below_0": 0,
+        "from_0_to_10": 0,
+        "above_60": 5769,
+        "above_70": 0,
+        "above_80": 0,
+        "above_90": 0
+      },
+      "minimum_pixel": {
+        "row": 6636,
+        "column": 1710,
+        "st_dn": 40854,
+        "celsius": 15.489789080000037,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 323400.0,
+        "y": 1994820.0,
+        "longitude": 73.33166552604638,
+        "latitude": 18.03469294514095,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 6634,
+              "column": 1708,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 45033,
+              "qa_pixel": 22280,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6634,
+              "column": 1709,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 44219,
+              "qa_pixel": 22280,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6634,
+              "column": 1710,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43718,
+              "qa_pixel": 22280,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6634,
+              "column": 1711,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43906,
+              "qa_pixel": 22280,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6634,
+              "column": 1712,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.892303800000036,
+              "st_dn": 44190,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6635,
+              "column": 1708,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 25.48066154000003,
+              "st_dn": 43777,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6635,
+              "column": 1709,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 21.259406839999997,
+              "st_dn": 42542,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6635,
+              "column": 1710,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 19.649519420000047,
+              "st_dn": 42071,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6635,
+              "column": 1711,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 20.927858900000047,
+              "st_dn": 42445,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6635,
+              "column": 1712,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 21.64564310000003,
+              "st_dn": 42655,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6636,
+              "column": 1708,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 22.226706499999977,
+              "st_dn": 42825,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6636,
+              "column": 1709,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 17.68073990000005,
+              "st_dn": 41495,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6636,
+              "column": 1710,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 15.489789080000037,
+              "st_dn": 40854,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6636,
+              "column": 1711,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 15.83500909999998,
+              "st_dn": 40955,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6636,
+              "column": 1712,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 16.070852479999985,
+              "st_dn": 41024,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6637,
+              "column": 1708,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 42013,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6637,
+              "column": 1709,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 40639,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6637,
+              "column": 1710,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39958,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6637,
+              "column": 1711,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39898,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6637,
+              "column": 1712,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39828,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 6638,
+              "column": 1708,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 41441,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6638,
+              "column": 1709,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 40043,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6638,
+              "column": 1710,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39393,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6638,
+              "column": 1711,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39208,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 6638,
+              "column": 1712,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39075,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 14,
+        "dilated_cloud_neighbor_count": 10
+      },
+      "maximum_pixel": {
+        "row": 4982,
+        "column": 3063,
+        "st_dn": 56685,
+        "celsius": 69.60046369999998,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 363990.0,
+        "y": 2044440.0,
+        "longitude": 73.71173367435719,
+        "latitude": 18.485991571422705,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 4980,
+              "column": 3061,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.67988980000001,
+              "st_dn": 53490,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4980,
+              "column": 3062,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 59.15841260000002,
+              "st_dn": 53630,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4980,
+              "column": 3063,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 59.196010820000026,
+              "st_dn": 53641,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4980,
+              "column": 3064,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.736516280000046,
+              "st_dn": 53214,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4980,
+              "column": 3065,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 56.758962559999986,
+              "st_dn": 52928,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 4981,
+              "column": 3061,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.201367000000005,
+              "st_dn": 53350,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4981,
+              "column": 3062,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.66621772000002,
+              "st_dn": 53486,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4981,
+              "column": 3063,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.61836544000005,
+              "st_dn": 53472,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4981,
+              "column": 3064,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 56.970879800000034,
+              "st_dn": 52990,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4981,
+              "column": 3065,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 56.19498926000006,
+              "st_dn": 52763,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 4982,
+              "column": 3061,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.72545058000003,
+              "st_dn": 56429,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4982,
+              "column": 3062,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.31676804000006,
+              "st_dn": 56602,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4982,
+              "column": 3063,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.60046369999998,
+              "st_dn": 56685,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4982,
+              "column": 3064,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.17173134000001,
+              "st_dn": 56267,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4982,
+              "column": 3065,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.36166060000005,
+              "st_dn": 56030,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 4983,
+              "column": 3061,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.08628084000003,
+              "st_dn": 56242,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4983,
+              "column": 3062,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.73912266000002,
+              "st_dn": 56433,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4983,
+              "column": 3063,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.06041654,
+              "st_dn": 56527,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4983,
+              "column": 3064,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.86069152000005,
+              "st_dn": 56176,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4983,
+              "column": 3065,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.26595603999999,
+              "st_dn": 56002,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 4984,
+              "column": 3061,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.75131488,
+              "st_dn": 56144,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4984,
+              "column": 3062,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.35288639999999,
+              "st_dn": 56320,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4984,
+              "column": 3063,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.61949196,
+              "st_dn": 56398,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4984,
+              "column": 3064,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.46761922000002,
+              "st_dn": 56061,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 4984,
+              "column": 3065,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.07454691999999,
+              "st_dn": 55946,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {},
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC09_L2SP_147047_20250427_20250428_02_T1",
+      "acquisition_date": "2025-04-27",
+      "satellite": "Landsat 9",
+      "qa_valid_pixel_count": 39443265,
+      "statistics_celsius": {
+        "minimum": 20.004993500000012,
+        "maximum": 71.17958894000003,
+        "mean": 48.9576479453475,
+        "p01": 36.43199762000006,
+        "p05": 40.15763942000001,
+        "p25": 45.927257180000026,
+        "median": 49.464907880000055,
+        "p75": 52.36680686,
+        "p95": 56.09586668000003,
+        "p99": 58.35859592000003
+      },
+      "threshold_counts": {
+        "below_0": 0,
+        "from_0_to_10": 0,
+        "above_60": 108517,
+        "above_70": 9,
+        "above_80": 0,
+        "above_90": 0
+      },
+      "minimum_pixel": {
+        "row": 5254,
+        "column": 3443,
+        "st_dn": 42175,
+        "celsius": 20.004993500000012,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 373290.0,
+        "y": 2036280.0,
+        "longitude": 73.80031926413315,
+        "latitude": 18.41283471563176,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 5252,
+              "column": 3441,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 40732,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5252,
+              "column": 3442,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39956,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5252,
+              "column": 3443,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39620,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5252,
+              "column": 3444,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39591,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5252,
+              "column": 3445,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 39557,
+              "qa_pixel": 54534,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5253,
+              "column": 3441,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 41561,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5253,
+              "column": 3442,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 40894,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5253,
+              "column": 3443,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 40732,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5253,
+              "column": 3444,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 40891,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5253,
+              "column": 3445,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 41119,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5254,
+              "column": 3441,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 21.720839540000043,
+              "st_dn": 42677,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5254,
+              "column": 3442,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 20.22032876000003,
+              "st_dn": 42238,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5254,
+              "column": 3443,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 20.004993500000012,
+              "st_dn": 42175,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5254,
+              "column": 3444,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 42556,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5254,
+              "column": 3445,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43005,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5255,
+              "column": 3441,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 28.939697780000017,
+              "st_dn": 44789,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5255,
+              "column": 3442,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.759001020000028,
+              "st_dn": 44151,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5255,
+              "column": 3443,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.304404360000035,
+              "st_dn": 44018,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5255,
+              "column": 3444,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 44458,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5255,
+              "column": 3445,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 44789,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5256,
+              "column": 3441,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 36.66784100000001,
+              "st_dn": 47050,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5256,
+              "column": 3442,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 34.53841454000002,
+              "st_dn": 46427,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5256,
+              "column": 3443,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 33.99153134000005,
+              "st_dn": 46267,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5256,
+              "column": 3444,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 46526,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5256,
+              "column": 3445,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 46527,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 16,
+        "dilated_cloud_neighbor_count": 16
+      },
+      "maximum_pixel": {
+        "row": 5923,
+        "column": 3494,
+        "st_dn": 57147,
+        "celsius": 71.17958894000003,
+        "qa_pixel": 21824,
+        "qa_radsat": 64,
+        "x": 374820.0,
+        "y": 2016210.0,
+        "longitude": 73.81603725050287,
+        "latitude": 18.23156516787463,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 5921,
+              "column": 3492,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 57.726262220000024,
+              "st_dn": 53211,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5921,
+              "column": 3493,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.87380034,
+              "st_dn": 54717,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5921,
+              "column": 3494,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.70392090000001,
+              "st_dn": 55545,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5921,
+              "column": 3495,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.23861188000001,
+              "st_dn": 55994,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5921,
+              "column": 3496,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.09117872000002,
+              "st_dn": 56536,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            }
+          ],
+          [
+            {
+              "row": 5922,
+              "column": 3492,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.41772381999999,
+              "st_dn": 54291,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5922,
+              "column": 3493,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.00766638000005,
+              "st_dn": 56219,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5922,
+              "column": 3494,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 70.35926414000005,
+              "st_dn": 56907,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5922,
+              "column": 3495,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 70.81386080000004,
+              "st_dn": 57040,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5922,
+              "column": 3496,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.02236002000001,
+              "st_dn": 57101,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5923,
+              "column": 3492,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.20045040000002,
+              "st_dn": 54520,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5923,
+              "column": 3493,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.16979318000006,
+              "st_dn": 56559,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5923,
+              "column": 3494,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.17958894000003,
+              "st_dn": 57147,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5923,
+              "column": 3495,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.14540874,
+              "st_dn": 57137,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5923,
+              "column": 3496,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 70.52332910000001,
+              "st_dn": 56955,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            }
+          ],
+          [
+            {
+              "row": 5924,
+              "column": 3492,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 59.18917478000003,
+              "st_dn": 53639,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5924,
+              "column": 3493,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.79472758000003,
+              "st_dn": 55279,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5924,
+              "column": 3494,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.61459408000002,
+              "st_dn": 56104,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 5924,
+              "column": 3495,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.06041654,
+              "st_dn": 56527,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5924,
+              "column": 3496,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.09117872000002,
+              "st_dn": 56536,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 5925,
+              "column": 3492,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 54.97475612000005,
+              "st_dn": 52406,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5925,
+              "column": 3493,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 58.47139058000005,
+              "st_dn": 53429,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5925,
+              "column": 3494,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 61.81763216000002,
+              "st_dn": 54408,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5925,
+              "column": 3495,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.2766684,
+              "st_dn": 55420,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 5925,
+              "column": 3496,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.87971978000002,
+              "st_dn": 55889,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {},
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "product_id": "LC08_L2SP_147047_20250505_20250512_02_T1",
+      "acquisition_date": "2025-05-05",
+      "satellite": "Landsat 8",
+      "qa_valid_pixel_count": 39631868,
+      "statistics_celsius": {
+        "minimum": 25.699414820000015,
+        "maximum": 71.90079116000004,
+        "mean": 47.71537108869188,
+        "p01": 34.316243240000006,
+        "p05": 38.212786040000026,
+        "p25": 44.54979512,
+        "median": 48.24809276000002,
+        "p75": 51.515719880000006,
+        "p95": 54.940575920000015,
+        "p99": 57.05633030000001
+      },
+      "threshold_counts": {
+        "below_0": 0,
+        "from_0_to_10": 0,
+        "above_60": 24736,
+        "above_70": 17,
+        "above_80": 0,
+        "above_90": 0
+      },
+      "minimum_pixel": {
+        "row": 2775,
+        "column": 2573,
+        "st_dn": 43841,
+        "celsius": 25.699414820000015,
+        "qa_pixel": 21824,
+        "qa_radsat": 0,
+        "x": 347190.0,
+        "y": 2110650.0,
+        "longitude": 73.5475230276067,
+        "latitude": 19.08304876480876,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 2773,
+              "column": 2571,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.398170760000028,
+              "st_dn": 44338,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2773,
+              "column": 2572,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.681866420000006,
+              "st_dn": 44421,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2773,
+              "column": 2573,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.93479990000003,
+              "st_dn": 44495,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2773,
+              "column": 2574,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 28.174061300000005,
+              "st_dn": 44565,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2773,
+              "column": 2575,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 28.39623260000002,
+              "st_dn": 44630,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2774,
+              "column": 2571,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.615444180000054,
+              "st_dn": 44109,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2774,
+              "column": 2572,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.588100020000013,
+              "st_dn": 44101,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2774,
+              "column": 2573,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.765837060000024,
+              "st_dn": 44153,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2774,
+              "column": 2574,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.844451520000007,
+              "st_dn": 44176,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2774,
+              "column": 2575,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 27.046114700000032,
+              "st_dn": 44235,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2775,
+              "column": 2571,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.11641326000006,
+              "st_dn": 43963,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2775,
+              "column": 2572,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 25.880569880000053,
+              "st_dn": 43894,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2775,
+              "column": 2573,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 25.699414820000015,
+              "st_dn": 43841,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2775,
+              "column": 2574,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 25.743849080000018,
+              "st_dn": 43854,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2775,
+              "column": 2575,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.061724939999976,
+              "st_dn": 43947,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2776,
+              "column": 2571,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43934,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2776,
+              "column": 2572,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43829,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2776,
+              "column": 2573,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43684,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2776,
+              "column": 2574,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43725,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2776,
+              "column": 2575,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 26.03779880000002,
+              "st_dn": 43940,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2777,
+              "column": 2571,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43986,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2777,
+              "column": 2572,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43943,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2777,
+              "column": 2573,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43874,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2777,
+              "column": 2574,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 43895,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2777,
+              "column": 2575,
+              "within_scene": true,
+              "qa_valid": false,
+              "celsius": null,
+              "st_dn": 44173,
+              "qa_pixel": 21762,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 9,
+        "dilated_cloud_neighbor_count": 9
+      },
+      "maximum_pixel": {
+        "row": 2628,
+        "column": 6348,
+        "st_dn": 57358,
+        "celsius": 71.90079116000004,
+        "qa_pixel": 21824,
+        "qa_radsat": 64,
+        "x": 460440.0,
+        "y": 2115060.0,
+        "longitude": 74.62384566160529,
+        "latitude": 19.128243830653982,
+        "neighborhood_5x5": [
+          [
+            {
+              "row": 2626,
+              "column": 6346,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.12433736000003,
+              "st_dn": 55668,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2626,
+              "column": 6347,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.87778162000001,
+              "st_dn": 56181,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2626,
+              "column": 6348,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.61117606000005,
+              "st_dn": 56103,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2626,
+              "column": 6349,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.95001834000004,
+              "st_dn": 55617,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2626,
+              "column": 6350,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 64.14872179999998,
+              "st_dn": 55090,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2627,
+              "column": 6346,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.25182566000001,
+              "st_dn": 56583,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2627,
+              "column": 6347,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.37441608000006,
+              "st_dn": 57204,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2627,
+              "column": 6348,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.39492419999999,
+              "st_dn": 57210,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2627,
+              "column": 6349,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 69.89783144,
+              "st_dn": 56772,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2627,
+              "column": 6350,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.52230754000004,
+              "st_dn": 56077,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2628,
+              "column": 6346,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.72203256,
+              "st_dn": 56428,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2628,
+              "column": 6347,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.25820340000001,
+              "st_dn": 57170,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2628,
+              "column": 6348,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 71.90079116000004,
+              "st_dn": 57358,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2628,
+              "column": 6349,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 70.91640140000004,
+              "st_dn": 57070,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2628,
+              "column": 6350,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.93394980000005,
+              "st_dn": 56490,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ],
+          [
+            {
+              "row": 2629,
+              "column": 6346,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 65.02031690000001,
+              "st_dn": 55345,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2629,
+              "column": 6347,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 67.22493980000002,
+              "st_dn": 55990,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2629,
+              "column": 6348,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.57847572000003,
+              "st_dn": 56386,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2629,
+              "column": 6349,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 68.31870620000001,
+              "st_dn": 56310,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            },
+            {
+              "row": 2629,
+              "column": 6350,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 66.96175226000003,
+              "st_dn": 55913,
+              "qa_pixel": 21824,
+              "qa_radsat": 64
+            }
+          ],
+          [
+            {
+              "row": 2630,
+              "column": 6346,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 60.409407920000035,
+              "st_dn": 53996,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2630,
+              "column": 6347,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 62.145762080000054,
+              "st_dn": 54504,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2630,
+              "column": 6348,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 63.33865106000002,
+              "st_dn": 54853,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2630,
+              "column": 6349,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 63.81033782000003,
+              "st_dn": 54991,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            },
+            {
+              "row": 2630,
+              "column": 6350,
+              "within_scene": true,
+              "qa_valid": true,
+              "celsius": 63.0207752,
+              "st_dn": 54760,
+              "qa_pixel": 21824,
+              "qa_radsat": 0
+            }
+          ]
+        ],
+        "same_dn_qa_valid_pixel_count": 1,
+        "at_uint16_max": false,
+        "invalid_qa_neighbor_count": 0,
+        "dilated_cloud_neighbor_count": 0
+      },
+      "clusters": {},
+      "status": "PASS",
+      "errors": []
+    }
+  ]
+}
