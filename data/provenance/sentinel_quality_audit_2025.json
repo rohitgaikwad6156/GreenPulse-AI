@@ -1,0 +1,221 @@
+{
+  "audit_type": "manual_sentinel2_l2a_source_intake",
+  "audited_at_utc": "2026-10-05T09:16:48.153375+00:00",
+  "source_directory": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2",
+  "discovery_file": "D:\\green pulse ai\\GreenPulse-AI\\data\\provenance\\discovery_2025.json",
+  "expected_product_count": 6,
+  "safe_directories_found": 0,
+  "minimum_required_files_expected": 30,
+  "required_file_slots_found": 0,
+  "products_passed": 0,
+  "products_failed": 6,
+  "unexpected_safe_directories": [],
+  "overall_status": "FAIL",
+  "intake_state": "PENDING",
+  "products": [
+    {
+      "product_id": "S2B_MSIL2A_20250314T052649_N0511_R105_T43QCA_20250314T095315",
+      "acquisition_date": "2025-03-14",
+      "mgrs_tile": "MGRS-43QCA",
+      "safe_directory": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2B_MSIL2A_20250314T052649_N0511_R105_T43QCA_20250314T095315.SAFE",
+      "safe_directory_present": false,
+      "metadata": {
+        "label": "MTD_MSIL2A.xml",
+        "path": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2B_MSIL2A_20250314T052649_N0511_R105_T43QCA_20250314T095315.SAFE\\MTD_MSIL2A.xml",
+        "present": false,
+        "size_bytes": null,
+        "sha256": null,
+        "readable": null,
+        "crs": null,
+        "resolution_m": null,
+        "transform": null,
+        "width": null,
+        "height": null,
+        "dtype": null,
+        "errors": []
+      },
+      "granules": [],
+      "required_files": {
+        "MTD_MSIL2A.xml": false,
+        "B04_10m": false,
+        "B08_10m": false,
+        "B11_20m": false,
+        "SCL_20m": false
+      },
+      "status": "FAIL",
+      "errors": [
+        "SAFE directory missing"
+      ]
+    },
+    {
+      "product_id": "S2B_MSIL2A_20250314T052649_N0511_R105_T43QDA_20250314T095315",
+      "acquisition_date": "2025-03-14",
+      "mgrs_tile": "MGRS-43QDA",
+      "safe_directory": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2B_MSIL2A_20250314T052649_N0511_R105_T43QDA_20250314T095315.SAFE",
+      "safe_directory_present": false,
+      "metadata": {
+        "label": "MTD_MSIL2A.xml",
+        "path": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2B_MSIL2A_20250314T052649_N0511_R105_T43QDA_20250314T095315.SAFE\\MTD_MSIL2A.xml",
+        "present": false,
+        "size_bytes": null,
+        "sha256": null,
+        "readable": null,
+        "crs": null,
+        "resolution_m": null,
+        "transform": null,
+        "width": null,
+        "height": null,
+        "dtype": null,
+        "errors": []
+      },
+      "granules": [],
+      "required_files": {
+        "MTD_MSIL2A.xml": false,
+        "B04_10m": false,
+        "B08_10m": false,
+        "B11_20m": false,
+        "SCL_20m": false
+      },
+      "status": "FAIL",
+      "errors": [
+        "SAFE directory missing"
+      ]
+    },
+    {
+      "product_id": "S2B_MSIL2A_20250413T052649_N0511_R105_T43QCA_20250413T075318",
+      "acquisition_date": "2025-04-13",
+      "mgrs_tile": "MGRS-43QCA",
+      "safe_directory": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2B_MSIL2A_20250413T052649_N0511_R105_T43QCA_20250413T075318.SAFE",
+      "safe_directory_present": false,
+      "metadata": {
+        "label": "MTD_MSIL2A.xml",
+        "path": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2B_MSIL2A_20250413T052649_N0511_R105_T43QCA_20250413T075318.SAFE\\MTD_MSIL2A.xml",
+        "present": false,
+        "size_bytes": null,
+        "sha256": null,
+        "readable": null,
+        "crs": null,
+        "resolution_m": null,
+        "transform": null,
+        "width": null,
+        "height": null,
+        "dtype": null,
+        "errors": []
+      },
+      "granules": [],
+      "required_files": {
+        "MTD_MSIL2A.xml": false,
+        "B04_10m": false,
+        "B08_10m": false,
+        "B11_20m": false,
+        "SCL_20m": false
+      },
+      "status": "FAIL",
+      "errors": [
+        "SAFE directory missing"
+      ]
+    },
+    {
+      "product_id": "S2B_MSIL2A_20250413T052649_N0511_R105_T43QDA_20250413T075318",
+      "acquisition_date": "2025-04-13",
+      "mgrs_tile": "MGRS-43QDA",
+      "safe_directory": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2B_MSIL2A_20250413T052649_N0511_R105_T43QDA_20250413T075318.SAFE",
+      "safe_directory_present": false,
+      "metadata": {
+        "label": "MTD_MSIL2A.xml",
+        "path": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2B_MSIL2A_20250413T052649_N0511_R105_T43QDA_20250413T075318.SAFE\\MTD_MSIL2A.xml",
+        "present": false,
+        "size_bytes": null,
+        "sha256": null,
+        "readable": null,
+        "crs": null,
+        "resolution_m": null,
+        "transform": null,
+        "width": null,
+        "height": null,
+        "dtype": null,
+        "errors": []
+      },
+      "granules": [],
+      "required_files": {
+        "MTD_MSIL2A.xml": false,
+        "B04_10m": false,
+        "B08_10m": false,
+        "B11_20m": false,
+        "SCL_20m": false
+      },
+      "status": "FAIL",
+      "errors": [
+        "SAFE directory missing"
+      ]
+    },
+    {
+      "product_id": "S2A_MSIL2A_20250510T053241_N0511_R105_T43QCA_20250510T084438",
+      "acquisition_date": "2025-05-10",
+      "mgrs_tile": "MGRS-43QCA",
+      "safe_directory": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2A_MSIL2A_20250510T053241_N0511_R105_T43QCA_20250510T084438.SAFE",
+      "safe_directory_present": false,
+      "metadata": {
+        "label": "MTD_MSIL2A.xml",
+        "path": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2A_MSIL2A_20250510T053241_N0511_R105_T43QCA_20250510T084438.SAFE\\MTD_MSIL2A.xml",
+        "present": false,
+        "size_bytes": null,
+        "sha256": null,
+        "readable": null,
+        "crs": null,
+        "resolution_m": null,
+        "transform": null,
+        "width": null,
+        "height": null,
+        "dtype": null,
+        "errors": []
+      },
+      "granules": [],
+      "required_files": {
+        "MTD_MSIL2A.xml": false,
+        "B04_10m": false,
+        "B08_10m": false,
+        "B11_20m": false,
+        "SCL_20m": false
+      },
+      "status": "FAIL",
+      "errors": [
+        "SAFE directory missing"
+      ]
+    },
+    {
+      "product_id": "S2A_MSIL2A_20250510T053241_N0511_R105_T43QDA_20250510T084438",
+      "acquisition_date": "2025-05-10",
+      "mgrs_tile": "MGRS-43QDA",
+      "safe_directory": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2A_MSIL2A_20250510T053241_N0511_R105_T43QDA_20250510T084438.SAFE",
+      "safe_directory_present": false,
+      "metadata": {
+        "label": "MTD_MSIL2A.xml",
+        "path": "D:\\green pulse ai\\GreenPulse-AI\\data\\raw\\sentinel2\\S2A_MSIL2A_20250510T053241_N0511_R105_T43QDA_20250510T084438.SAFE\\MTD_MSIL2A.xml",
+        "present": false,
+        "size_bytes": null,
+        "sha256": null,
+        "readable": null,
+        "crs": null,
+        "resolution_m": null,
+        "transform": null,
+        "width": null,
+        "height": null,
+        "dtype": null,
+        "errors": []
+      },
+      "granules": [],
+      "required_files": {
+        "MTD_MSIL2A.xml": false,
+        "B04_10m": false,
+        "B08_10m": false,
+        "B11_20m": false,
+        "SCL_20m": false
+      },
+      "status": "FAIL",
+      "errors": [
+        "SAFE directory missing"
+      ]
+    }
+  ]
+}
