@@ -124,7 +124,7 @@ export async function getNearbySensorContext(params, signal) {
   return response.data;
 }
 
-export async function getDataReadiness(signal) {
-  const response = await api.get('/api/data-readiness', { signal });
+export async function getReadiness(signal) {
+  const response = await api.get('/api/readiness', { signal });
   return response.data;
 }

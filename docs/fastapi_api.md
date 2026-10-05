@@ -34,7 +34,9 @@ The first command installs the existing real-data/ML stack (including FastAPI, P
 | `POST /api/validation/analyze/{dataset_id}` | versioned multi-period DiD report with diagnostics, uncertainty and calibration proposal gate | 404 for unknown dataset; 503 for invalid evidence |
 | `GET /api/research/status` | point-sensor and separate exposure/vulnerability availability | explicit missing/sparse/stale/mismatch states; no composite risk score |
 | `GET /api/research/sensors/nearby` | nearest verified point observation by distance/time | proximity context only; never interpolation or calibrated LST confidence |
-| `GET /api/methodology` | pipeline, scientific limits, artifact-presence flags | 200 |
+| `GET /api/readiness` | canonical source gate, accepted artifact metadata, detailed source/audit evidence | 200; unknown source gate on malformed evidence |
+| `GET /api/data-readiness` | deprecated compatibility alias for `/api/readiness` | same response contract |
+| `GET /api/methodology` | pipeline, scientific limits, legacy artifact flags derived from readiness | 200 |
 
 All POST bodies and successful responses have Pydantic schemas visible in Swagger. Invalid field values return HTTP 422, missing real artifacts return HTTP 503, and unknown real IDs return HTTP 404. Server errors are not converted to invented observations or plan outputs.
 

@@ -140,6 +140,7 @@ def readiness(root: Path | None = None) -> dict:
     records = manifest.get("sources") if manifest else None
     valid = isinstance(records, list) and all(isinstance(s, dict) and isinstance(s.get("id"), str) for s in records)
     valid = valid and len({s["id"] for s in records}) == len(records)
+    valid = valid and set(CATALOG).issubset({s["id"] for s in records})
     by_id = {s["id"]: s for s in records} if valid else {}
     rows = []
     for source_id, (name, role, action, doc) in CATALOG.items():

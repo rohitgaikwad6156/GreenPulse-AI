@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from backend.app.data_intake.readiness import readiness, CATALOG
 from backend.app.main import app
 from backend.app.api import services
+from backend.app.api.readiness_status import artifact_statuses, readiness_status
 
 
 def write(root, name, value):
@@ -95,6 +96,89 @@ def test_read_only_endpoint_and_missing_repository(evidence, tmp_path, monkeypat
         assert missing.status_code == 200
         assert missing.json()['overall_status'] == 'blocked'
     assert before == {p: p.read_bytes() for p in evidence.rglob('*') if p.is_file()}
+
+
+def test_canonical_endpoint_and_compatibility_share_evidence(evidence, monkeypatch):
+    monkeypatch.setattr(services, 'ROOT', evidence)
+    with TestClient(app) as client:
+        canonical = client.get('/api/readiness')
+        legacy = client.get('/api/data-readiness')
+        assert canonical.status_code == legacy.status_code == 200
+        assert canonical.json() == legacy.json() or (
+            canonical.json()['checked_at'] != legacy.json()['checked_at']
+            and {k: v for k, v in canonical.json().items() if k != 'checked_at'} ==
+                {k: v for k, v in legacy.json().items() if k != 'checked_at'})
+        data = canonical.json()
+        assert data['software']['basis'] == 'backend_runtime'
+        assert data['production_data'] == 'blocked'
+        assert data['first_heat_map'] == {
+            'ready': False, 'required_sources_ready': 3, 'required_sources_total': 5,
+            'blocker_count': 2}
+        assert {item['id'] for item in data['blockers']} == {
+            'municipal_boundary', 'sentinel2_l2a_scenes'}
+        assert data['source_status']['pmc_outline'] == 'pending'
+        assert data['source_status']['pcmc_outline'] == 'staged'
+        assert data['source_status']['ward_boundaries'] == 'pending'
+        assert data['artifacts']['real_ml_grid'] == 'blocked'
+        assert data['artifacts']['trained_xgboost_model'] == 'blocked'
+        assert str(evidence) not in json.dumps(data)
+        assert '/api/readiness' in client.get('/openapi.json').json()['paths']
+        assert client.get('/openapi.json').json()['paths']['/api/data-readiness']['get']['deprecated']
+        method = client.get('/api/methodology').json()['data_status']
+        assert method['real_ml_grid_available'] == (data['artifacts']['real_ml_grid'] == 'ready')
+        assert method['trained_model_available'] == (data['artifacts']['trained_xgboost_model'] == 'ready')
+
+
+def test_dynamic_gate_and_fail_closed(evidence):
+    result = readiness_status(evidence)
+    assert result['software']['status'] == 'ready'  # Sentinel absence is a data blocker.
+    assert result['first_heat_map']['blocker_count'] == 2
+    manifest = json.loads((evidence / 'data/source_manifest.json').read_text())
+    for source in manifest['sources']:
+        if source['id'] == 'sentinel2_l2a_scenes':
+            source['verification_status'] = 'verified'
+            (evidence / source['local_path']).write_bytes(b'synthetic source')
+    write(evidence, 'data/source_manifest.json', manifest)
+    write(evidence, 'data/provenance/sentinel_quality_audit_2025.json', dict(
+        expected_product_count=6, safe_directories_found=6,
+        minimum_required_files_expected=30, required_file_slots_found=30,
+        products_passed=6, products_failed=0, overall_status='PASS'))
+    assert readiness_status(evidence)['first_heat_map']['blocker_count'] == 1
+    for source in manifest['sources']:
+        if source['id'] == 'municipal_boundary':
+            source['verification_status'] = 'verified'
+            (evidence / source['local_path']).write_bytes(b'synthetic combined boundary')
+    write(evidence, 'data/source_manifest.json', manifest)
+    ready = readiness_status(evidence)
+    assert ready['production_data'] == 'source_ready'
+    assert ready['first_heat_map']['blocker_count'] == 0
+    assert ready['source_status']['ward_boundaries'] == 'pending'
+    write(evidence, 'data/source_manifest.json', {'sources': []})
+    unknown = readiness_status(evidence)
+    assert unknown['production_data'] == 'unknown'
+    assert unknown['first_heat_map']['ready'] is None
+    assert unknown['source_status']['landsat_lst_scenes'] != 'verified'
+
+
+def test_artifacts_require_accepted_grid_and_model_metadata(tmp_path, monkeypatch):
+    class Reader:
+        def close(self): pass
+    grid_meta = {'features': ['ndvi'], 'row_count': 4, 'crs': 'EPSG:32643'}
+    monkeypatch.setattr(services, '_real_grid', lambda: (Reader(), grid_meta))
+    monkeypatch.setattr(services, 'model_metrics', lambda: {'target': 'lst_c'})
+    metadata = tmp_path / 'model.json'
+    monkeypatch.setattr(services, 'MODEL_METADATA', metadata)
+    metadata.write_text(json.dumps({'target': 'lst_c'}))
+    assert artifact_statuses(tmp_path)['trained_xgboost_model'] == 'blocked'
+    metadata.write_text(json.dumps(dict(model_artifact_sha256='sha256:' + 'a'*64,
+                                        dataset_version='sha256:' + 'b'*64,
+                                        feature_list=['ndvi'], dataset_rows=4,
+                                        crs='EPSG:32643', resolution_m=30)))
+    assert artifact_statuses(tmp_path)['trained_xgboost_model'] == 'ready'
+    monkeypatch.setattr(services, '_real_grid', lambda: (_ for _ in ()).throw(
+        services.DataUnavailableError('legacy grid rejected')))
+    assert artifact_statuses(tmp_path)['real_ml_grid'] == 'blocked'
+    assert artifact_statuses(tmp_path)['trained_xgboost_model'] == 'blocked'
 
 @pytest.mark.parametrize('content', ['{broken', 'null'])
 def test_invalid_json_is_unavailable(evidence, content):

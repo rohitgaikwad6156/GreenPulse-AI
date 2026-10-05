@@ -210,23 +210,9 @@ def predict_grid_cell(grid_id: str) -> dict:
 
 
 def methodology() -> dict:
-    real_grid_available = False
-    try:
-        reader, _ = _real_grid()
-        reader.close()
-        real_grid_available = True
-    except DataUnavailableError:
-        pass
-    optimizer_location_available = False
-    if CATALOG.is_file():
-        try:
-            from backend.app.optimizer.location_catalog import list_planning_locations
-            optimizer_location_available = bool(
-                list_planning_locations(CATALOG, project_root=ROOT)["total"])
-        except RuntimeError:
-            optimizer_location_available = False
-    from backend.app.validation.workflow import list_imported_datasets
-    real_validation_available = bool(list_imported_datasets(VALIDATION_IMPORTS)["total"])
+    # Legacy data_status uses the same readiness projection as /api/readiness.
+    from backend.app.api.readiness_status import readiness_status
+    artifacts = readiness_status(ROOT)["artifacts"]
     return {
         "system": "GreenPulse AI — An AI-powered Urban Climate Decision-Support System",
         "target": "continuous Landsat land surface temperature (LST) in °C",
@@ -242,9 +228,9 @@ def methodology() -> dict:
                         "SHAP explains model predictions and does not prove causation.",
                         "Intervention estimates need local calibration and later field validation.",
                         "The optimization is optimal only under its modeled objective, assumptions and constraints."],
-        "data_status": {"real_ml_grid_available": real_grid_available,
-                        "trained_model_available": real_grid_available and MODEL.is_file() and MODEL_METADATA.is_file(),
+        "data_status": {"real_ml_grid_available": artifacts["real_ml_grid"] == "ready",
+                        "trained_model_available": artifacts["trained_xgboost_model"] == "ready",
                         "intervention_catalog_available": CATALOG.is_file(),
-                        "optimizer_location_available": optimizer_location_available,
-                        "real_validation_dataset_available": real_validation_available},
+                        "optimizer_location_available": artifacts["planning_evidence"] == "ready",
+                        "real_validation_dataset_available": artifacts["field_validation"] == "staged"},
     }

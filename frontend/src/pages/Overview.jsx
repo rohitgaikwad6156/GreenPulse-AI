@@ -3,7 +3,8 @@ import { ArrowRight, BookOpenText, MapPinned, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import BackendStatus from "../components/BackendStatus.jsx";
 import PageIntro from "../components/PageIntro.jsx";
-import { getMethodology } from "../services/api.js";
+import { getReadiness } from "../services/api.js";
+import { artifactLabel, sourceGateMessage, validOverviewReadiness } from "../utils/overviewReadiness.js";
 import { researchWorkflow } from "../utils/researchWorkflow.js";
 
 export default function Overview() {
@@ -16,14 +17,14 @@ export default function Overview() {
   useEffect(() => {
     const controller = new AbortController();
     setStatus({ loading: true, data: null, error: "" });
-    getMethodology(controller.signal)
+    getReadiness(controller.signal)
       .then((data) => {
-        if (!data?.data_status)
+        if (!validOverviewReadiness(data))
           throw new Error(
             "The backend returned an incomplete research status.",
           );
         if (!controller.signal.aborted)
-          setStatus({ loading: false, data: data.data_status, error: "" });
+          setStatus({ loading: false, data, error: "" });
       })
       .catch((error) => {
         if (!controller.signal.aborted)
@@ -41,17 +42,17 @@ export default function Overview() {
   const cards = [
     [
       "Satellite ML grid",
-      status.data?.real_ml_grid_available,
+      status.data?.artifacts.real_ml_grid,
       "Observed Landsat LST and aligned features",
     ],
     [
       "Trained XGBoost model",
-      status.data?.trained_model_available,
+      status.data?.artifacts.trained_xgboost_model,
       "Saved model and metadata; results require validation",
     ],
     [
       "Planning evidence",
-      status.data?.optimizer_location_available,
+      status.data?.artifacts.planning_evidence,
       "At least one location with verified planning inputs",
     ],
   ];
@@ -96,19 +97,17 @@ export default function Overview() {
         </div>
         <div className="readiness-grid">
           <BackendStatus key={attempt} />
-          {cards.map(([label, present, detail]) => (
+          {cards.map(([label, artifactStatus, detail]) => (
             <section key={label} className="readiness-item">
               <h3>{label}</h3>
               <p
-                className={`readiness-value ${status.data && !present ? "needs-input" : ""}`}
+                className={`readiness-value ${status.data && artifactStatus !== "ready" ? "needs-input" : ""}`}
               >
                 {status.loading
                   ? "Checking…"
                   : !status.data
                     ? "Not checked"
-                    : present
-                      ? "Inputs present"
-                      : "Inputs needed"}
+                    : artifactLabel(artifactStatus)}
               </p>
               <p className="readiness-detail">{detail}</p>
             </section>
@@ -118,11 +117,7 @@ export default function Overview() {
           <p role="status">
             {status.loading
               ? "Checking research inputs. A sleeping service may take about a minute to start."
-              : status.error ||
-                (status.data.real_ml_grid_available &&
-                status.data.trained_model_available
-                  ? "Grid and model files are present. Each research stage checks evidence and compatibility before producing results."
-                  : "Climate predictions are not ready yet. The real satellite grid and trained model are not both available.")}
+              : status.error || sourceGateMessage(status.data)}
           </p>
           <p>
             Input availability does not establish model accuracy. Missing

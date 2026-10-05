@@ -10,7 +10,7 @@ from backend.app.schemas.api import (
     DidRequest, DidResponse, ExplainRequest, ExplainResponse, GridIdRequest,
     GridResponse, MethodologyResponse, MetricsResponse, OptimizeRequest,
     OptimizeResponse, OptimizerLocationsResponse, PredictResponse, SimulateRequest, SimulateResponse,
-    ProvenanceValidationResponse, ValidationDatasetsResponse, WardResponse, WardsResponse,
+    ProvenanceValidationResponse, ReadinessResponse, ValidationDatasetsResponse, WardResponse, WardsResponse,
 )
 
 
@@ -245,8 +245,15 @@ def get_methodology() -> dict:
     """Describe the system and actual local artifact availability."""
     return services.methodology()
 
-@router.get("/data-readiness", tags=["Data readiness"])
+@router.get("/readiness", response_model=ReadinessResponse, tags=["Data readiness"])
+def get_readiness() -> dict:
+    """Return source evidence and lightweight artifact readiness for both dashboards."""
+    from backend.app.api.readiness_status import readiness_status
+    return readiness_status(services.ROOT)
+
+
+@router.get("/data-readiness", response_model=ReadinessResponse, tags=["Data readiness"],
+            deprecated=True)
 def get_data_readiness() -> dict:
-    """Summarize recorded source evidence without processing production datasets."""
-    from backend.app.data_intake.readiness import readiness
-    return readiness(services.ROOT)
+    """Compatibility alias for the canonical readiness response."""
+    return get_readiness()

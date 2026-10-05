@@ -293,3 +293,82 @@ class MethodologyResponse(BaseModel):
     validation: str
     limitations: list[str]
     data_status: dict[str, bool]
+
+
+class RuntimeSoftwareStatus(BaseModel):
+    status: Literal["ready"] = Field(description="The readiness API is serving requests; this is not a CI result.")
+    basis: Literal["backend_runtime"]
+    note: str
+
+
+class FirstHeatMapStatus(BaseModel):
+    ready: bool | None = Field(description="Source gate only; null means evidence is inconsistent or unavailable.")
+    required_sources_ready: int | None
+    required_sources_total: int | None
+    blocker_count: int | None
+
+
+class ReadinessRequirement(BaseModel):
+    id: str
+    name: str
+    ready: bool
+    reason: str | None
+
+
+class ReadinessBlocker(BaseModel):
+    id: str
+    name: str
+    reason: str
+
+
+class ReadinessAudit(BaseModel):
+    id: str
+    title: str
+    status: str
+    summary: list[str]
+    documentation_url: str
+    diagnostics: list[dict[str, Any]]
+    model_config = ConfigDict(extra="allow")
+
+
+class ReadinessSource(BaseModel):
+    id: str
+    name: str
+    status: str
+    manifest_status: str | None
+    local_available: bool
+    evidence: list[str]
+    audits: list[ReadinessAudit]
+    blocked_reason: str | None
+    next_action: str
+    scope: str
+    documentation_url: str
+    model_config = ConfigDict(extra="allow")
+
+
+class ReadinessResponse(BaseModel):
+    software: RuntimeSoftwareStatus
+    production_data: Literal["source_ready", "blocked", "unknown"] = Field(
+        description="State of the first heat-map source gate, not accepted municipal results.")
+    first_heat_map: FirstHeatMapStatus
+    source_status: dict[str, str] = Field(description="Effective statuses derived from the detailed source records.")
+    artifacts: dict[str, Literal["ready", "blocked", "pending", "staged"]] = Field(
+        description="Lightweight grid and model metadata acceptance plus later-stage evidence.")
+    artifact_basis: str
+    blockers: list[ReadinessBlocker] = Field(description="Current first-build source blockers.")
+    sources: list[ReadinessSource]
+    audit_trail: list[ReadinessAudit]
+    evidence_chains: list[dict[str, Any]]
+    later_stage_dependencies: list[dict[str, str]]
+    required_sources: list[ReadinessRequirement]
+    first_heat_map_blockers: list[ReadinessRequirement]
+    first_heat_map_ready: bool
+    required_sources_ready: int
+    required_sources_total: int
+    overall_status: str
+    summary: dict[str, int]
+    evidence_warnings: list[str]
+    checked_at: str
+    readiness_basis: str
+    audit_disclaimer: str
+    audit_preservation_note: str

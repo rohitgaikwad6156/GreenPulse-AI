@@ -681,6 +681,7 @@ textarea {
 .dr-staged { background: #e4f0f3; color: #275868; }
 .dr-pending { background: #fff2d9; color: #795515; }
 .dr-blocked { background: #fbeae3; color: #913d27; }
+.dr-unknown { background: #eff0ec; color: #536058; }
 .dr-optional { background: #f0f0eb; color: #53564c; }
 .dr-counts { display: flex; gap: 32px; flex-wrap: wrap; margin: 20px 0; }
 .dr-counts > div { display: flex; align-items: center; gap: 10px; }

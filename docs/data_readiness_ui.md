@@ -2,11 +2,29 @@
 
 ## Purpose and routes
 
-The **Data Readiness** navigation item opens `/data-readiness`. The page reads
-`GET /api/data-readiness` and presents recorded source status, supporting audits,
+The **Data Readiness** navigation item opens `/data-readiness`. Both it and Overview
+read `GET /api/readiness`, which presents recorded source status, supporting audits,
 local availability, blockers and next actions. It also links from Overview and to
 Methodology and the existing source documentation. It performs no processing,
 verification, downloads, training or source writes.
+
+`GET /api/data-readiness` remains a deprecated compatibility alias with the same
+response contract. `backend.app.data_intake.readiness.readiness()` remains the
+single source/evidence readiness calculation. The API adds `software` (backend
+runtime only, never a CI claim), `production_data` (`source_ready`, `blocked`, or
+`unknown`), `first_heat_map` counts, `source_status`, `artifacts`, and `blockers`.
+The detailed inventory, audits, evidence chains, and later-stage dependencies
+remain available in the same response. `/api/methodology` still provides the
+research description; its legacy artifact booleans derive from this readiness
+projection.
+
+The artifact summary checks the accepted real-grid Parquet schema and metadata,
+then the model-metrics contract and matching model metadata. It checks verified
+planning locations and registered field evidence separately. This request does
+not hash the grid or model or deserialize the model; production endpoints perform
+those full validations before use. Missing real sources block the production
+source gate, while the runtime API can still be healthy. Local software test
+status belongs to `scripts/project_health.ps1`, not this HTTP response.
 
 ## Source of truth
 
@@ -67,7 +85,8 @@ optimizer or municipal-temperature acceptance.
 
 Missing/malformed audit JSON, invalid counts, missing manifest records and LFS
 pointers fail closed. The API still returns the inventory with clear missing
-information. Loading and connection failures have explicit states and retry
+information. Malformed manifest evidence makes `production_data` unknown rather
+than implying a known blocker count. Loading and connection failures have explicit states and retry
 controls; they never fall back to demo data. Missing scientific evidence cannot
 be replaced by simulated evidence without misrepresenting production readiness.
 

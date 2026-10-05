@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { CheckCircle2, Circle, ExternalLink } from "lucide-react";
 import AuditTrail from "../components/AuditTrail.jsx";
 import PageIntro from "../components/PageIntro.jsx";
-import { getDataReadiness } from "../services/api.js";
+import { getReadiness } from "../services/api.js";
 import {
   readinessPresentation,
   STATUS_LABELS,
@@ -26,7 +26,7 @@ export default function DataReadiness() {
   useEffect(() => {
     const controller = new AbortController();
     setState({ loading: true, data: null, error: false });
-    getDataReadiness(controller.signal)
+    getReadiness(controller.signal)
       .then((data) => {
         if (!controller.signal.aborted)
           setState({ loading: false, data, error: false });
@@ -108,13 +108,15 @@ export default function DataReadiness() {
                 <h2 id="dr-gate">First real 30 m heat-map readiness</h2>
               </div>
               <Badge
-                status={data.first_heat_map_ready ? "verified" : "blocked"}
+                status={data.production_data === "unknown" ? "unknown" :
+                  data.first_heat_map.ready ? "verified" : "blocked"}
               />
             </div>
             <p>
               <strong>
-                {data.required_sources_ready}/{data.required_sources_total}{" "}
-                required source groups ready
+                {view.gateKnown
+                  ? `${data.first_heat_map.required_sources_ready}/${data.first_heat_map.required_sources_total} required source groups ready`
+                  : "Source gate unknown; review the evidence warnings"}
               </strong>{" "}
               · {view.blockerLabel}
             </p>
