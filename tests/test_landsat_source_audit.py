@@ -1,13 +1,12 @@
 """Small synthetic fixtures for the source audit; never used as source data."""
 
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 import numpy as np
 import rasterio
 from rasterio.transform import from_origin
 
-from scripts.audit_landsat_sources import ROOT, audit_scene
+from scripts import audit_landsat_sources as audit
 
 
 PRODUCT_ID = "LC08_L2SP_147047_20250302_20250311_02_T1"
@@ -37,25 +36,25 @@ def make_scene(folder: Path, *, qa_width: int = 2) -> Path:
     return scene
 
 
-def test_valid_scene_and_hashes() -> None:
-    with TemporaryDirectory(dir=ROOT / "tmp") as temporary:
-        result = audit_scene(make_scene(Path(temporary)))
-        assert result["status"] == "PASS"
-        assert len(result["files"]) == 4
-        assert all(len(file["sha256"]) == 64 for file in result["files"].values())
+def test_valid_scene_and_hashes(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(audit, "ROOT", tmp_path)
+    result = audit.audit_scene(make_scene(tmp_path))
+    assert result["status"] == "PASS"
+    assert len(result["files"]) == 4
+    assert all(len(file["sha256"]) == 64 for file in result["files"].values())
 
 
-def test_raster_dimension_mismatch_fails() -> None:
-    with TemporaryDirectory(dir=ROOT / "tmp") as temporary:
-        result = audit_scene(make_scene(Path(temporary), qa_width=3))
-        assert result["status"] == "FAIL"
-        assert any("width differs from ST_B10.TIF" in error for error in result["errors"])
+def test_raster_dimension_mismatch_fails(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(audit, "ROOT", tmp_path)
+    result = audit.audit_scene(make_scene(tmp_path, qa_width=3))
+    assert result["status"] == "FAIL"
+    assert any("width differs from ST_B10.TIF" in error for error in result["errors"])
 
 
-def test_missing_file_fails() -> None:
-    with TemporaryDirectory(dir=ROOT / "tmp") as temporary:
-        scene = make_scene(Path(temporary))
-        (scene / f"{PRODUCT_ID}_QA_RADSAT.TIF").unlink()
-        result = audit_scene(scene)
-        assert result["status"] == "FAIL"
-        assert result["required_files"]["QA_RADSAT.TIF"] is False
+def test_missing_file_fails(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(audit, "ROOT", tmp_path)
+    scene = make_scene(tmp_path)
+    (scene / f"{PRODUCT_ID}_QA_RADSAT.TIF").unlink()
+    result = audit.audit_scene(scene)
+    assert result["status"] == "FAIL"
+    assert result["required_files"]["QA_RADSAT.TIF"] is False

@@ -28,6 +28,6 @@ The figures below use QA-valid pixels over each original scene footprint. No mun
 
 - Lowest QA-valid Celsius value: **-10.95 °C** in `LC08_L2SP_147047_20250403_20250411_02_T1`.
 - Highest QA-valid Celsius value: **99.85 °C** in `LC09_L2SP_147047_20250310_20250311_02_T1`.
-- These extremes are preserved without clipping or extra QA rules. Their location and cause have not been established.
+- These extremes are preserved without clipping or extra QA rules. Their locations and cluster patterns are now recorded in the subsequent [extreme diagnostic audit](landsat_extreme_audit.md); their causes remain unconfirmed.
 
 No temperature range filter was applied. A PASS means the source files decoded, matched grids, and yielded finite QA-valid values; it does not verify municipal coverage or support a city temperature claim.

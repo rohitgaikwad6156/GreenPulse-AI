@@ -52,10 +52,25 @@ def sensor_fixture(root: Path, timestamp: str, *, minimum_stations: int = 1) -> 
 class ResearchLayerTests(unittest.TestCase):
     def test_missing_sensor_state_and_separate_context_layers(self):
         with tempfile.TemporaryDirectory() as temp:
-            status = sensor_status(Path(temp), SOURCE_MANIFEST)
+            root = Path(temp)
+            status = sensor_status(root / "sensors", SOURCE_MANIFEST)
+            registry = root / "data" / "research" / "layers.json"
+            registry.parent.mkdir(parents=True)
+            source = root / "synthetic-exposure.txt"
+            source.write_bytes(b"SYNTHETIC TEST SOURCE; not population observations")
+            registry.write_text(json.dumps({"schema_version": "1.0", "layers": [
+                {"layer_id": "test_exposure", "layer_type": "exposure",
+                 "status": "source_verified_processing_blocked", "source": {
+                     "local_path": source.name,
+                     "checksum": "sha256:" + hashlib.sha256(source.read_bytes()).hexdigest()}},
+                {"layer_id": "test_vulnerability", "layer_type": "vulnerability", "status": "missing"},
+            ]}), encoding="utf-8")
+            layers = research_layer_status(registry)
+            source.write_bytes(b"CHANGED SYNTHETIC TEST SOURCE")
+            with self.assertRaisesRegex(ValueError, "checksum mismatch"):
+                research_layer_status(registry)
         self.assertEqual(status["status"], "missing")
         self.assertFalse(status["wall_to_wall_interpolation"])
-        layers = research_layer_status(ROOT / "data" / "research" / "research_layers.json")
         self.assertTrue(layers["heat_hazard_score_separate"])
         self.assertFalse(layers["composite_risk_available"])
         self.assertEqual(layers["exposure_layers"][0]["layer_type"], "exposure")

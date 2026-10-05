@@ -1,8 +1,35 @@
 # GreenPulse AI
 
+[![GreenPulse CI](https://github.com/rohitgaikwad6156/GreenPulse-AI/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rohitgaikwad6156/GreenPulse-AI/actions/workflows/ci.yml)
+
 An AI-powered Urban Climate Decision-Support System.
 
 The repository implements the FastAPI, React, real-data intake, geospatial processing, spatial-validation, XGBoost, TreeSHAP, intervention-simulation, location-specific MILP, post-implementation validation, and optional research-layer workflows. The dashboard has eight working routes with explicit unavailable and connection-error states; it does not substitute demo values when production evidence is absent.
+
+CI validates software behavior using synthetic test fixtures and does not imply that production climate datasets or model results are complete. See [software CI](docs/ci.md) for checks and local commands.
+
+## Current project status
+
+Status reviewed: **2026-10-05**. Based on the current manifest, local files, source audits and check-only heat-map preflight.
+
+| Component | Current status | Evidence |
+| --- | --- | --- |
+| Landsat 8/9 L2SP | **VERIFIED + AUDITED** | 9/9 selected scenes, 36/36 required files; [manifest](data/source_manifest.json) records the source SHA-256 |
+| Landsat source QA | **PASS** | [Source-quality audit](docs/landsat_quality_audit.md), 9/9 passed |
+| Landsat processing | **PASS** | [QA and calibration smoke test](docs/landsat_processing_audit.md), 9/9 passed |
+| Landsat extreme diagnostics | **PASS; investigation remains open** | [Extreme audit](docs/landsat_extreme_audit.md); small hot/cold clusters identified, causes not confirmed |
+| ESA WorldCover | **VERIFIED** | Manifest and local checksum validation; 2021 v200 snapshot |
+| OSM roads | **VERIFIED** | Manifest and local checksum validation; 2026-09-19 extract |
+| WorldPop | **VERIFIED** | Manifest and local checksum validation; 2025 India R2024B v1 counts |
+| PCMC municipal outline | **OFFICIAL SOURCE STAGED** | [Acquisition provenance](data/provenance/acquisition_pcmc_boundary.json); not yet combined; reuse terms need confirmation |
+| PMC municipal outline | **PENDING** | Official outline still missing |
+| Combined PMC/PCMC boundary | **PENDING** | `municipal_boundary` remains pending; blocks the real municipal grid |
+| Sentinel-2 L2A | **PENDING** | [Manual intake audit](docs/sentinel_quality_audit.md): 0/6 SAFE products, 0/30 required files; FAIL as expected |
+| Real 30 m ML grid | **BLOCKED** | Combined boundary and Sentinel still required; existing demo files are not real evidence |
+| Real XGBoost model | **NOT TRAINED** | Waits for the real ML grid; legacy model files do not establish real model readiness |
+| Verified ward GIS | **PENDING** | Reporting/UI dependency, not a first cell-level model blocker |
+
+Landsat full-scene diagnostics are **not Pune, PMC or PCMC temperature results**. A diagnostic PASS does not resolve the unusual temperature clusters or establish municipal coverage. No real spatial-CV metrics, SHAP outputs, calibrated Heat Hazard Score or model-backed intervention results are available.
 
 ## Acceptance status
 
@@ -10,9 +37,9 @@ The final acceptance review is [documented here](docs/final_acceptance_review.md
 
 | Readiness level | Status | Meaning |
 | --- | --- | --- |
-| Software-complete | **PASS** | The complete Python suite, frontend tests/build, API/OpenAPI checks, and desktop/mobile browser smoke checks pass. |
-| Data-complete | **BLOCKED** | WorldCover, OSM roads, and WorldPop are verified locally, and an official PCMC municipal outline is staged. Combined PMC/PCMC municipal boundaries and Landsat/Sentinel scenes are still absent, so the real 30 m grid cannot be built. Verified ward GIS is separately missing for ward reporting. |
-| Model-validated | **BLOCKED** | No real ML grid or trained XGBoost model exists, so no Pune/PCMC spatial-CV metrics, SHAP values, calibrated Heat Hazard Score, or model-backed scenario results can be reported. |
+| Software-complete | **PASS** | Implementation and prior full-system acceptance are documented; current focused Python tests and frontend tests/build pass. See the review for the scope and date of each check. |
+| Data-complete | **BLOCKED** | Landsat, WorldCover, OSM roads and WorldPop are verified locally. PCMC outline is staged; official PMC outline, verified combined boundary and Sentinel SAFE products are missing. Broader acceptance also needs green-space and peri-urban evidence; ward GIS is separately pending for reporting. |
+| Model-validated | **BLOCKED** | No accepted real ML grid or real trained XGBoost model exists, so no Pune/PCMC spatial-CV metrics, SHAP values, calibrated Heat Hazard Score, or model-backed scenario results can be reported. |
 | Field-validated | **BLOCKED** | No genuine pre/post intervention dataset or verified point-sensor dataset is locally available. |
 
 Overall project outcome is **PARTIAL**: the software contract is executable and evidence-gated, but the required real-data, model-validation, and field-validation evidence is incomplete.
@@ -65,7 +92,7 @@ npm install
 npm run dev -- --host localhost --port 5173 --strictPort
 ```
 
-The copy command is optional: Vite also proxies `/api` to the local FastAPI server when no URL override is set. It sets `VITE_API_BASE_URL` to the local FastAPI address. Start FastAPI and Vite in separate PowerShell windows. Open <http://localhost:5173/> and expect `Backend Status: Healthy`. If FastAPI is stopped, the card shows `Backend Status: Connection Error`. Restart Vite after changing its environment file. The sidebar links to Overview, Heat Map, Root Cause Analysis, Scenario Simulator, Climate Action Optimizer, Validation, and Methodology. On a narrow screen, use the menu button in the top bar. Press `Ctrl+C` in the frontend server window to stop it.
+The copy command is optional: Vite also proxies `/api` to the local FastAPI server when no URL override is set. It sets `VITE_API_BASE_URL` to the local FastAPI address. Start FastAPI and Vite in separate PowerShell windows. Open <http://localhost:5173/> and expect `Connected` under Service connection. If FastAPI is stopped, the card shows `Connection Error`. Restart Vite after changing its environment file. The sidebar links to Overview, Heat Map, Root Cause Analysis, Scenario Simulator, Climate Action Optimizer, Validation, Research Layers, and Methodology. On a narrow screen, use the menu button in the top bar. Press `Ctrl+C` in the frontend server window to stop it.
 
 To check the production build:
 
@@ -78,10 +105,10 @@ npm run build
 - `frontend/`: React, Vite, Tailwind CSS, and eight dashboard routes
 - `backend/app/`: API, geospatial processing, ML, simulation, optimization, and validation modules
 - `data/`: raw, processed, boundary, and clearly labeled demo data
-- `models/`: trained model artifacts in later steps
-- `notebooks/`, `scripts/`, `tests/`, `docs/`: future analysis and project materials
+- `models/`: model artifact paths; current legacy artifacts are not accepted real results
+- `notebooks/`, `scripts/`, `tests/`, `docs/`: analysis, acquisition/audit/build tools, tests, and documentation
 
-The Heat Map now displays dated NASA MODIS surface-temperature imagery by default, with an observation-date selector and approximately 1 km source resolution. This independent satellite view does not require a trained model. No locally processed 30 m temperature grid, model metric, or intervention outcome is currently available. Verified WorldCover, OSM roads, and WorldPop source files are present, plus a staged official PCMC outline that is not a ward layer and is not yet combined with PMC. The dashboard requests production artifacts and shows explicit unavailable states when they are absent.
+When real model layers are unavailable, the Heat Map displays dated NASA MODIS surface-temperature imagery by default, with an observation-date selector and approximately 1 km source resolution. This independent satellite view does not require a trained model. No accepted real municipal 30 m temperature grid, model metric, or intervention outcome is currently available. Verified Landsat (nine scenes), WorldCover, OSM roads, and WorldPop source files are present, plus a staged official PCMC outline that is not a ward layer and is not yet combined with PMC. The dashboard requests production artifacts and shows explicit unavailable states when they are absent.
 
 ## Real Heat Map build
 
@@ -89,16 +116,20 @@ Run `.\.venv\Scripts\python.exe scripts\build_heat_map_pipeline.py --check-only 
 then the same command without `--check-only` once source validation passes.
 The [real Heat Map pipeline](docs/real_heat_map_pipeline.md) uses only Landsat LST,
 Sentinel-2 NDVI/NDBI, WorldCover tree/built fractions and OSM road density.
+Its exact required source IDs are `municipal_boundary`, `landsat_lst_scenes`,
+`sentinel2_l2a_scenes`, `esa_worldcover`, and `osm_roads`. WorldPop, OSM green spaces,
+peri-urban calibration and ward GIS are not required by this first build profile.
 It preserves the backend artifact contract and rejects explicitly labeled demo data.
-Real scene downloads currently require source authentication; verified combined
-PMC/PCMC municipal polygons are also missing. Ward polygons are a
+Landsat acquisition and verification are complete. The remaining source blockers
+are the six Sentinel SAFE products awaiting manual placement and verified combined
+PMC/PCMC municipal polygons (PCMC is staged; PMC is still missing). Ward polygons are a
 reporting dependency, not a cell-level model prerequisite. Existing synthetic
 artifacts are not real results.
 
 ## Real satellite pipelines
 
 - [Real-data intake contract](docs/data_intake_contract.md): authoritative required/optional/future source inventory plus provenance, date, CRS, checksum, and local-file validation before processing.
-- [Landsat LST processing](docs/landsat_lst_pipeline.md): measured March–May land surface temperature target on the PMC/PCMC 30 m grid.
+- [Landsat LST processing](docs/landsat_lst_pipeline.md): code for the measured March–May surface-temperature target on the PMC/PCMC 30 m analysis grid; municipal output is still blocked. The grid does not create native 30 m thermal resolution.
 - [Sentinel-2 NDVI/NDBI processing](docs/sentinel2_indices_pipeline.md): cloud-masked optical features aligned exactly to that LST grid. It requires the real LST raster, verified municipal boundary, and extracted L2A SAFE scenes.
 - [WorldCover, OSM, and WorldPop morphology processing](docs/urban_morphology_pipeline.md): real tree-cover and built-up fractions, road density, nearest green-space distance, and population density on the same 30 m grid. It requires the real LST reference and source datasets.
 - [Real-data acquisition status](docs/real_data_acquisition.md): reproducible official-source discovery/download commands, selected 2025 scenes, municipal-boundary importer, and exact credential/manual blockers.
@@ -124,3 +155,5 @@ artifacts are not real results.
 - [Deploy on Render and Vercel](docs/deployment_vercel_render.md): project-specific dashboard settings, cloud environment variables, routing, verification, and current data limitations.
 
 No production pipeline substitutes synthetic climate values for missing source data. Automated tests use only temporary, labelled artificial fixtures; the separately labelled demo files are never a production API fallback.
+
+Real accuracy requires real spatial validation. SHAP is model attribution, not causation; scenario outputs are model sensitivity estimates, not observed cooling.

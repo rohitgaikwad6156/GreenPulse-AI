@@ -97,12 +97,27 @@ class DataManifestTests(unittest.TestCase):
         self.assertTrue(all(by_id[source_id]["scope"] == "required_mvp" for source_id in REQUIRED_SOURCE_IDS))
         self.assertEqual(REPORTING_SOURCE_IDS, {"ward_boundaries"})
         self.assertEqual(by_id["ward_boundaries"]["scope"], "reporting_dependency")
-        report = validate_manifest(root / "data" / "source_manifest.json", root)
-        self.assertFalse(report.ok)  # Some required authority/credential-gated inputs remain absent.
+
+    def test_pending_inventory_is_reported_without_production_files(self):
+        # Inventory definitions are code fixtures; local production files/statuses
+        # must not determine whether this software test passes.
+        repository = Path(__file__).resolve().parents[1]
+        document = json.loads((repository / "data" / "source_manifest.json").read_text(encoding="utf-8"))
+        for source in document["sources"]:
+            source["verification_status"] = "pending"
+            source["checksum"] = None
+            for companion in source.get("companion_files", []):
+                companion["checksum"] = None
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest = self._write(root, document)
+            report = validate_manifest(manifest, root)
+        self.assertFalse(report.ok)
         errors = "\n".join(report.errors)
         self.assertNotIn("ward_boundaries.local_path", errors)
         self.assertIn("ward_boundaries.local_path", "\n".join(report.warnings))
         self.assertIn("periurban_lst_reference.companion_files[0].local_path", errors)
+
 
 
 if __name__ == "__main__":

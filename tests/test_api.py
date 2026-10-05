@@ -1,5 +1,6 @@
 """API contract tests use temporary ARTIFICIAL / SYNTHETIC grid fixtures."""
 
+import hashlib
 import json
 import tempfile
 import unittest
@@ -167,7 +168,22 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(context.exception.status_code, 404)
 
     def test_research_status_keeps_point_and_context_layers_separate(self):
-        result = routes.get_research_status()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            registry = root / "data" / "research" / "layers.json"
+            registry.parent.mkdir(parents=True)
+            source = root / "synthetic-exposure.txt"
+            source.write_bytes(b"SYNTHETIC API FIXTURE; not population observations")
+            registry.write_text(json.dumps({"schema_version": "1.0", "layers": [
+                {"layer_id": "test_exposure", "layer_type": "exposure",
+                 "status": "source_verified_processing_blocked", "source": {
+                     "local_path": source.name,
+                     "checksum": "sha256:" + hashlib.sha256(source.read_bytes()).hexdigest()}},
+                {"layer_id": "test_vulnerability", "layer_type": "vulnerability", "status": "missing"},
+            ]}), encoding="utf-8")
+            with patch.object(services, "RESEARCH_LAYERS", registry), \
+                 patch.object(services, "SENSOR_IMPORTS", root / "sensors"):
+                result = routes.get_research_status()
         self.assertEqual(result["sensors"]["status"], "missing")
         self.assertFalse(result["sensors"]["wall_to_wall_interpolation"])
         self.assertTrue(result["context_layers"]["heat_hazard_score_separate"])

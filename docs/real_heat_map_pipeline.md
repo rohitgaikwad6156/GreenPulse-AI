@@ -1,5 +1,7 @@
 # Real Heat Map pipeline (March–May 2025)
 
+Status reviewed: **2026-10-05**.
+
 Run from the GreenPulse-AI repository with its existing Python environment:
 
 ```powershell
@@ -78,28 +80,34 @@ prediction and simulation loaders. Existing demo files are preserved, not relabe
 
 ## Acquisition and current blockers
 
-Attempted during this implementation:
+The current check-only preflight accepts `landsat_lst_scenes`, `esa_worldcover`
+and `osm_roads`. It exits with code 2 because `municipal_boundary` and
+`sentinel2_l2a_scenes` are still pending and their required local content and
+provenance are incomplete. These are the only failing source IDs for this profile.
 
-- `scripts/acquire_real_sources.py landsat`: USGS redirected the original MTL
-  asset to authentication; the downloader rejected the HTML response.
-- `scripts/acquire_real_sources.py sentinel`: stopped because CDSE_USERNAME and
-  CDSE_PASSWORD are not configured. Configure them locally; do not paste secrets
-  into chat. Then rerun the command.
-- Earth Engine: no Python package, saved authentication, Google application
-  credentials, or configured project were present. GEE is not an anonymous
-  download fallback. [Authentication and project setup](https://developers.google.com/earth-engine/guides/auth).
-- Official PCMC WFS capabilities were retrieved; no ward/prabhag feature type
-  was listed. Its municipal outline and zone boundaries are not ward substitutes.
-- Public community ward files were found, but their metadata describes independent
-  digitization. They were not installed as verified municipal polygons.
+- Landsat acquisition is complete: nine verified L2SP scenes and 36/36 required
+  files. [Source QA](landsat_quality_audit.md), [processing](landsat_processing_audit.md)
+  and [extreme diagnostics](landsat_extreme_audit.md) each pass 9/9 scenes.
+  Full-scene diagnostics are not municipal Pune/PMC/PCMC temperature results.
+  The hot/cold clusters remain investigational; no source pixels or QA rules
+  were changed in response to the audits.
+- Sentinel manual intake is ready, but all six exact selected SAFE products are
+  absent. Follow the [manual checklist](sentinel_quality_audit.md); the manifest
+  remains pending and the audit is FAIL as expected.
+- Official PCMC outline is staged, with [acquisition provenance](../data/provenance/acquisition_pcmc_boundary.json).
+  The official PMC outline is missing. Obtain its authority/version/permission
+  evidence and confirm PCMC reuse terms, then import and verify the combined
+  municipal boundary. A staged outline alone does not satisfy that manifest gate.
 
-No new real grid or trained model has been produced. The files currently at the
-requested production paths predate this build and the grid metadata labels them
-`DEMO / SYNTHETIC DATA`; production access now rejects that label.
+No accepted real grid, real trained model, real spatial-CV metrics or real SHAP
+outputs have been produced. Legacy files exist at some production paths, but
+`data/processed/metadata.json` identifies the grid as `DEMO / SYNTHETIC DATA`.
+They are rejected as real evidence; file existence is not model readiness.
 
-Obtain the original scenes through authorized USGS/Copernicus access and verified
-combined PMC/PCMC municipal polygons with their effective dates and provenance.
-Update verified source checksums and rerun `--check-only`. Official ward GIS can
-be imported later using `import_municipal_boundaries.py` for ward reporting.
+Once both source blockers are resolved, rerun `--check-only` before the build.
+Official ward GIS may be imported later for reporting and ward UI. WorldPop
+is already verified, but is outside this build profile. OSM green spaces,
+peri-urban reference/calibrated Heat Hazard Score, intervention evidence, and
+field validation belong to broader or later-stage acceptance, not this preflight.
 A bounding box, zone polygon, traced PDF, or fictional ward is never substituted
 for a verified municipality or ward.

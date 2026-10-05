@@ -1,8 +1,10 @@
 # Real-data intake contract
 
-GreenPulse does not treat a file's presence as proof that it is usable. The authoritative inventory is `data/source_manifest.json`; its machine-readable shape is `schemas/source_manifest.schema.json`; and `scripts/validate_data_manifest.py` is the processing gate. Entries remain `pending` until their actual files and evidence pass the gate. The currently acquired WorldCover tile is marked separately as verified; this does not make the overall intake complete.
+GreenPulse does not treat a file's presence as proof that it is usable. The authoritative inventory is `data/source_manifest.json`; its machine-readable shape is `schemas/source_manifest.schema.json`; and `scripts/validate_data_manifest.py` is the processing gate. Entries remain `pending` until their actual files and evidence pass the gate. As reviewed on 2026-10-05, Landsat, WorldCover, OSM roads and WorldPop are verified and pass local validation; this does not make the overall intake complete.
 
 The selected archived season is **2025-03-01 through 2025-05-31**. Exact scene discovery, acquisition commands, municipal-source findings, and access blockers are in [real_data_acquisition.md](real_data_acquisition.md).
+
+The full inventory below describes broader project acceptance. The first heat-map profile requires only `municipal_boundary`, `landsat_lst_scenes`, `sentinel2_l2a_scenes`, `esa_worldcover` and `osm_roads`; see [the build contract](real_heat_map_pipeline.md). Ward GIS is not a cell-model prerequisite.
 
 ## What must be obtained
 
@@ -11,7 +13,7 @@ Choose one peak-summer year before downloading scenes. The Landsat, Sentinel-2, 
 | Contract ID | Class | Exact local path | Acquisition and evidence requirement |
 |---|---|---|---|
 | `municipal_boundary` | Required MVP | `data/boundaries/pmc_pcmc.geojson` | Verified PMC and PCMC outlines in EPSG:4326, with issuing authority, release/effective date, license, and both municipality values. |
-| `ward_boundaries` | Required MVP | `data/boundaries/pmc_pcmc_wards.geojson` | Verified wards for both corporations in EPSG:4326. Each feature needs `municipality`, `ward_id`, and `ward_name`; record authority and boundary version. |
+| `ward_boundaries` | Reporting dependency | `data/boundaries/pmc_pcmc_wards.geojson` | Verified wards for both corporations in EPSG:4326. Each feature needs `municipality`, `ward_id`, and `ward_name`; record authority and boundary version. |
 | `landsat_lst_scenes` | Required MVP | `data/raw/landsat/` | USGS Landsat 8/9 Collection 2 L2SP scenes intersecting both cities. Keep matching `MTL.txt`, `ST_B10.TIF`, `QA_PIXEL.TIF`, and `QA_RADSAT.TIF`; record every product ID. |
 | `sentinel2_l2a_scenes` | Required MVP | `data/raw/sentinel2/` | Original extracted Sentinel-2 L2A SAFE products for the same season. Preserve product XML plus B04 10 m, B08 10 m, B11 20 m, and SCL 20 m. |
 | `esa_worldcover` | Required MVP | `data/raw/worldcover/` | Original ESA WorldCover 2021 v200 `*_Map.tif` tiles covering both cities. This fixed 2021 snapshot is not current canopy measurement. |
@@ -21,7 +23,7 @@ Choose one peak-summer year before downloading scenes. The Landsat, Sentinel-2, 
 | `periurban_lst_reference` | Required MVP | `data/processed/periurban_lst_reference.parquet` and `data/processed/periurban_lst_reference_metadata.json` | QA-valid Landsat LST outside both municipalities, with unique non-overlapping `grid_id` and `lst_c`, using the exact municipal season and QA method. Independently source and document the reference-area boundary. |
 | `osm_buildings` | Optional MVP | `data/raw/osm/buildings.geojson` | Enable only when complete tagged building-footprint coverage has been assessed. The current morphology pipeline works without it. |
 | `measured_albedo` | Optional MVP | `data/raw/albedo/albedo_pune_30m.tif` | Documented, QA-masked surface albedo on the exact 30 m LST grid and season, with `source` and `period` tags. Illustrative roof-albedo assumptions are not measurements. |
-| `municipal_sensor_observations` | Optional research scope | `data/research/sensors/<dataset_id>/` | Not an MVP dependency. Import only through `scripts/import_point_sensors.py` with station coordinates, timestamps, units, calibration references, license, QA, and checksum provenance. No verified dataset is currently present and no citywide interpolation is permitted. |
+| `municipal_sensor_observations` | Future scope (optional research) | `data/raw/sensors/observations.csv` | Not an MVP dependency. Import only through `scripts/import_point_sensors.py` with station coordinates, timestamps, units, calibration references, license, QA, and checksum provenance. No verified dataset is currently present and no citywide interpolation is permitted. |
 
 The USGS identifies the accepted Landsat product and dataset DOI and states there are no use restrictions: <https://www.usgs.gov/landsat-missions/landsat-collection-2-level-2-science-products>. Sentinel data use is governed by the free, full and open Copernicus legal notice: <https://dataspace.copernicus.eu/terms-and-conditions>. ESA WorldCover publishes its v200 DOI and CC BY 4.0 terms: <https://esa-worldcover.org/en/data-access>. WorldPop also publishes CC BY 4.0 terms: <https://www.worldpop.org/faq/>. OSM extracts require ODbL attribution: <https://www.openstreetmap.org/copyright>.
 
@@ -38,7 +40,7 @@ For every acquired source, replace the pending values in `data/source_manifest.j
 PowerShell examples from the repository root:
 
 ```powershell
-Set-Location 'D:\green plus ai\GreenPulse-AI'
+# Run from your GreenPulse-AI checkout.
 
 # File digest (prefix the displayed hash with "sha256:" and lowercase it in the manifest).
 (Get-FileHash -Algorithm SHA256 .\data\raw\osm\roads.geojson).Hash.ToLower()
@@ -47,7 +49,7 @@ Set-Location 'D:\green plus ai\GreenPulse-AI'
 .\.venv\Scripts\python.exe -c "from pathlib import Path; from backend.app.data_intake.manifest import sha256_path; print(sha256_path(Path('data/raw/landsat')))"
 ```
 
-Do not commit the large source data. The repository's `.gitignore` already excludes `data/raw/*` and generated `data/processed/*`; the manifest remains reviewable.
+Selected Landsat `.TIF` files are already tracked with Git LFS and their MTL files are tracked directly. Other raw and generated files follow `.gitignore`; do not infer version-control coverage from directory names. The manifest remains the verification record.
 
 ## Validate before processing
 
@@ -58,7 +60,7 @@ Install the existing geospatial/data requirements, then run the gate:
 .\.venv\Scripts\python.exe .\scripts\validate_data_manifest.py
 ```
 
-Exit code `0` and `PASS` mean every required MVP source is verified, present, checksum-matched, and internally consistent. Exit code `2` means processing must stop. Each error is prefixed with its manifest source ID and field, for example `worldpop.local_path` or `landsat_lst_scenes.checksum`. Optional/future omissions are warnings unless marked `verified`.
+Exit code `0` and `PASS` mean every required MVP source is verified, present, checksum-matched, and internally consistent. Exit code `2` means processing must stop. Each error is prefixed with its manifest source ID and field, for example `worldpop.local_path` or `landsat_lst_scenes.checksum`. Pending reporting/optional/future omissions are warnings unless marked `verified`. This full-inventory gate is broader than the five-source heat-map preflight; a full-manifest FAIL does not identify every error as a first-profile blocker.
 
 For CI or another program:
 
