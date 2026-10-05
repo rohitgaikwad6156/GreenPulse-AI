@@ -8,6 +8,12 @@ The repository implements the FastAPI, React, real-data intake, geospatial proce
 
 CI validates software behavior using synthetic test fixtures and does not imply that production climate datasets or model results are complete. See [software CI](docs/ci.md) for checks and local commands.
 
+## Project health check
+
+On Windows, run `.\scripts\project_health.ps1` from the repository root for
+software checks, source readiness, production blockers and artifact acceptance.
+See [project health](docs/project_health.md) for status and exit-code meanings.
+
 ## Current project status
 
 Status reviewed: **2026-10-05**. Based on the current manifest, local files, source audits and check-only heat-map preflight.

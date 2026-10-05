@@ -95,7 +95,8 @@ pointers and no production WorldPop, Sentinel, ML grid or model. A clean `npm ci
 17 frontend tests and the production build passed; tracked snapshot files were
 unchanged. YAML syntax/structure and whitespace were checked locally.
 
-This is not a recorded GitHub Actions success: the workflow has not been committed,
-pushed or executed on GitHub during preparation. Linux runtime behavior still needs
-its first hosted run. Dependency resolution is a compatibility check, not Linux test
-execution; unpinned transitive Python dependencies may resolve differently later.
+The workflow is tracked on `main`; the local preparation results above do not
+establish the status of any hosted GitHub Actions run. Dependency resolution is
+a compatibility check, not Linux test execution; unpinned transitive Python
+dependencies may resolve differently later. For a current local software and
+source-status check on Windows, use [project health](project_health.md).
