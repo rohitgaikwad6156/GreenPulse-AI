@@ -9,9 +9,10 @@ from fastapi import HTTPException
 
 from backend.app.main import ClimatePlanRequest, climate_action_plan
 from backend.app.optimizer.milp_optimizer import (
-    OptimizerDataUnavailableError, optimize_actions, optimize_catalog,
+    OptimizerDataUnavailableError,
+    optimize_actions,
+    optimize_catalog,
 )
-
 
 ROOT = Path(__file__).resolve().parents[1]
 

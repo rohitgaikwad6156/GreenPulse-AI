@@ -15,7 +15,6 @@ import numpy as np
 import pandas as pd
 from pyproj import Transformer
 
-
 SEED = 20260917
 GRID_SIZE = 60
 CELL_SIZE_M = 30

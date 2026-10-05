@@ -7,7 +7,6 @@ import json
 import math
 from collections import defaultdict
 from functools import lru_cache
-from pathlib import Path
 
 import joblib
 import numpy as np
@@ -19,8 +18,10 @@ from backend.app.api import services
 from backend.app.geospatial.ml_dataset import load_wards
 from backend.app.ml.heat_hazard import score_from_model_metadata
 from backend.app.ml.shap_explain import _shap_values, feature_category
-from backend.app.ml.uncertainty import UncertaintyUnavailableError, spatial_cv_rmse_from_metadata
-
+from backend.app.ml.uncertainty import (
+    UncertaintyUnavailableError,
+    spatial_cv_rmse_from_metadata,
+)
 
 BOUNDARY = services.ROOT / "data" / "boundaries" / "pmc_pcmc_wards.geojson"
 MAX_VIEW_CELLS = 2500

@@ -31,7 +31,6 @@ from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from shapely.ops import transform as transform_geometry
 from shapely.ops import unary_union
 
-
 TARGET_CRS = "EPSG:32643"
 PIXEL_SIZE_M = 30
 OUTPUT_NODATA = -9999.0

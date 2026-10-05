@@ -13,7 +13,6 @@ from pathlib import Path
 
 from backend.app.schemas.api import DidRequest
 
-
 DEMO_PATH = Path(__file__).resolve().parents[3] / "data" / "demo" / "validation_scenario.json"
 
 

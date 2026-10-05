@@ -9,7 +9,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from backend.app.research.sensors import SensorEvidenceError, import_sensor_observations  # noqa: E402
+from backend.app.research.sensors import (  # noqa: E402
+    SensorEvidenceError,
+    import_sensor_observations,
+)
 
 
 def main() -> int:

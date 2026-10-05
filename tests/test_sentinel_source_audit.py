@@ -10,7 +10,6 @@ from rasterio.transform import from_origin
 
 from scripts.audit_sentinel_sources import audit_product
 
-
 PRODUCT_ID = "S2A_MSIL2A_20250314T052649_N0511_R105_T43QCA_20250314T095315"
 ITEM = {"product_id": PRODUCT_ID, "acquisition_datetime": "2025-03-14T05:26:49.024Z", "mgrs_tile": "MGRS-43QCA"}
 

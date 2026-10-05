@@ -8,7 +8,6 @@ from pathlib import Path
 
 from backend.app.optimizer.catalog import CATALOG_COLUMNS, build_intervention_catalog
 
-
 ROOT = Path(__file__).resolve().parents[1]
 ASSUMPTIONS = ROOT / "data" / "demo" / "intervention_catalog_assumptions.json"
 UNCERTAINTY = ROOT / "backend" / "app" / "ml" / "uncertainty_assumptions.json"

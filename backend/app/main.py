@@ -4,12 +4,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from .config import APP_NAME, CORS_ORIGINS
-from .api.routes import router as greenpulse_router
 from .api.map_routes import router as map_router
+from .api.routes import router as greenpulse_router
+from .config import APP_NAME, CORS_ORIGINS
 from .schemas.api import HealthResponse
-from .simulation.config import cool_roof_assumptions_from_env, tree_canopy_assumptions_from_env
-
+from .simulation.config import (
+    cool_roof_assumptions_from_env,
+    tree_canopy_assumptions_from_env,
+)
 
 app = FastAPI(title=APP_NAME)
 app.add_middleware(
@@ -58,7 +60,10 @@ class ClimatePlanRequest(BaseModel):
 @app.post("/api/optimizer/plan")
 def climate_action_plan(request: ClimatePlanRequest) -> dict:
     """Optimize discrete actions after location-specific benefits/capacities exist."""
-    from .optimizer.milp_optimizer import OptimizerDataUnavailableError, optimize_location_catalog
+    from .optimizer.milp_optimizer import (
+        OptimizerDataUnavailableError,
+        optimize_location_catalog,
+    )
 
     catalog = Path(__file__).resolve().parents[2] / "data" / "interventions" / "location_catalog.json"
     try:
@@ -102,7 +107,10 @@ def tree_canopy_config() -> dict:
 def tree_canopy_scenario(request: TreeCanopyRequest) -> dict:
     """Re-predict a selected real grid cell with changed canopy features."""
     from .ml.uncertainty import UncertaintyUnavailableError, add_uncertainty_to_scenario
-    from .simulation.tree_canopy import SimulationUnavailableError, simulate_saved_grid_cell
+    from .simulation.tree_canopy import (
+        SimulationUnavailableError,
+        simulate_saved_grid_cell,
+    )
 
     try:
         paths = _scenario_paths()

@@ -10,9 +10,14 @@ from pyproj import Transformer
 from rasterio.transform import from_origin
 
 from scripts.audit_landsat_extremes import (
-    HOT_SCENE, audit_scene, cluster_summary, extract_neighborhood,
-    percentile_from_histogram, pixel_coordinates, run_audit,
-    threshold_counts, write_reports,
+    HOT_SCENE,
+    cluster_summary,
+    extract_neighborhood,
+    percentile_from_histogram,
+    pixel_coordinates,
+    run_audit,
+    threshold_counts,
+    write_reports,
 )
 
 

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import math
 import os
 import platform
 import tempfile
@@ -24,7 +23,12 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeRegressor
 
-from backend.app.ml.spatial_cv import SpatialBlockCV, load_cv_assignment, sha256_file, summarize_blocks
+from backend.app.ml.spatial_cv import (
+    SpatialBlockCV,
+    load_cv_assignment,
+    sha256_file,
+    summarize_blocks,
+)
 
 TARGET = "lst_c"
 RANDOM_STATE = 42

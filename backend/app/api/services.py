@@ -7,7 +7,6 @@ import math
 from collections import Counter
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[3]
 GRID = ROOT / "data" / "processed" / "greenpulse_ml_grid.parquet"
 GRID_METADATA = ROOT / "data" / "processed" / "metadata.json"
@@ -194,6 +193,7 @@ def predict_grid_cell(grid_id: str) -> dict:
     if not all(path.is_file() for path in (GRID, GRID_METADATA, MODEL, MODEL_METADATA)):
         raise DataUnavailableError("Real ML grid, trained model, and matching metadata are required")
     import numpy as np
+
     from backend.app.simulation.tree_canopy import load_saved_grid_cell
     try:
         model, names, features, metadata = load_saved_grid_cell(GRID, MODEL, MODEL_METADATA, grid_id)

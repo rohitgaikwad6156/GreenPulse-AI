@@ -1,14 +1,21 @@
 """Read-only evidence summary; never validates large rasters or changes source state."""
 from __future__ import annotations
 
+import json
+import re
 from collections import Counter
 from datetime import datetime, timezone
-import json
 from pathlib import Path
-import re
 
 from scripts.build_heat_map_pipeline import SOURCE_IDS
-from .audit_viewer import audit_template, decorate_audit, evidence_chains, DISCLAIMER, UNCHANGED
+
+from .audit_viewer import (
+    DISCLAIMER,
+    UNCHANGED,
+    audit_template,
+    decorate_audit,
+    evidence_chains,
+)
 
 ROOT = Path(__file__).resolve().parents[3]
 DOCS = "https://github.com/rohitgaikwad6156/GreenPulse-AI/blob/main/docs/"

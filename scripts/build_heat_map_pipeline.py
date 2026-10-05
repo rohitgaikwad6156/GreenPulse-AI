@@ -6,18 +6,21 @@ XGBoost trainer. Production files are replaced only after every stage succeeds.
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
 import json
 import os
-from pathlib import Path
 import shutil
 import sys
 import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from backend.app.data_intake.manifest import validate_manifest, verified_ward_path
+from backend.app.data_intake.manifest import (  # noqa: E402 - ROOT must be on sys.path first
+    validate_manifest,
+    verified_ward_path,
+)
 
 SOURCE_IDS = {"municipal_boundary", "landsat_lst_scenes",
               "sentinel2_l2a_scenes", "esa_worldcover", "osm_roads"}
@@ -98,13 +101,14 @@ def run_pipeline(root: Path, manifest: Path, year: int, trials: int = 8, jobs: i
     if not check["ok"]:
         raise ValueError("Source preflight failed:\n" + "\n".join(check["errors"]))
     sources = check["sources"]
-    source_path = lambda name: root / sources[name]["local_path"]
+    def source_path(name):
+        return root / sources[name]["local_path"]
     from backend.app.geospatial import landsat_lst as landsat
     from backend.app.geospatial import sentinel2_indices as sentinel
     from backend.app.geospatial import urban_morphology as morphology
     from backend.app.geospatial.ml_dataset import build_ml_dataset
-    from backend.app.ml.spatial_cv import build_cv_artifacts
     from backend.app.ml.baselines import evaluate_baselines
+    from backend.app.ml.spatial_cv import build_cv_artifacts
     from backend.app.ml.xgboost_lst import train_xgboost_lst
 
     scratch = root / "data" / "interim"

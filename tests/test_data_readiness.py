@@ -3,10 +3,11 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from backend.app.data_intake.readiness import readiness, CATALOG
-from backend.app.main import app
+
 from backend.app.api import services
 from backend.app.api.readiness_status import artifact_statuses, readiness_status
+from backend.app.data_intake.readiness import CATALOG, readiness
+from backend.app.main import app
 
 
 def write(root, name, value):
@@ -246,7 +247,8 @@ def test_extreme_allowlist_and_disclaimers(evidence):
 ])
 def test_impossible_audit_counts_unavailable(evidence, patch):
     path = evidence / 'data/provenance/landsat_quality_audit_2025.json'
-    raw = json.loads(path.read_text()); raw['summary'].update(patch)
+    raw = json.loads(path.read_text())
+    raw['summary'].update(patch)
     write(evidence, 'data/provenance/landsat_quality_audit_2025.json', raw)
     assert readiness(evidence)['audit_trail'][0]['status'] == 'unavailable'
 
@@ -255,10 +257,14 @@ def test_impossible_audit_counts_unavailable(evidence, patch):
 def test_malformed_extremes_unavailable(evidence, fault):
     path = evidence / 'data/provenance/landsat_extreme_audit_2025.json'
     raw = json.loads(path.read_text())
-    if fault == 'missing': raw.pop('scenes')
-    elif fault == 'nan': raw['scenes'][0]['statistics_celsius']['maximum'] = float('nan')
-    elif fault == 'clusters': raw['scenes'][0]['clusters']['above_80']['cluster_count'] = 20
-    else: raw['scenes'][0]['product_id'] = r'C:\private\wrong'
+    if fault == 'missing':
+        raw.pop('scenes')
+    elif fault == 'nan':
+        raw['scenes'][0]['statistics_celsius']['maximum'] = float('nan')
+    elif fault == 'clusters':
+        raw['scenes'][0]['clusters']['above_80']['cluster_count'] = 20
+    else:
+        raw['scenes'][0]['product_id'] = r'C:\private\wrong'
     write(evidence, 'data/provenance/landsat_extreme_audit_2025.json', raw)
     audit = readiness(evidence)['audit_trail'][2]
     assert audit['status'] == 'unavailable' and audit['diagnostics'] == []
@@ -266,7 +272,8 @@ def test_malformed_extremes_unavailable(evidence, fault):
 
 def test_sentinel_existing_but_invalid_sources_require_review(evidence):
     path = evidence / 'data/provenance/sentinel_quality_audit_2025.json'
-    raw = json.loads(path.read_text()); raw.update(safe_directories_found=6, required_file_slots_found=30)
+    raw = json.loads(path.read_text())
+    raw.update(safe_directories_found=6, required_file_slots_found=30)
     write(evidence, 'data/provenance/sentinel_quality_audit_2025.json', raw)
     assert readiness(evidence)['audit_trail'][3]['status'] == 'review'
 
@@ -280,7 +287,8 @@ def test_chain_never_infers_production_completion(evidence):
 
 
 def test_api_never_opens_rasters(evidence, monkeypatch):
-    path = evidence / 'data/raw/scene.TIF'; path.write_bytes(b'x' * 2048)
+    path = evidence / 'data/raw/scene.TIF'
+    path.write_bytes(b'x' * 2048)
     manifest = json.loads((evidence / 'data/source_manifest.json').read_text())
     manifest['sources'][0]['local_path'] = 'data/raw/scene.TIF'
     write(evidence, 'data/source_manifest.json', manifest)

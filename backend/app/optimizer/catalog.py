@@ -11,7 +11,6 @@ from pathlib import Path
 
 from backend.app.ml.uncertainty import load_uncertainty_assumptions
 
-
 CATALOG_COLUMNS = (
     "catalog_label", "intervention_id", "name", "unit_type", "block_size",
     "capital_cost_inr", "annual_maintenance_inr", "ground_area_required_m2",

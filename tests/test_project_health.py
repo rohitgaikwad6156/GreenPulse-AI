@@ -5,7 +5,6 @@ from pathlib import Path
 from scripts.build_heat_map_pipeline import SOURCE_IDS
 from scripts.project_health import CHECKS, collect_health, software_status
 
-
 PASSING = {key: "PASS" for key in CHECKS}
 
 
@@ -97,6 +96,9 @@ def test_missing_readiness_is_unknown(tmp_path):
 
 def test_failed_or_skipped_software_checks_are_not_ready(tmp_path):
     assert software_status(PASSING) == "READY"
+    assert software_status({**PASSING, "python_lint": "FAIL"}) == "NOT READY"
+    assert software_status({**PASSING, "frontend_eslint": "FAIL"}) == "NOT READY"
+    assert software_status({**PASSING, "frontend_format": "NOT RUN"}) == "NOT READY"
     assert software_status({**PASSING, "frontend_tests": "FAIL"}) == "NOT READY"
     assert software_status({**PASSING, "python_tests": "NOT RUN"}) == "NOT READY"
     assert software_status(None) == "NOT READY"

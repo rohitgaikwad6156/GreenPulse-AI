@@ -9,7 +9,9 @@ from datetime import date
 from pathlib import Path
 
 from backend.app.optimizer.location_catalog import (
-    CatalogEvidenceError, actions_for_location, list_planning_locations,
+    CatalogEvidenceError,
+    actions_for_location,
+    list_planning_locations,
     load_location_catalog,
 )
 from backend.app.optimizer.milp_optimizer import optimize_location_catalog

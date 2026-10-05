@@ -24,7 +24,6 @@ from xgboost import XGBRegressor
 from backend.app.api import map_data, services
 from backend.app.main import app
 
-
 FEATURES = [
     "ndvi", "ndbi", "tree_canopy_pct", "built_pct", "albedo",
     "road_density", "ndvi_mean_3x3", "ndvi_mean_5x5",

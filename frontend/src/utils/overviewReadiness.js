@@ -4,9 +4,11 @@ export function validOverviewReadiness(data) {
   const artifacts = data?.artifacts;
   const gate = data?.first_heat_map;
   return !!(
-    artifacts && gate &&
-    ["real_ml_grid", "trained_xgboost_model", "planning_evidence", "field_validation"]
-      .every((key) => artifactStatuses.has(artifacts[key])) &&
+    artifacts &&
+    gate &&
+    ["real_ml_grid", "trained_xgboost_model", "planning_evidence", "field_validation"].every((key) =>
+      artifactStatuses.has(artifacts[key]),
+    ) &&
     ["source_ready", "blocked", "unknown"].includes(data.production_data) &&
     Array.isArray(data.blockers) &&
     (data.production_data === "unknown"
@@ -22,15 +24,19 @@ export function validOverviewReadiness(data) {
 }
 
 export function artifactLabel(status) {
-  return ({ ready: "Evidence present", staged: "Evidence staged",
-    pending: "Awaiting evidence", blocked: "Inputs needed" })[status] || "Not checked";
+  return (
+    { ready: "Evidence present", staged: "Evidence staged", pending: "Awaiting evidence", blocked: "Inputs needed" }[
+      status
+    ] || "Not checked"
+  );
 }
 
 export function sourceGateMessage(data) {
   if (!data) return "Source readiness could not be checked.";
   const gate = data.first_heat_map;
   if (data.production_data === "unknown") return "Source readiness is unknown. Review the evidence warnings.";
-  if (gate.ready) return `${gate.required_sources_ready}/${gate.required_sources_total} required source groups ready. Production preflight is still required.`;
+  if (gate.ready)
+    return `${gate.required_sources_ready}/${gate.required_sources_total} required source groups ready. Production preflight is still required.`;
   const count = gate.blocker_count;
   return `${gate.required_sources_ready}/${gate.required_sources_total} required source groups ready · ${count} ${count === 1 ? "blocker" : "blockers"} remaining.`;
 }

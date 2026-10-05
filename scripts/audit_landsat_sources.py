@@ -12,7 +12,6 @@ from pathlib import Path
 
 import rasterio
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data" / "raw" / "landsat"
 PROVENANCE = ROOT / "data" / "provenance"

@@ -8,7 +8,6 @@ from rasterio.transform import from_origin
 
 from scripts import audit_landsat_sources as audit
 
-
 PRODUCT_ID = "LC08_L2SP_147047_20250302_20250311_02_T1"
 
 

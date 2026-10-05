@@ -5,12 +5,16 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts.audit_sentinel_sources import (  # noqa: E402
-    BANDS, SOURCE, backend_band_matches, band_candidates, load_selected_items, product_fields,
+    BANDS,
+    SOURCE,
+    backend_band_matches,
+    band_candidates,
+    load_selected_items,
+    product_fields,
 )
 
 

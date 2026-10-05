@@ -12,6 +12,17 @@ if (-not (Test-Path -LiteralPath (Join-Path $frontend "node_modules") -PathType 
 
 Push-Location $projectRoot
 try {
+    & $python -m ruff check backend scripts tests
+    if ($LASTEXITCODE -ne 0) { throw "Python Ruff lint failed with exit code $LASTEXITCODE." }
+    Push-Location $frontend
+    try {
+        & npm.cmd run lint:eslint
+        if ($LASTEXITCODE -ne 0) { throw "Frontend ESLint failed with exit code $LASTEXITCODE." }
+        & npm.cmd run format:check
+        if ($LASTEXITCODE -ne 0) { throw "Frontend Prettier check failed with exit code $LASTEXITCODE." }
+    }
+    finally { Pop-Location }
+
     & $python -m pytest tests -q
     if ($LASTEXITCODE -ne 0) { throw "Python test suite failed with exit code $LASTEXITCODE." }
     Push-Location $frontend
@@ -25,4 +36,4 @@ try {
 }
 finally { Pop-Location }
 
-Write-Host "GreenPulse automated checks passed: Python tests, frontend unit tests, and frontend build."
+Write-Host "GreenPulse automated checks passed: Ruff, ESLint, Prettier check, Python tests, frontend unit tests, and frontend build."

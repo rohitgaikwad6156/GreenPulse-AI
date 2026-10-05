@@ -13,10 +13,12 @@ from fastapi.testclient import TestClient
 from backend.app.api import services
 from backend.app.main import app
 from backend.app.validation.workflow import (
-    ValidationEvidenceError, analyze_validation_dataset,
-    approve_calibration_report, import_validation_dataset, list_imported_datasets,
+    ValidationEvidenceError,
+    analyze_validation_dataset,
+    approve_calibration_report,
+    import_validation_dataset,
+    list_imported_datasets,
 )
-
 
 PERIODS = [
     {"period_id": "PRE-1", "phase": "pre", "acquisition_date": "2023-03-15",
@@ -41,7 +43,9 @@ def fixture(root: Path, *, contaminated: bool = False, failed_trends: bool = Fal
                  ("C2", 60 if contaminated else 1000, 100)]
     grid = root / "grid.csv"
     with grid.open("w", encoding="utf-8", newline="") as stream:
-        writer = csv.writer(stream); writer.writerow(["grid_id", "x", "y"]); writer.writerows(grid_rows)
+        writer = csv.writer(stream)
+        writer.writerow(["grid_id", "x", "y"])
+        writer.writerows(grid_rows)
     values = {
         "T1": [35, 35 if failed_trends else 34, 30],
         "T2": [36, 36 if failed_trends else 35, 31],
@@ -61,7 +65,9 @@ def fixture(root: Path, *, contaminated: bool = False, failed_trends: bool = Fal
         rows.append(dict(rows[0]))
     observations = root / "observations.csv"
     with observations.open("w", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
     manifest = {
         "schema_version": "1.0", "dataset_id": "SYNTHETIC_VALIDATION",
         "dataset_version": "synthetic-v1", "evidence_label": "SYNTHETIC TEST FIXTURE",
@@ -91,7 +97,8 @@ def fixture(root: Path, *, contaminated: bool = False, failed_trends: bool = Fal
 class ValidationWorkflowTests(unittest.TestCase):
     def test_synthetic_fixture_import_analysis_and_residuals(self):
         with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp); manifest, observations, grid = fixture(root)
+            root = Path(temp)
+            manifest, observations, grid = fixture(root)
             imported = import_validation_dataset(
                 manifest, observations, grid, root / "imported", allow_synthetic=True)
             self.assertEqual(imported, import_validation_dataset(
@@ -113,7 +120,8 @@ class ValidationWorkflowTests(unittest.TestCase):
 
     def test_mismatched_season_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp); manifest, observations, grid = fixture(root)
+            root = Path(temp)
+            manifest, observations, grid = fixture(root)
             data = json.loads(manifest.read_text(encoding="utf-8"))
             data["periods"][1]["season"] = "June-August"
             manifest.write_text(json.dumps(data), encoding="utf-8")
@@ -130,7 +138,8 @@ class ValidationWorkflowTests(unittest.TestCase):
 
     def test_failed_parallel_trends_blocks_calibration(self):
         with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp); manifest, observations, grid = fixture(root, failed_trends=True)
+            root = Path(temp)
+            manifest, observations, grid = fixture(root, failed_trends=True)
             imported = import_validation_dataset(manifest, observations, grid, root / "imported", allow_synthetic=True)
             report = analyze_validation_dataset(imported)
             self.assertFalse(report["parallel_trends"]["passed"])
@@ -139,7 +148,8 @@ class ValidationWorkflowTests(unittest.TestCase):
 
     def test_controls_inside_spillover_distance_are_flagged(self):
         with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp); manifest, observations, grid = fixture(root, contaminated=True)
+            root = Path(temp)
+            manifest, observations, grid = fixture(root, contaminated=True)
             imported = import_validation_dataset(manifest, observations, grid, root / "imported", allow_synthetic=True)
             report = analyze_validation_dataset(imported)
             self.assertFalse(report["control_diagnostics"]["passed"])
@@ -148,8 +158,10 @@ class ValidationWorkflowTests(unittest.TestCase):
 
     def test_api_returns_versioned_blocked_report_for_synthetic_import(self):
         with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp); manifest, observations, grid = fixture(root)
-            imports = root / "imported"; reports = root / "reports"
+            root = Path(temp)
+            manifest, observations, grid = fixture(root)
+            imports = root / "imported"
+            reports = root / "reports"
             import_validation_dataset(manifest, observations, grid, imports, allow_synthetic=True)
             with patch.object(services, "VALIDATION_IMPORTS", imports), patch.object(services, "VALIDATION_REPORTS", reports):
                 with TestClient(app) as client:

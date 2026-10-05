@@ -83,15 +83,18 @@ def main() -> int:
     parser.add_argument("--pmc-wards", required=True, type=Path)
     parser.add_argument("--pcmc-wards", required=True, type=Path)
     parser.add_argument("--provenance", required=True, type=Path)
-    parser.add_argument("--pmc-id-field", required=True); parser.add_argument("--pmc-name-field", required=True)
-    parser.add_argument("--pcmc-id-field", required=True); parser.add_argument("--pcmc-name-field", required=True)
+    parser.add_argument("--pmc-id-field", required=True)
+    parser.add_argument("--pmc-name-field", required=True)
+    parser.add_argument("--pcmc-id-field", required=True)
+    parser.add_argument("--pcmc-name-field", required=True)
     args = parser.parse_args()
     result = import_boundaries(args.pmc_wards, args.pcmc_wards, args.provenance,
                                pmc_id=args.pmc_id_field, pmc_name=args.pmc_name_field,
                                pcmc_id=args.pcmc_id_field, pcmc_name=args.pcmc_name_field,
                                output_dir=ROOT / "data" / "boundaries")
     print("Imported verified boundary files:")
-    for path in result.values(): print(path)
+    for path in result.values():
+        print(path)
     return 0
 
 

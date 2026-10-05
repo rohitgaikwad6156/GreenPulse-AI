@@ -14,9 +14,10 @@ from xgboost import XGBRegressor
 
 from backend.app.simulation.config import TreeCanopyAssumptions
 from backend.app.simulation.tree_canopy import (
-    SimulationUnavailableError, simulate_saved_grid_cell, simulate_tree_canopy,
+    SimulationUnavailableError,
+    simulate_saved_grid_cell,
+    simulate_tree_canopy,
 )
-
 
 NAMES = ["ndvi", "tree_canopy_pct", "ndvi_mean_3x3", "ndvi_mean_5x5", "ndbi"]
 

@@ -2,27 +2,34 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { modelReadinessPresentation } from "./modelReadiness.js";
 
-const ids = ["landsat_lst_scenes", "esa_worldcover", "osm_roads",
-  "sentinel2_l2a_scenes", "municipal_boundary"];
+const ids = ["landsat_lst_scenes", "esa_worldcover", "osm_roads", "sentinel2_l2a_scenes", "municipal_boundary"];
 
 function fixture(readyCount = 3, grid = "blocked", model = "blocked") {
   const required_sources = ids.map((id, index) => ({
-    id, name: id, ready: index < readyCount,
+    id,
+    name: id,
+    ready: index < readyCount,
     reason: index < readyCount ? null : "Source verification is pending.",
   }));
   return {
     production_data: readyCount === ids.length ? "source_ready" : "blocked",
-    first_heat_map: { ready: readyCount === ids.length,
-      required_sources_ready: readyCount, required_sources_total: ids.length,
-      blocker_count: ids.length - readyCount },
+    first_heat_map: {
+      ready: readyCount === ids.length,
+      required_sources_ready: readyCount,
+      required_sources_total: ids.length,
+      blocker_count: ids.length - readyCount,
+    },
     required_sources,
-    blockers: required_sources.filter((source) => !source.ready)
+    blockers: required_sources
+      .filter((source) => !source.ready)
       .map(({ id, name }) => ({ id, name, reason: "Pending" })),
     sources: ids.map((id) => ({ id, next_action: `Prepare ${id}` })),
     source_status: Object.fromEntries([
       ...ids.map((id, index) => [id, index < readyCount ? "verified" : "pending"]),
-      ["ward_boundaries", "pending"], ["worldpop", "verified"],
-      ["pmc_outline", "pending"], ["pcmc_outline", "staged"],
+      ["ward_boundaries", "pending"],
+      ["worldpop", "verified"],
+      ["pmc_outline", "pending"],
+      ["pcmc_outline", "staged"],
     ]),
     artifacts: { real_ml_grid: grid, trained_xgboost_model: model },
   };
@@ -52,8 +59,7 @@ test("four of five and five of five update without changing UI membership", () =
 });
 
 test("grid readiness cannot promote a blocked model; both accepted artifacts enable model view", () => {
-  assert.equal(modelReadinessPresentation({ data: fixture(5, "ready", "blocked") }).state,
-    "WAITING_FOR_BUILD");
+  assert.equal(modelReadinessPresentation({ data: fixture(5, "ready", "blocked") }).state, "WAITING_FOR_BUILD");
   const ready = fixture(5, "ready", "ready");
   assert.equal(modelReadinessPresentation({ data: ready }).state, "READY");
   ready.source_status.ward_boundaries = "pending";

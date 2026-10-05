@@ -14,7 +14,13 @@ from pydantic import ValidationError
 
 from backend.app.api import routes, services
 from backend.app.main import app, health_check
-from backend.app.schemas.api import DidRequest, ExplainRequest, GridIdRequest, OptimizeRequest, SimulateRequest
+from backend.app.schemas.api import (
+    DidRequest,
+    ExplainRequest,
+    GridIdRequest,
+    OptimizeRequest,
+    SimulateRequest,
+)
 
 
 class ApiTests(unittest.TestCase):

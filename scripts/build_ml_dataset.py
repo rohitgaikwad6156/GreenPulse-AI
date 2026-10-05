@@ -7,8 +7,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from backend.app.geospatial.ml_dataset import build_ml_dataset  # noqa: E402
 from backend.app.data_intake.manifest import verified_ward_path  # noqa: E402
+from backend.app.geospatial.ml_dataset import build_ml_dataset  # noqa: E402
 
 
 def main() -> int:

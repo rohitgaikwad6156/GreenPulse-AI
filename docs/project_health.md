@@ -6,16 +6,17 @@ Run this command from the repository root in Windows PowerShell:
 .\scripts\project_health.ps1
 ```
 
-The default run executes the complete local Python test suite with
-`.venv\Scripts\python.exe -m pytest tests -q`, then `npm test` and `npm run build`
-in `frontend`, and `git diff --check` from the repository root. These are the
+The default run checks Ruff, ESLint and Prettier formatting, then executes the
+complete local Python test suite with `.venv\Scripts\python.exe -m pytest tests -q`,
+`npm test` and `npm run build` in `frontend`, and `git diff --check` from the
+repository root. These are the
 software checks used by the existing `test_full_system.ps1` and CI workflow,
 with the local diff check added. The repository check also inspects staged changes
 and the latest commit, following CI's whitespace gate. Numeric library thread
 limits and the headless
 Matplotlib backend match CI. It does not call GitHub Actions or install packages.
 
-The command checks for virtualenv Python, npm, the frontend directory and its
+The command checks for virtualenv Python and Ruff, npm, the frontend directory and its
 installed Vite dependency, and Git. Missing tools mark their dependent checks
 **NOT RUN** with a reason. Each check runs independently, so a Python failure
 does not prevent the frontend checks or final report. Successful checks have
@@ -27,7 +28,7 @@ Run the indicated command directly for its complete failure log.
 | Section | Meaning |
 | --- | --- |
 | Environment | Local tools and dependencies needed for the full check. |
-| Software | Actual outcomes for Python tests, frontend tests, build and diff check. |
+| Software | Actual outcomes for Ruff, ESLint, Prettier check, Python tests, frontend tests, build and diff check. |
 | Data evidence | Statuses projected from `readiness()` and its validated audit trail. |
 | Production | First heat-map source gate, accepted ML grid and accepted XGBoost model. |
 | Summary | Independent software and production outcomes. |
@@ -54,7 +55,7 @@ validation, the report displays **INVALID / REVIEW**.
 
 **Software READY does not mean production climate data is complete.**
 **Production data being pending does not mean the software test suite failed.**
-The command exits **0** only after all four software checks pass and the
+The command exits **0** only after all seven software checks pass and the
 health helper succeeds, even when production sources are still pending. It
 exits **1** for a failed or unrun software check, missing essential environment,
 or an unusable health helper. It does not return a nonzero code solely because

@@ -10,26 +10,59 @@ credentials, uses no repository secrets, and does not deploy, push or upload dat
 | Job ID | GitHub check name | Purpose |
 | --- | --- | --- |
 | `repository-checks` | Repository checks | Working-tree whitespace plus the latest commit diff (full PR diff against the target parent for PR merge checkouts) |
+| `quality` | Code quality | Ruff, ESLint and check-only Prettier before test jobs |
 | `python-tests` | Python tests | Source-audit fixtures followed by every remaining Python test |
 | `frontend` | Frontend tests & build | Lockfile installation, frontend unit tests and Vite production compilation |
 
-All jobs run on `ubuntu-24.04`. Software failures are blocking. There are no
+All jobs run on `ubuntu-24.04`. `quality` needs `repository-checks`; both test
+jobs need `quality`, and the frontend build follows its tests. Ruff is installed
+from the pinned test requirements with `--no-deps`, so quality checks do not
+install the scientific runtime stack. Frontend quality uses `npm ci`. ESLint
+and Prettier only check files; CI never formats the checkout. Software failures
+are blocking. There are no
 non-blocking test steps. Concurrency cancels superseded runs on the same ref.
 Python and frontend jobs finish with `git diff --check` and `git diff --exit-code HEAD`,
 even after a failed step. These detect changes to tracked files without failing on
 ignored caches, temporary fixtures or `frontend/dist`.
 
-Python **3.14** matches the documented project interpreter. The unchanged pinned
-requirements resolve to compatible CPython 3.14 Linux wheels in a pip dry run.
+Python **3.14** matches the documented project interpreter. The scientific
+requirement pins resolve to compatible CPython 3.14 Linux wheels in a pip dry run.
 Node **24 LTS** satisfies Vite 8's declared `^20.19.0 || >=22.12.0` engine range.
 See the [Node release schedule](https://nodejs.org/en/about/previous-releases).
 
 A single pip invocation installs the SHAP chain, optimizer and test requirements.
 The SHAP chain already includes XGBoost, ML, data and base requirements; pip resolves
-the shared dependencies once. No project pins were changed. Setup-python caches
+the shared dependencies once. Scientific/runtime pins are unchanged; Ruff is a
+test-only requirement. Setup-python caches
 pip downloads using all `backend/requirements*.txt` files as the cache input.
-The existing tracked `frontend/package-lock.json` supports `npm ci`; setup-node
-caches npm downloads keyed by that lockfile. No new lockfile was generated.
+The tracked `frontend/package-lock.json` supports `npm ci`; setup-node caches
+npm downloads keyed by that lockfile.
+
+## Code-quality policy
+
+- Ruff 0.16.10 checks Python under `backend/`, `scripts/` and `tests/` with
+  Python 3.14 syntax. `E4`, `E7`, `E9`, `F` and `I` catch import placement/order,
+  syntax and common correctness issues. The one `E402` exception in the heat-map
+  build script is necessary because it inserts the repository root into
+  `sys.path` before importing the backend. The `B` set was evaluated but deferred:
+  25 existing `zip` calls need a behavior review before enforcing explicit
+  strictness. Ruff does not format Python in this workflow.
+- ESLint 9.39.5 uses a flat config with browser globals for application files
+  and Node globals for tests and configuration. Core recommended rules catch
+  undefined and unused names, unreachable code and duplicate cases; React
+  rules account for JSX imports, Hook use/dependencies and refresh exports.
+  ESLint 9 matches the current React plugin peer range; an ESLint 10 upgrade
+  should follow plugin compatibility review.
+- Prettier 3.9.9 checks `App`, shared components, services, utilities and their
+  tests, plus the entry point and frontend configuration. Large route pages and
+  the stylesheet are outside this first formatting baseline: formatting them
+  would add several thousand unrelated line changes. ESLint still checks every
+  JS/JSX file, including those pages. `npm run format` is a local write command;
+  CI runs `format:check` only.
+
+Tool defaults exclude dependency, build, virtualenv, cache, data, model and
+temporary directories. No satellite rasters or generated provenance reports
+are linted.
 
 ## Dataset independence
 
@@ -74,9 +107,11 @@ From an environment with Python 3.14 and Node 24:
 ```sh
 python -m pip install -r backend/requirements-shap.txt -r backend/requirements-optimizer.txt -r backend/requirements-test.txt
 python -m pip check
+python -m ruff check backend scripts tests
 python -m pytest tests -q
 cd frontend
 npm ci
+npm run lint
 npm test
 npm run build
 cd ..
@@ -88,15 +123,12 @@ headless, bounded test execution. The PowerShell helper
 [`test_full_system.ps1`](../scripts/test_full_system.ps1) remains available locally;
 the Linux workflow uses portable commands directly.
 
-Local preparation used Python 3.14.7 and Node 24.19.0 on Windows. Dedicated source
-audit tests passed (35 tests); the complete source-only suite passed (178 tests and
-24 subtests, 144 dependency deprecation warnings). The snapshot contained LFS
-pointers and no production WorldPop, Sentinel, ML grid or model. A clean `npm ci`,
-17 frontend tests and the production build passed; tracked snapshot files were
-unchanged. YAML syntax/structure and whitespace were checked locally.
-
-The workflow is tracked on `main`; the local preparation results above do not
-establish the status of any hosted GitHub Actions run. Dependency resolution is
-a compatibility check, not Linux test execution; unpinned transitive Python
-dependencies may resolve differently later. For a current local software and
+Local verification used Python 3.14.7 and Node 24.19.0 on Windows. A clean
+`npm ci`, Ruff, ESLint, Prettier check, 217 Python tests with 24 subtests,
+39 frontend tests and the production build passed. The Python suite emitted
+144 dependency deprecation warnings. The project-health command reported all
+seven software checks PASS while the production source gate remained pending.
+YAML syntax/dependencies and `git diff --check` were checked locally. These
+results do not establish the status of a hosted GitHub Actions run; Linux and
+unpinned transitive dependencies may differ. For a current local software and
 source-status check on Windows, use [project health](project_health.md).

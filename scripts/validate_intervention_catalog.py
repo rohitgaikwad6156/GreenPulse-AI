@@ -10,7 +10,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from backend.app.optimizer.location_catalog import CatalogEvidenceError, list_planning_locations  # noqa: E402
+from backend.app.optimizer.location_catalog import (  # noqa: E402
+    CatalogEvidenceError,
+    list_planning_locations,
+)
 
 
 def main() -> int:

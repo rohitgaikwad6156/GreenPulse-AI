@@ -10,8 +10,11 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from backend.app.ml.spatial_cv import (
-    SpatialBlockCV, assign_spatial_blocks, build_cv_artifacts,
-    make_spatial_folds, summarize_blocks,
+    SpatialBlockCV,
+    assign_spatial_blocks,
+    build_cv_artifacts,
+    make_spatial_folds,
+    summarize_blocks,
 )
 
 

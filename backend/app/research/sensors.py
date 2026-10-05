@@ -13,7 +13,6 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA_VERSION = "1.0"
 VARIABLES = {"air_temperature_c", "relative_humidity_pct", "aqi"}
 REQUIRED_COLUMNS = {"observation_id", "station_id", "timestamp_utc", "latitude", "longitude", "qa_status"}
@@ -58,7 +57,9 @@ def _atomic_json(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent,
                                      prefix=path.name, suffix=".tmp", delete=False) as stream:
-        temporary = Path(stream.name); json.dump(value, stream, indent=2); stream.write("\n")
+        temporary = Path(stream.name)
+        json.dump(value, stream, indent=2)
+        stream.write("\n")
     try:
         os.replace(temporary, path)
     finally:
@@ -123,7 +124,8 @@ def _validate_manifest(document: dict, observations: Path) -> tuple[dict[str, di
             if field not in station:
                 raise SensorEvidenceError(f"{station_id}: {field} is required")
         try:
-            latitude = float(station["latitude"]); longitude = float(station["longitude"])
+            latitude = float(station["latitude"])
+            longitude = float(station["longitude"])
             height = float(station["measurement_height_m"])
         except (TypeError, ValueError) as exc:
             raise SensorEvidenceError(f"{station_id}: invalid coordinates or measurement height") from exc
@@ -148,7 +150,9 @@ def import_sensor_observations(manifest_path: Path, observations_path: Path,
     if not observations_path.is_file():
         raise SensorEvidenceError(f"Sensor observations are missing: {observations_path}")
     stations, variables = _validate_manifest(document, observations_path)
-    seen = set(); rows = []; latest = None
+    seen = set()
+    rows = []
+    latest = None
     with observations_path.open(encoding="utf-8-sig", newline="") as stream:
         reader = csv.DictReader(stream)
         missing = sorted((REQUIRED_COLUMNS | variables) - set(reader.fieldnames or []))
@@ -165,7 +169,8 @@ def import_sensor_observations(manifest_path: Path, observations_path: Path,
                 raise SensorEvidenceError(f"{observation_id}: only QA-valid observations may be imported")
             timestamp = _utc(raw.get("timestamp_utc"), f"{observation_id}.timestamp_utc")
             try:
-                latitude = float(raw["latitude"]); longitude = float(raw["longitude"])
+                latitude = float(raw["latitude"])
+                longitude = float(raw["longitude"])
             except (TypeError, ValueError) as exc:
                 raise SensorEvidenceError(f"{observation_id}: invalid coordinates") from exc
             station = stations[station_id]
@@ -189,7 +194,8 @@ def import_sensor_observations(manifest_path: Path, observations_path: Path,
             rows.append({"observation_id": observation_id, "station_id": station_id,
                          "timestamp_utc": timestamp.isoformat(), "latitude": latitude,
                          "longitude": longitude, **values})
-            seen.add(observation_id); latest = timestamp if latest is None or timestamp > latest else latest
+            seen.add(observation_id)
+            latest = timestamp if latest is None or timestamp > latest else latest
     if not rows:
         raise SensorEvidenceError("Sensor CSV contains no observations")
     dataset_id = document["dataset_id"]
@@ -241,11 +247,14 @@ def sensor_status(root: Path, source_manifest: Path, *, reference_time: datetime
                 "wall_to_wall_interpolation": False,
                 "message": "No verified point-sensor dataset is locally available."}
     now = (reference_time or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    summaries = []; statuses = []
+    summaries = []
+    statuses = []
     for manifest, rows in datasets:
         timestamps = [_utc(row["timestamp_utc"], "timestamp_utc") for row in rows]
-        latest = max(timestamps); age_hours = (now - latest).total_seconds() / 3600
-        scope_start = date.fromisoformat(scope["start"]); scope_end = date.fromisoformat(scope["end"])
+        latest = max(timestamps)
+        age_hours = (now - latest).total_seconds() / 3600
+        scope_start = date.fromisoformat(scope["start"])
+        scope_end = date.fromisoformat(scope["end"])
         matched = sum(scope_start <= stamp.date() <= scope_end for stamp in timestamps)
         sparse = int(manifest["station_count"]) < int(manifest["minimum_station_count_for_context"])
         stale = age_hours > float(manifest["freshness_threshold_hours"])
@@ -270,7 +279,8 @@ def sensor_status(root: Path, source_manifest: Path, *, reference_time: datetime
 def _distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     radius = 6_371_008.8
     p1, p2 = math.radians(lat1), math.radians(lat2)
-    dp = p2 - p1; dl = math.radians(lon2 - lon1)
+    dp = p2 - p1
+    dl = math.radians(lon2 - lon1)
     a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
     return 2 * radius * math.asin(math.sqrt(a))
 

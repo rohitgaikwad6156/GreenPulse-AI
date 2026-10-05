@@ -17,7 +17,6 @@ from typing import Any
 
 from pyproj import CRS
 
-
 CONTRACT_VERSION = "1.0"
 REQUIRED_SOURCE_IDS = {
     "municipal_boundary",
@@ -192,7 +191,9 @@ def _check_product_specific(source: dict[str, Any], path: Path, start: date | No
                 _check_raster(raster, declared_crs, resolution, source_id, report)
         if source_id == "esa_worldcover":
             try:
-                from backend.app.geospatial.urban_morphology import discover_worldcover_tiles
+                from backend.app.geospatial.urban_morphology import (
+                    discover_worldcover_tiles,
+                )
                 discover_worldcover_tiles(path)
             except ValueError as exc:
                 _error(report, source_id, "local_path", str(exc))

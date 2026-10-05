@@ -1,7 +1,15 @@
 import { ArrowUpRight, DatabaseZap } from "lucide-react";
 import PageIntro from "./PageIntro.jsx";
 
-export default function PlaceholderPage({ eyebrow, title, description, icon: Icon, emptyTitle, emptyDescription, plannedItems }) {
+export default function PlaceholderPage({
+  eyebrow,
+  title,
+  description,
+  icon: Icon,
+  emptyTitle,
+  emptyDescription,
+  plannedItems,
+}) {
   return (
     <>
       <PageIntro eyebrow={eyebrow} title={title} description={description} />
@@ -9,7 +17,9 @@ export default function PlaceholderPage({ eyebrow, title, description, icon: Ico
         <section className="overflow-hidden rounded-2xl border border-[#e4ebe3] bg-white shadow-[0_2px_14px_rgba(27,58,39,0.035)]">
           <div className="flex items-center justify-between border-b border-[#edf1ec] px-5 py-4 sm:px-6">
             <h2 className="text-sm font-semibold text-[#2b4834]">{title} workspace</h2>
-            <span className="rounded-full bg-[#f1f5ef] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#798e7b]">Awaiting data</span>
+            <span className="rounded-full bg-[#f1f5ef] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#798e7b]">
+              Awaiting data
+            </span>
           </div>
           <div className="spatial-grid flex min-h-[430px] flex-col items-center justify-center px-6 py-12 text-center sm:min-h-[520px]">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#dce9dd] bg-white text-[#4e875f] shadow-sm">
@@ -26,7 +36,9 @@ export default function PlaceholderPage({ eyebrow, title, description, icon: Ico
               <DatabaseZap size={18} strokeWidth={1.8} aria-hidden="true" />
               <h2 className="text-sm font-semibold text-[#294532]">Connection status</h2>
             </div>
-            <p className="mt-3 text-xs leading-5 text-[#7a8a7e]">This page is ready for a verified data connection. No measurements or model results are shown yet.</p>
+            <p className="mt-3 text-xs leading-5 text-[#7a8a7e]">
+              This page is ready for a verified data connection. No measurements or model results are shown yet.
+            </p>
             <div className="mt-5 flex items-center gap-2 border-t border-[#edf1ec] pt-4 text-xs font-medium text-[#9a8051]">
               <span className="h-2 w-2 rounded-full bg-[#cfb477]" />
               Source not connected

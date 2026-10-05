@@ -10,7 +10,6 @@ from rasterio.transform import from_origin
 
 from scripts.audit_landsat_processing import audit_scene, run_audit, write_reports
 
-
 PRODUCT_ID = "LC08_L2SP_147047_20250302_20250311_02_T1"
 MULTIPLIER = 0.00341802
 OFFSET = 149.0

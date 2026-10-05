@@ -30,7 +30,11 @@ from sklearn.model_selection import GroupKFold
 from xgboost import XGBRegressor
 
 from backend.app.ml.baselines import _read_ml_inputs, regression_metrics
-from backend.app.ml.spatial_cv import SpatialBlockCV, load_cv_assignment, summarize_blocks
+from backend.app.ml.spatial_cv import (
+    SpatialBlockCV,
+    load_cv_assignment,
+    summarize_blocks,
+)
 
 DEFAULT_TRIALS = 8
 DEFAULT_INNER_FOLDS = 3

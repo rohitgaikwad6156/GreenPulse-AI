@@ -13,7 +13,6 @@ from collections.abc import Iterable
 import numpy as np
 from shapely.geometry import MultiPolygon, Point, Polygon
 
-
 EPSILON = 1e-8
 
 

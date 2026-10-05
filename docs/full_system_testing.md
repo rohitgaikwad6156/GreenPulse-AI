@@ -14,13 +14,14 @@ dependencies in the existing virtual environment:
 .\.venv\Scripts\python.exe -m pip install -r backend\requirements-test.txt
 ```
 
-Then run the Python suite, frontend unit tests, and production build:
+Then run Ruff, ESLint, the check-only Prettier baseline, the Python suite,
+frontend unit tests, and production build:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\test_full_system.ps1
 ```
 
-Expected final message: `GreenPulse automated checks passed: Python tests, frontend unit tests, and frontend build.`
+Expected final message: `GreenPulse automated checks passed: Ruff, ESLint, Prettier check, Python tests, frontend unit tests, and frontend build.`
 The script exits with an error if either command fails. The build checks that
 the React application compiles; the manual checklist below checks interaction
 and presentation.

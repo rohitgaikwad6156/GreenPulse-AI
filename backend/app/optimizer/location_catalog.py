@@ -9,7 +9,6 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA_VERSION = "1.0"
 ALLOWED_EVIDENCE = {
     "municipal_tender", "schedule_of_rates", "published_study",

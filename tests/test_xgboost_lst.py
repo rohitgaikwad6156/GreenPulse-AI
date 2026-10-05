@@ -1,7 +1,7 @@
 """All model tests use ARTIFICIAL TEST FIXTURES in temporary directories."""
 
-import json
 import hashlib
+import json
 import math
 import tempfile
 import unittest

@@ -16,14 +16,12 @@ from pyproj import Transformer
 from rasterio.windows import Window
 from scipy import ndimage
 
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from backend.app.geospatial.landsat_lst import parse_mtl, qa_valid_mask  # noqa: E402
 from scripts.audit_landsat_processing import _check_grid  # noqa: E402
 from scripts.audit_landsat_sources import EXPECTED_IDS  # noqa: E402
-
 
 SOURCE = ROOT / "data" / "raw" / "landsat"
 JSON_REPORT = ROOT / "data" / "provenance" / "landsat_extreme_audit_2025.json"

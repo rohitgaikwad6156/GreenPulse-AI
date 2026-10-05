@@ -5,9 +5,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.acquire_real_sources import _validate_download
 from scripts.import_municipal_boundaries import import_boundaries
 from scripts.import_municipal_outlines import import_outlines
-from scripts.acquire_real_sources import _validate_download
 
 
 def _geojson(offset: float, id_key="number", name_key="label"):
@@ -57,9 +57,12 @@ class BoundaryImportTests(unittest.TestCase):
     def test_rejects_pdf_and_missing_provenance(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            pdf = root / "ward-map.pdf"; pdf.write_bytes(b"%PDF SYNTHETIC TEST")
-            geo = root / "pcmc.geojson"; geo.write_text(json.dumps(_geojson(.1)), encoding="utf-8")
-            provenance = root / "provenance.json"; provenance.write_text("{}", encoding="utf-8")
+            pdf = root / "ward-map.pdf"
+            pdf.write_bytes(b"%PDF SYNTHETIC TEST")
+            geo = root / "pcmc.geojson"
+            geo.write_text(json.dumps(_geojson(.1)), encoding="utf-8")
+            provenance = root / "provenance.json"
+            provenance.write_text("{}", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "provenance must contain"):
                 import_boundaries(pdf, geo, provenance, pmc_id="number", pmc_name="label",
                                   pcmc_id="number", pcmc_name="label", output_dir=root / "out")

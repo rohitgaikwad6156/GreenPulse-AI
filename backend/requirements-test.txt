@@ -1,3 +1,4 @@
-# Development-only dependencies for HTTP and Python test execution.
+# Development-only dependencies for HTTP tests, Python tests, and lint.
 pytest==9.1.1
 httpx2==2.13.0
+ruff==0.16.10

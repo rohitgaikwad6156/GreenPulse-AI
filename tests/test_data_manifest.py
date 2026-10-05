@@ -8,8 +8,8 @@ from pathlib import Path
 
 from backend.app.data_intake.manifest import (
     ALL_SOURCE_IDS,
-    REQUIRED_SOURCE_IDS,
     REPORTING_SOURCE_IDS,
+    REQUIRED_SOURCE_IDS,
     validate_manifest,
 )
 

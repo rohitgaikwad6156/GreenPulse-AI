@@ -11,7 +11,9 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from backend.app.ml.heat_hazard import (
-    derive_heat_hazard_references, heat_hazard_score, score_from_model_metadata,
+    derive_heat_hazard_references,
+    heat_hazard_score,
+    score_from_model_metadata,
 )
 
 

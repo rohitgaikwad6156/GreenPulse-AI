@@ -32,7 +32,11 @@ from shapely.geometry import MultiPolygon, Polygon, mapping, shape
 from shapely.ops import transform as transform_geometry
 
 from backend.app.geospatial.features import focal_mean
-from backend.app.geospatial.landsat_lst import TARGET_CRS, load_municipal_boundary, target_grid
+from backend.app.geospatial.landsat_lst import (
+    TARGET_CRS,
+    load_municipal_boundary,
+    target_grid,
+)
 
 REQUIRED_RASTERS = {
     "lst_c": "data/processed/lst_pune_30m.tif",

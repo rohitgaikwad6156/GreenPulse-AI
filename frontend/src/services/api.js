@@ -58,8 +58,7 @@ export async function getMapWardDetail(wardId, signal) {
 }
 
 export async function explainGridCell(gridId, signal) {
-  const response = await api.post("/api/explain", { grid_id: gridId, sample_size: 2000 },
-    { signal, timeout: 120000 });
+  const response = await api.post("/api/explain", { grid_id: gridId, sample_size: 2000 }, { signal, timeout: 120000 });
   return response.data;
 }
 
@@ -94,8 +93,11 @@ export async function getValidationDatasets(signal) {
 }
 
 export async function analyzeValidationDataset(datasetId, signal) {
-  const response = await api.post(`/api/validation/analyze/${encodeURIComponent(datasetId)}`, {},
-    { signal, timeout: 120000 });
+  const response = await api.post(
+    `/api/validation/analyze/${encodeURIComponent(datasetId)}`,
+    {},
+    { signal, timeout: 120000 },
+  );
   return response.data;
 }
 
@@ -125,6 +127,6 @@ export async function getNearbySensorContext(params, signal) {
 }
 
 export async function getReadiness(signal) {
-  const response = await api.get('/api/readiness', { signal });
+  const response = await api.get("/api/readiness", { signal });
   return response.data;
 }

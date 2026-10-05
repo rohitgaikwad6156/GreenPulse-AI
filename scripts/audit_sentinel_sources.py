@@ -14,12 +14,10 @@ from xml.etree import ElementTree
 
 import rasterio
 
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from backend.app.geospatial.sentinel2_indices import read_boa_calibration  # noqa: E402
-
 
 DISCOVERY = ROOT / "data" / "provenance" / "discovery_2025.json"
 SOURCE = ROOT / "data" / "raw" / "sentinel2"

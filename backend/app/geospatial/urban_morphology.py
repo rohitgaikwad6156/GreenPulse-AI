@@ -19,11 +19,21 @@ from affine import Affine
 from pyproj import Geod, Transformer
 from rasterio.enums import Resampling
 from rasterio.vrt import WarpedVRT
-from rasterio.windows import Window, from_bounds, transform as window_transform
 from rasterio.warp import reproject, transform_bounds
-from shapely import distance as geometry_distance, points as geometry_points
-from shapely.geometry import LineString, MultiLineString, MultiPolygon, Polygon, box, shape
-from shapely.ops import transform as transform_geometry, unary_union
+from rasterio.windows import Window, from_bounds
+from rasterio.windows import transform as window_transform
+from shapely import distance as geometry_distance
+from shapely import points as geometry_points
+from shapely.geometry import (
+    LineString,
+    MultiLineString,
+    MultiPolygon,
+    Polygon,
+    box,
+    shape,
+)
+from shapely.ops import transform as transform_geometry
+from shapely.ops import unary_union
 from shapely.strtree import STRtree
 
 from backend.app.geospatial.landsat_lst import OUTPUT_NODATA, TARGET_CRS

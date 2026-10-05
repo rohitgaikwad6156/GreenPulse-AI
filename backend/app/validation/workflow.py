@@ -17,7 +17,6 @@ from typing import Any
 import numpy as np
 from scipy import stats
 
-
 SCHEMA_VERSION = "1.0"
 REPORT_VERSION = "1.0"
 REAL_LABEL = "REAL INTERVENTION OBSERVATIONS"
@@ -251,7 +250,9 @@ def import_validation_dataset(manifest_path: Path, observations_path: Path, grid
             if grid_id not in grid:
                 raise ValidationEvidenceError(f"Grid cell is absent from the verified reference grid: {grid_id}")
             try:
-                lst = float(raw["lst_c"]); x = float(raw["x"]); y = float(raw["y"])
+                lst = float(raw["lst_c"])
+                x = float(raw["x"])
+                y = float(raw["y"])
             except (TypeError, ValueError) as exc:
                 raise ValidationEvidenceError(f"row {line}: LST/x/y must be numeric") from exc
             if not all(math.isfinite(item) for item in (lst, x, y)) or not -100 <= lst <= 100:
@@ -267,7 +268,9 @@ def import_validation_dataset(manifest_path: Path, observations_path: Path, grid
                      "ndvi": None if ndvi == "" else float(ndvi)}
             if clean["ndvi"] is not None and not -1 <= clean["ndvi"] <= 1:
                 raise ValidationEvidenceError(f"{grid_id}/{period_id}: NDVI must be within -1 to 1")
-            rows.append(clean); groups[grid_id] = group; cells[grid_id][period_id] = group
+            rows.append(clean)
+            groups[grid_id] = group
+            cells[grid_id][period_id] = group
     if not rows or "treated" not in groups.values() or "control" not in groups.values():
         raise ValidationEvidenceError("At least one treated and one control cell are required")
     for grid_id, observed in cells.items():
@@ -372,7 +375,8 @@ def analyze_validation_dataset(dataset_dir: Path, *, output_path: Path | None = 
         for period in periods} for group in group_ids}
     treated_pre = [period_means["treated"][item] for item in pre_ids]
     control_pre = [period_means["control"][item] for item in pre_ids]
-    treated_slope = _slope(treated_pre); control_slope = _slope(control_pre)
+    treated_slope = _slope(treated_pre)
+    control_slope = _slope(control_pre)
     slope_difference = treated_slope - control_slope
     threshold = float(manifest["parallel_trends_max_abs_slope_difference_c_per_period"])
     parallel = {"pre_period_count": len(pre_ids), "treated_slope_c_per_period": treated_slope,

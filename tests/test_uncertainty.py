@@ -7,8 +7,10 @@ import unittest
 from pathlib import Path
 
 from backend.app.ml.uncertainty import (
-    UncertaintyUnavailableError, add_uncertainty_to_scenario,
-    estimate_cooling_uncertainty, load_uncertainty_assumptions,
+    UncertaintyUnavailableError,
+    add_uncertainty_to_scenario,
+    estimate_cooling_uncertainty,
+    load_uncertainty_assumptions,
     spatial_cv_rmse_from_metadata,
 )
 

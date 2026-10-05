@@ -14,6 +14,7 @@ import { getMapCellDetail, getMapWardDetail, getMapWards, getReadiness, getVisib
 const COLORS = ["#397d85", "#77a7a2", "#d9d18a", "#e3975b", "#ad4e42"];
 const TILE_URL = import.meta.env.VITE_MAP_TILE_URL?.trim() || "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const initial = { status: "loading", data: null, message: "" };
+const EMPTY_FEATURES = [];
 
 function failure(error) {
   const unavailable = error?.response?.status === 503;
@@ -194,7 +195,7 @@ export default function HeatMap() {
   const detailed = modelReady && season === "dataset" && view !== "wards" && viewport?.zoom >= 16 && cellHeat.status === "ready";
   const metricLabel = metric === "predicted_lst_c" ? "LST" : metric === "heat_hazard_score" ? "Heat Hazard" : "Confidence · spatial CV RMSE";
   const unit = metric === "heat_hazard_score" ? " / 100" : "°C";
-  const activeFeatures = modelReady && season === "dataset" ? (detailed ? cellHeat.data?.features : wardHeat.data?.features) || [] : [];
+  const activeFeatures = modelReady && season === "dataset" ? (detailed ? cellHeat.data?.features : wardHeat.data?.features) || EMPTY_FEATURES : EMPTY_FEATURES;
   const range = useMemo(() => {
     const values = activeFeatures.map((item) => item.properties[metric]).filter(Number.isFinite);
     return values.length ? { min: Math.min(...values), max: Math.max(...values) } : null;

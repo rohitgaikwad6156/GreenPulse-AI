@@ -14,9 +14,11 @@ from xgboost import XGBRegressor
 
 from backend.app.simulation.config import CoolRoofAssumptions
 from backend.app.simulation.cool_roof import (
-    simulate_combined, simulate_cool_roof, simulate_saved_combined, simulate_saved_cool_roof,
+    simulate_combined,
+    simulate_cool_roof,
+    simulate_saved_combined,
+    simulate_saved_cool_roof,
 )
-
 
 NAMES = ["ndvi", "tree_canopy_pct", "ndvi_mean_3x3", "ndvi_mean_5x5",
          "ndbi", "ndbi_mean_3x3", "ndbi_mean_5x5", "albedo", "roof_fraction"]

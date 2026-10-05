@@ -16,12 +16,14 @@ $env:MKL_NUM_THREADS = "1"
 $env:NUMBA_NUM_THREADS = "1"
 
 $pythonOk = Test-Path -LiteralPath $python -PathType Leaf
+$ruffOk = Test-Path -LiteralPath (Join-Path $projectRoot ".venv\Scripts\ruff.exe") -PathType Leaf
 $frontendOk = Test-Path -LiteralPath $frontend -PathType Container
 $dependenciesOk = $frontendOk -and (Test-Path -LiteralPath (Join-Path $frontend "node_modules\.bin\vite.cmd") -PathType Leaf)
 $npm = Get-Command npm.cmd -ErrorAction SilentlyContinue
 $git = Get-Command git.exe -ErrorAction SilentlyContinue
 $environment = [ordered]@{
     "Virtualenv Python" = $(if ($pythonOk) { "AVAILABLE" } else { "MISSING: .venv Python" })
+    "Ruff" = $(if ($ruffOk) { "AVAILABLE" } else { "MISSING: .venv Ruff" })
     "npm" = $(if ($npm) { "AVAILABLE" } else { "MISSING: npm.cmd" })
     "Frontend directory" = $(if ($frontendOk) { "AVAILABLE" } else { "MISSING: frontend directory" })
     "Frontend dependencies" = $(if ($dependenciesOk) { "AVAILABLE" } else { "MISSING: frontend/node_modules" })
@@ -73,6 +75,15 @@ function Invoke-RepositoryDiffCheck {
 }
 
 $results = [ordered]@{}
+$results.python_lint = if ($pythonOk -and $ruffOk) {
+    Invoke-HealthCheck $python @("-m", "ruff", "check", "backend", "scripts", "tests") $projectRoot
+} else { @{ status = "NOT RUN"; detail = ".venv Python or Ruff missing" } }
+$results.frontend_eslint = if ($npm -and $frontendOk -and $dependenciesOk) {
+    Invoke-HealthCheck $npm.Source @("run", "lint:eslint") $frontend
+} else { @{ status = "NOT RUN"; detail = "npm, frontend directory or dependencies missing" } }
+$results.frontend_format = if ($npm -and $frontendOk -and $dependenciesOk) {
+    Invoke-HealthCheck $npm.Source @("run", "format:check") $frontend
+} else { @{ status = "NOT RUN"; detail = "npm, frontend directory or dependencies missing" } }
 $results.python_tests = if ($pythonOk) {
     Invoke-HealthCheck $python @("-m", "pytest", "tests", "-q") $projectRoot
 } else { @{ status = "NOT RUN"; detail = ".venv Python missing" } }
@@ -114,6 +125,9 @@ foreach ($key in $environment.Keys) { Write-Output ("{0,-29} {1}" -f $key, $envi
 Write-Output ""
 Write-Output "SOFTWARE"
 foreach ($item in @(
+    @{key="python_lint"; label="Python Ruff"},
+    @{key="frontend_eslint"; label="Frontend ESLint"},
+    @{key="frontend_format"; label="Frontend format"},
     @{key="python_tests"; label="Backend / Python tests"},
     @{key="frontend_tests"; label="Frontend unit tests"},
     @{key="frontend_build"; label="Frontend production build"},

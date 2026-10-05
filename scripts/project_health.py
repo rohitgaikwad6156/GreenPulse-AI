@@ -6,8 +6,8 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Callable
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -16,7 +16,8 @@ from backend.app.data_intake.readiness import readiness
 from scripts.build_heat_map_pipeline import SOURCE_IDS
 
 ROOT = Path(__file__).resolve().parents[1]
-CHECKS = ("python_tests", "frontend_tests", "frontend_build", "repository_diff")
+CHECKS = ("python_lint", "frontend_eslint", "frontend_format", "python_tests",
+          "frontend_tests", "frontend_build", "repository_diff")
 AUDITS = {
     "landsat_source": "landsat_source_audit",
     "landsat_processing": "landsat_processing_audit",

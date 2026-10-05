@@ -14,7 +14,6 @@ from pathlib import Path
 import numpy as np
 from scipy.optimize import Bounds, LinearConstraint, milp
 
-
 DEFAULT_CONFIG = Path(__file__).with_name("objective_config.json")
 REQUIRED_FIELDS = (
     "intervention_id", "name", "unit_type", "block_size", "capital_cost_inr",
@@ -268,7 +267,10 @@ def optimize_location_catalog(catalog_path: Path, *, location_id: str,
                               priority_weights: dict[str, float] | None = None,
                               project_root: Path | None = None) -> dict:
     """Solve from one verified location; spatial capacities are never caller supplied."""
-    from backend.app.optimizer.location_catalog import CatalogEvidenceError, actions_for_location
+    from backend.app.optimizer.location_catalog import (
+        CatalogEvidenceError,
+        actions_for_location,
+    )
 
     try:
         location, rows = actions_for_location(

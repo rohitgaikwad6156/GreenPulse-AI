@@ -8,10 +8,18 @@ from pathlib import Path
 import numpy as np
 from xgboost import XGBRegressor
 
-from .config import (CoolRoofAssumptions, TreeCanopyAssumptions,
-                     cool_roof_assumptions_from_env, tree_canopy_assumptions_from_env)
-from .tree_canopy import (_resolve_capacity, assess_training_support,
-                          load_saved_grid_cell, simulate_tree_canopy)
+from .config import (
+    CoolRoofAssumptions,
+    TreeCanopyAssumptions,
+    cool_roof_assumptions_from_env,
+    tree_canopy_assumptions_from_env,
+)
+from .tree_canopy import (
+    _resolve_capacity,
+    assess_training_support,
+    load_saved_grid_cell,
+    simulate_tree_canopy,
+)
 
 
 def _roof_modified_features(feature_names: list[str], baseline_features: dict[str, float],

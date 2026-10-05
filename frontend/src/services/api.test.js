@@ -19,18 +19,26 @@ test("missing build-time API URL uses same-origin GET and POST endpoints", async
     await getGridCells({ limit: 6, offset: 2 });
     await simulateScenario({ grid_id: "test-cell" });
     assert.ok(requests.every((request) => !request.baseURL));
-    assert.deepEqual(requests.map((request) => request.url), ["/api/health", "/api/methodology", "/api/readiness", "/api/grid", "/api/simulate"]);
+    assert.deepEqual(
+      requests.map((request) => request.url),
+      ["/api/health", "/api/methodology", "/api/readiness", "/api/grid", "/api/simulate"],
+    );
     assert.deepEqual(requests[3].params, { limit: 6, offset: 2 });
     assert.equal(requests[4].method, "post");
     assert.equal(JSON.parse(requests[4].data).grid_id, "test-cell");
-  } finally { api.defaults.adapter = original; }
+  } finally {
+    api.defaults.adapter = original;
+  }
 });
 
 test("an HTML SPA fallback cannot masquerade as a healthy API", async () => {
   const original = api.defaults.adapter;
   api.defaults.adapter = async (config) => response(config, "<!doctype html><html></html>");
-  try { await assert.rejects(getBackendHealth(), /non-JSON/); }
-  finally { api.defaults.adapter = original; }
+  try {
+    await assert.rejects(getBackendHealth(), /non-JSON/);
+  } finally {
+    api.defaults.adapter = original;
+  }
 });
 
 test("the production API proxy precedes the frontend deep-link fallback", () => {

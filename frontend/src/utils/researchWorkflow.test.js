@@ -11,10 +11,17 @@ test("an empty catalog is not a usable optimizer location", () => {
 });
 test("map, SHAP and scenarios require both grid and model", () => {
   for (const status of [{ artifacts: { real_ml_grid: "ready" } }, { artifacts: { trained_xgboost_model: "ready" } }]) {
-    assert.ok(researchWorkflow(status).slice(0, 3).every((stage) => stage.state === "Inputs needed"));
+    assert.ok(
+      researchWorkflow(status)
+        .slice(0, 3)
+        .every((stage) => stage.state === "Inputs needed"),
+    );
   }
-  assert.ok(researchWorkflow({ artifacts: { real_ml_grid: "ready", trained_xgboost_model: "ready" } })
-    .slice(0, 3).every((stage) => stage.state === "Inputs present"));
+  assert.ok(
+    researchWorkflow({ artifacts: { real_ml_grid: "ready", trained_xgboost_model: "ready" } })
+      .slice(0, 3)
+      .every((stage) => stage.state === "Inputs present"),
+  );
 });
 test("field evidence is independent of model availability", () => {
   const stages = researchWorkflow({ artifacts: { real_ml_grid: "ready", trained_xgboost_model: "ready" } });

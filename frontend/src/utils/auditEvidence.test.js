@@ -30,10 +30,7 @@ test("bulk and extreme values format without clipping or replacing", () => {
 });
 test("scientific disclaimer and unchanged QA remain explicit", () => {
   assert.match(AUDIT_DISCLAIMER, /not Pune\/PMC\/PCMC temperature results/);
-  assert.match(
-    AUDIT_PRESERVATION,
-    /did not change production QA rules or alter source pixels/,
-  );
+  assert.match(AUDIT_PRESERVATION, /did not change production QA rules or alter source pixels/);
 });
 test("missing or unknown audit never implies a pass", () => {
   for (const value of [undefined, {}, { status: "invented", summary: [] }]) {

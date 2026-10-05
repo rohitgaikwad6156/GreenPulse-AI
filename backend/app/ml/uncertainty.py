@@ -10,7 +10,6 @@ import json
 import math
 from pathlib import Path
 
-
 DEFAULT_CONFIG_PATH = Path(__file__).with_name("uncertainty_assumptions.json")
 SUPPORTED_INTERVENTIONS = ("cool_roof", "tree_canopy", "green_roof", "cool_pavement")
 

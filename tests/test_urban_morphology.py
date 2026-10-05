@@ -13,8 +13,13 @@ from shapely.geometry import LineString, box, mapping
 from shapely.ops import transform as transform_geometry
 
 from backend.app.geospatial.urban_morphology import (
-    building_fraction_grid, discover_worldcover_tiles, green_distance_grid,
-    load_osm_geometries, road_density_grid, save_layers, worldcover_fractions,
+    building_fraction_grid,
+    discover_worldcover_tiles,
+    green_distance_grid,
+    load_osm_geometries,
+    road_density_grid,
+    save_layers,
+    worldcover_fractions,
     worldpop_density_grid,
 )
 

@@ -5,8 +5,7 @@ import { getBackendHealth } from "../services/api.js";
 const initialState = {
   kind: "loading",
   label: "Checking...",
-  detail:
-    "Connecting to the research service. Startup may take about a minute.",
+  detail: "Connecting to the research service. Startup may take about a minute.",
 };
 
 export default function BackendStatus() {
@@ -18,9 +17,7 @@ export default function BackendStatus() {
     getBackendHealth(controller.signal)
       .then((result) => {
         if (result?.status !== "ok") {
-          throw new Error(
-            "The backend returned an unexpected health response.",
-          );
+          throw new Error("The backend returned an unexpected health response.");
         }
         if (controller.signal.aborted) return;
         setState({
@@ -44,21 +41,13 @@ export default function BackendStatus() {
   }, []);
 
   const valueColor =
-    state.kind === "healthy"
-      ? "text-[#2f8050]"
-      : state.kind === "error"
-        ? "text-[#b05749]"
-        : "text-[#80652f]";
+    state.kind === "healthy" ? "text-[#2f8050]" : state.kind === "error" ? "text-[#b05749]" : "text-[#80652f]";
   return (
     <section className="readiness-item">
       <h3 className="flex items-center gap-2">
         <Activity size={15} aria-hidden="true" /> Service connection
       </h3>
-      <p
-        className={`readiness-value ${valueColor}`}
-        role="status"
-        aria-live="polite"
-      >
+      <p className={`readiness-value ${valueColor}`} role="status" aria-live="polite">
         {state.label}
       </p>
       <p className="readiness-detail">{state.detail}</p>

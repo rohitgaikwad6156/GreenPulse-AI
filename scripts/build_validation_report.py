@@ -9,7 +9,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from backend.app.validation.workflow import ValidationEvidenceError, analyze_validation_dataset  # noqa: E402
+from backend.app.validation.workflow import (  # noqa: E402
+    ValidationEvidenceError,
+    analyze_validation_dataset,
+)
 
 
 def main() -> int:

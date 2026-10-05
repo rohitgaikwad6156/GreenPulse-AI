@@ -3,16 +3,31 @@
 from __future__ import annotations
 
 from datetime import datetime
+
 from fastapi import APIRouter, HTTPException, Query
 
 from backend.app.api import services
 from backend.app.schemas.api import (
-    DidRequest, DidResponse, ExplainRequest, ExplainResponse, GridIdRequest,
-    GridResponse, MethodologyResponse, MetricsResponse, OptimizeRequest,
-    OptimizeResponse, OptimizerLocationsResponse, PredictResponse, SimulateRequest, SimulateResponse,
-    ProvenanceValidationResponse, ReadinessResponse, ValidationDatasetsResponse, WardResponse, WardsResponse,
+    DidRequest,
+    DidResponse,
+    ExplainRequest,
+    ExplainResponse,
+    GridIdRequest,
+    GridResponse,
+    MethodologyResponse,
+    MetricsResponse,
+    OptimizeRequest,
+    OptimizeResponse,
+    OptimizerLocationsResponse,
+    PredictResponse,
+    ProvenanceValidationResponse,
+    ReadinessResponse,
+    SimulateRequest,
+    SimulateResponse,
+    ValidationDatasetsResponse,
+    WardResponse,
+    WardsResponse,
 )
-
 
 router = APIRouter(prefix="/api", tags=["GreenPulse MVP"])
 
@@ -98,9 +113,18 @@ def post_explain(request: ExplainRequest) -> dict:
 @router.post("/simulate", response_model=SimulateResponse)
 def post_simulate(request: SimulateRequest) -> dict:
     """Run one XGBoost input-change scenario and attach approximate uncertainty."""
-    from backend.app.ml.uncertainty import UncertaintyUnavailableError, add_uncertainty_to_scenario
-    from backend.app.simulation.cool_roof import simulate_saved_combined, simulate_saved_cool_roof
-    from backend.app.simulation.tree_canopy import SimulationUnavailableError, simulate_saved_grid_cell
+    from backend.app.ml.uncertainty import (
+        UncertaintyUnavailableError,
+        add_uncertainty_to_scenario,
+    )
+    from backend.app.simulation.cool_roof import (
+        simulate_saved_combined,
+        simulate_saved_cool_roof,
+    )
+    from backend.app.simulation.tree_canopy import (
+        SimulationUnavailableError,
+        simulate_saved_grid_cell,
+    )
     paths = (services.GRID, services.MODEL, services.MODEL_METADATA)
     try:
         if request.scenario_type == "tree_canopy":
@@ -134,7 +158,10 @@ def post_simulate(request: SimulateRequest) -> dict:
 @router.post("/optimize", response_model=OptimizeResponse)
 def post_optimize(request: OptimizeRequest) -> dict:
     """Solve an integer-block plan only with completed location-specific inputs."""
-    from backend.app.optimizer.milp_optimizer import OptimizerDataUnavailableError, optimize_location_catalog
+    from backend.app.optimizer.milp_optimizer import (
+        OptimizerDataUnavailableError,
+        optimize_location_catalog,
+    )
     try:
         return optimize_location_catalog(
             services.CATALOG, project_root=services.ROOT, **request.model_dump())
@@ -160,7 +187,10 @@ def get_optimizer_config() -> dict:
             tags=["Climate action optimizer"])
 def get_optimizer_locations() -> dict:
     """List only evidence-complete locations that the optimizer can solve."""
-    from backend.app.optimizer.location_catalog import CatalogEvidenceError, list_planning_locations
+    from backend.app.optimizer.location_catalog import (
+        CatalogEvidenceError,
+        list_planning_locations,
+    )
     try:
         return list_planning_locations(services.CATALOG, project_root=services.ROOT)
     except CatalogEvidenceError as exc:
@@ -201,7 +231,10 @@ def post_validation_analysis(dataset_id: str) -> dict:
             or any(ch not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
                    for ch in dataset_id)):
         raise HTTPException(status_code=422, detail="dataset_id contains unsupported characters")
-    from backend.app.validation.workflow import ValidationEvidenceError, analyze_validation_dataset
+    from backend.app.validation.workflow import (
+        ValidationEvidenceError,
+        analyze_validation_dataset,
+    )
     dataset = services.VALIDATION_IMPORTS / dataset_id
     if not dataset.is_dir():
         raise HTTPException(status_code=404, detail=f"Imported validation dataset was not found: {dataset_id}")
