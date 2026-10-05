@@ -21,9 +21,27 @@ from backend.app.data_intake.manifest import (  # noqa: E402 - ROOT must be on s
     validate_manifest,
     verified_ward_path,
 )
+from backend.app.reproducibility import (  # noqa: E402 - ROOT must be on sys.path first
+    assert_git_unchanged,
+    build_pipeline_record,
+    build_reproducibility_snapshot,
+    collect_dependency_files,
+    collect_runtime_versions,
+    get_git_state,
+    hash_file,
+)
 
 SOURCE_IDS = {"municipal_boundary", "landsat_lst_scenes",
               "sentinel2_l2a_scenes", "esa_worldcover", "osm_roads"}
+SNAPSHOT_ARTIFACTS = {
+    "ml_grid": "data/processed/greenpulse_ml_grid.parquet",
+    "grid_metadata": "data/processed/metadata.json",
+    "spatial_cv_blocks": "data/processed/spatial_cv_blocks.parquet",
+    "spatial_cv_metadata": "data/processed/spatial_cv_metadata.json",
+    "baseline_metrics": "models/baseline_metrics.json",
+    "model": "models/xgboost_lst.joblib",
+}
+SNAPSHOT_PATH = "models/reproducibility_snapshot.json"
 
 
 def preflight(root: Path, manifest: Path, year: int) -> dict:
@@ -96,10 +114,15 @@ def _rewrite_paths(value, stage: Path, root: Path):
 def run_pipeline(root: Path, manifest: Path, year: int, trials: int = 8, jobs: int = 2) -> dict:
     if trials < 1 or jobs < 1:
         raise ValueError("trials and jobs must be positive")
+    git_start = get_git_state(root)
     print("1/7 Checking real source provenance, checksums and acquisition period", flush=True)
     check = preflight(root, manifest, year)
     if not check["ok"]:
         raise ValueError("Source preflight failed:\n" + "\n".join(check["errors"]))
+    pipeline_record = build_pipeline_record(root, manifest, year, trials, jobs)
+    manifest_start_hash = hash_file(manifest)
+    runtime_start = collect_runtime_versions()
+    dependencies_start = collect_dependency_files(root)
     sources = check["sources"]
     def source_path(name):
         return root / sources[name]["local_path"]
@@ -164,21 +187,44 @@ def run_pipeline(root: Path, manifest: Path, year: int, trials: int = 8, jobs: i
         evaluate_baselines(dataset, processed, models / "baseline_metrics.json", rf_jobs=jobs)
         model_report = train_xgboost_lst(dataset, processed, models / "baseline_metrics.json",
                                         models / "xgboost_lst.joblib", models / "model_metadata.json",
-                                        n_trials=trials, jobs=jobs)
+                                        n_trials=trials, jobs=jobs,
+                                        reproducibility_context={"git": git_start,
+                                                                 "pipeline": pipeline_record,
+                                                                 "snapshot_path": SNAPSHOT_PATH})
         model_report.update(data_classification="real", verified_sources=sources,
                             feature_profile="heat-map", pipeline="scripts/build_heat_map_pipeline.py")
         (models / "model_metadata.json").write_text(json.dumps(model_report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
-        print("7/7 Recheck sources and publish verified artifacts with backup", flush=True)
-        recheck = preflight(root, manifest, year)
-        if not recheck["ok"] or recheck.get("sources") != sources:
-            raise ValueError("Source files or manifest changed during processing; nothing published")
+        print("7/7 Finalize reproducibility evidence, recheck sources and publish", flush=True)
         for path in stage.rglob("*.json"):
             value = json.loads(path.read_text(encoding="utf-8"))
             path.write_text(json.dumps(_rewrite_paths(value, stage, root), indent=2, allow_nan=False) + "\n", encoding="utf-8")
+        snapshot = build_reproducibility_snapshot(
+            root, stage, manifest, git_start, pipeline_record, sources, SOURCE_IDS,
+            SNAPSHOT_ARTIFACTS, model_report, runtime=runtime_start,
+            dependency_identity=dependencies_start)
+        recheck = preflight(root, manifest, year)
+        if not recheck["ok"] or recheck.get("sources") != sources:
+            raise ValueError("Source files or manifest changed during processing; nothing published")
+        if hash_file(manifest) != manifest_start_hash:
+            raise ValueError("Source manifest changed during processing; nothing published")
+        if collect_dependency_files(root) != dependencies_start:
+            raise ValueError("Dependency files changed during processing; nothing published")
+        runtime_end = collect_runtime_versions()
+        if (runtime_end["python_version"] != runtime_start["python_version"]
+                or runtime_end["scientific_packages"] != runtime_start["scientific_packages"]):
+            raise ValueError("Python scientific environment changed during processing; nothing published")
+        assert_git_unchanged(git_start, get_git_state(root))
+        snapshot_file = stage / SNAPSHOT_PATH
+        snapshot_file.write_text(json.dumps(snapshot, indent=2, allow_nan=False) + "\n", encoding="utf-8")
         backup = _publish(stage, root)
     return {"status": "complete", "row_count": report["row_count"],
             "date_range": report["date_range"], "features": report["features"],
             "spatial_cv_metrics": model_report["spatial_cv_metrics"], "backup": str(backup),
+            "git_commit": git_start["commit"], "git_dirty": git_start["dirty"],
+            "reproducibility_status": snapshot["reproducibility_status"],
+            "dataset_version": model_report["dataset_version"],
+            "model_artifact_sha256": model_report["model_artifact_sha256"],
+            "reproducibility_snapshot": SNAPSHOT_PATH,
             "finished_at_utc": datetime.now(timezone.utc).isoformat()}
 
 

@@ -63,6 +63,8 @@ Landsat uses per-scene MTL multiplier and offset on `ST_B10`, rejects invalid pi
 
 The source verification state does not by itself certify a finished municipal raster or model table. See [morphology](urban_morphology_pipeline.md) and [ML dataset assembly](ml_dataset_pipeline.md).
 
+A future successful real build will copy the five preflight-verified source checksum records into a [versioned reproducibility snapshot](reproducibility.md), alongside the actual dataset, fold-map, baseline and model artifact hashes. No such accepted production snapshot exists yet.
+
 ## Known limitations and appropriate use
 
 This dataset is intended for research analysis of seasonal urban land-surface patterns at the municipal grid scale after the source gate passes. It is not a current heat event map or a measure of 2 m air temperature. Landsat thermal information is coarser than the analysis grid; the March–May median mixes dates rather than describing an instantaneous event. Sentinel and Landsat clear observations may occur on different days. Cloud/QA gaps and complete-case filtering may create spatially uneven coverage and selection bias. WorldCover predates the thermal season by four years, and the OSM roads snapshot is from 2026. Municipal boundary authority/version and ward GIS remain unresolved. Tree, built, road and optical features are proxies and correlations; they do not establish causal heat drivers.

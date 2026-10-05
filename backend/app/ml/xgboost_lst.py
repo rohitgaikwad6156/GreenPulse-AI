@@ -35,6 +35,7 @@ from backend.app.ml.spatial_cv import (
     load_cv_assignment,
     summarize_blocks,
 )
+from backend.app.reproducibility import assert_git_unchanged, get_git_state
 
 DEFAULT_TRIALS = 8
 DEFAULT_INNER_FOLDS = 3
@@ -166,7 +167,8 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
                       model_path: Path, metadata_path: Path,
                       n_trials: int = DEFAULT_TRIALS,
                       inner_folds: int = DEFAULT_INNER_FOLDS,
-                      jobs: int = 2) -> dict:
+                      jobs: int = 2,
+                      reproducibility_context: dict | None = None) -> dict:
     """Nested spatial evaluation, final spatial tuning, full-data fit, save.
 
     Outer folds are the saved Step 13 folds. Within each outer training set,
@@ -179,6 +181,8 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
             or isinstance(inner_folds, bool) or not isinstance(inner_folds, int) or inner_folds < 2
             or isinstance(jobs, bool) or not isinstance(jobs, int) or jobs < 1):
         raise ValueError("n_trials and jobs must be positive integers; inner_folds must be at least 2")
+    context = reproducibility_context or {}
+    git_state = context.get("git") or get_git_state(Path(__file__).resolve().parents[3])
     x, y, target, features, feature_names, dataset_metadata = _read_ml_inputs(
         dataset_path, dataset_path.with_name("metadata.json"))
     assignment = load_cv_assignment(x, y, dataset_path, cv_dir)
@@ -225,6 +229,13 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
         "target": "lst_c", "target_units": "degrees Celsius, land surface temperature",
         "feature_list": feature_names,
         "reproducibility_seed": SEED,
+        "git_commit": git_state["commit"], "git_dirty": git_state["dirty"],
+        "git_state": git_state["state"],
+        "git_reproducibility_note": (
+            "Commit alone does not reproduce working-tree modifications"
+            if git_state["dirty"] else
+            "Git identity unavailable; commit-level reproducibility is incomplete"
+            if git_state["state"] == "unavailable" else None),
         "training_date_utc": datetime.now(timezone.utc).isoformat(),
         "dataset_version": f"sha256:{dataset_hash}",
         "dataset_path": str(dataset_path), "dataset_date_range": dataset_metadata.get("date_range"),
@@ -272,6 +283,12 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
                                    "The complete-case input may overrepresent clear and well-mapped places.",
                                    "Outer metrics estimate the nested tuning procedure, not final full-data in-sample fit.",
                                    "LST is not pedestrian air temperature; this regression does not establish causal cooling effects."]}
+    if context.get("pipeline"):
+        report["pipeline"] = context["pipeline"]["script"]
+        report["pipeline_parameters"] = context["pipeline"]["resolved_parameters"]
+        report["pipeline_command"] = context["pipeline"]["command"]
+    if context.get("snapshot_path"):
+        report["reproducibility_snapshot"] = context["snapshot_path"]
     model_path.parent.mkdir(parents=True, exist_ok=True)
     metadata_path.parent.mkdir(parents=True, exist_ok=True)
     plot_path = model_path.with_name("xgboost_baseline_comparison.png")
@@ -287,6 +304,8 @@ def train_xgboost_lst(dataset_path: Path, cv_dir: Path, baseline_metrics_path: P
         probe = features[: min(5, len(features))]
         if not np.allclose(restored.predict(probe), final_model.predict(probe), rtol=0, atol=1e-6):
             raise ValueError("Saved XGBoost model failed reload/prediction verification")
+        if not context:
+            assert_git_unchanged(git_state, get_git_state(Path(__file__).resolve().parents[3]))
         temporary_metadata.write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
         _comparison_plot(summary, baselines, temporary_plot)
         os.replace(temporary_plot, plot_path)

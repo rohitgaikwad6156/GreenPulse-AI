@@ -109,8 +109,15 @@ The ranges below are implemented *search-space definitions*, not selected traine
 | Optuna trial budget | NOT AVAILABLE YET | `tuning.trials_per_outer_fold` and `tuning.final_full_dataset_trials` |
 | Actual study period | NOT AVAILABLE YET | `dataset_date_range` |
 | Spatial evaluation | NOT AVAILABLE YET | `outer_fold_results`, `spatial_cv_metrics`, `cv_mapping_path`, `block_size_m`, `outer_folds` |
+| Git commit and repository state | NOT AVAILABLE YET | `git_commit`, `git_dirty`, `git_state`, `git_reproducibility_note` |
+| Resolved pipeline command and parameters | NOT AVAILABLE YET | `pipeline_command`, `pipeline_parameters` |
+| Reproducibility snapshot | NOT AVAILABLE YET | `reproducibility_snapshot` → `models/reproducibility_snapshot.json` after a real full build |
+| Python and dependency identities | NOT AVAILABLE YET | Snapshot `runtime`, `dependency_identity.python_requirement_files` |
+| Frontend lockfile identity | NOT AVAILABLE YET | Snapshot `dependency_identity.frontend_package_lock`; optional for model generation |
 
 Although `models/xgboost_lst.joblib`, `models/model_metadata.json`, and `models/baseline_metrics.json` exist locally, the current upstream `data/processed/metadata.json` identifies its grid as **DEMO / SYNTHETIC DATA**. The existing model files therefore cannot populate real-run fields. Real dataset and model checksums, training date, rows, feature ranges, selected settings, and performance remain **NOT AVAILABLE YET**.
+
+The future [reproducibility snapshot](reproducibility.md) links a successful real run's Git state, resolved command, source checksums, Python environment, requirement-file hashes, optional frontend lockfile, and dataset/CV/baseline/model hashes. None of those real-run values may be copied from current demo files.
 
 ## Intended use
 

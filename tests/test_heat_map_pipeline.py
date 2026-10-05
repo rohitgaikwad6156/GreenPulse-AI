@@ -86,8 +86,10 @@ class HeatMapPipelineTests(unittest.TestCase):
             (stage / 'models').mkdir(parents=True)
             (root / 'models/model_metadata.json').write_text('old metadata')
             (stage / 'models/model_metadata.json').write_text('new metadata')
+            (stage / 'models/reproducibility_snapshot.json').write_text('artificial snapshot')
             backup = pipeline._publish(stage, root)
             self.assertEqual((root / 'models/model_metadata.json').read_text(), 'new metadata')
+            self.assertEqual((root / 'models/reproducibility_snapshot.json').read_text(), 'artificial snapshot')
             self.assertEqual((backup / 'models/model_metadata.json').read_text(), 'old metadata')
             self.assertEqual(pipeline._rewrite_paths({'path': str(stage / 'models')}, stage, root),
                              {'path': str(root / 'models')})

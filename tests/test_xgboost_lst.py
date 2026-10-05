@@ -49,7 +49,13 @@ class XgboostLstTests(unittest.TestCase):
             model_path = root / "models" / "xgboost_lst.joblib"
             metadata_path = root / "models" / "model_metadata.json"
             report = train_xgboost_lst(dataset, dataset.parent, baselines, model_path,
-                                       metadata_path, n_trials=1, inner_folds=2, jobs=1)
+                                       metadata_path, n_trials=1, inner_folds=2, jobs=1,
+                                       reproducibility_context={"git": {
+                                           "commit": "a" * 40, "dirty": True, "state": "available"},
+                                           "pipeline": {"script": "scripts/build_heat_map_pipeline.py",
+                                                        "resolved_parameters": {"year": 2025, "trials": 1, "jobs": 1},
+                                                        "command": "python scripts/build_heat_map_pipeline.py --year 2025 --trials 1 --jobs 1"},
+                                           "snapshot_path": "models/reproducibility_snapshot.json"})
             self.assertEqual(report["objective"], "reg:squarederror")
             self.assertEqual(report["target"], "lst_c")
             self.assertEqual(report["feature_list"], ["ndvi", "ndbi"])
@@ -59,6 +65,11 @@ class XgboostLstTests(unittest.TestCase):
             self.assertEqual(report["model_artifact_sha256"],
                              "sha256:" + hashlib.sha256(model_path.read_bytes()).hexdigest())
             self.assertEqual(report["reproducibility_seed"], 42)
+            self.assertEqual(report["git_commit"], "a" * 40)
+            self.assertTrue(report["git_dirty"])
+            self.assertIn("Commit alone", report["git_reproducibility_note"])
+            self.assertEqual(report["pipeline_parameters"]["trials"], 1)
+            self.assertEqual(report["reproducibility_snapshot"], "models/reproducibility_snapshot.json")
             self.assertEqual(set(report["training_feature_distributions"]), {"ndvi", "ndbi"})
             self.assertLessEqual(report["training_feature_distributions"]["ndvi"]["min"],
                                  report["training_feature_distributions"]["ndvi"]["p01"])
@@ -80,6 +91,8 @@ class XgboostLstTests(unittest.TestCase):
             self.assertEqual(model.get_params()["objective"], "reg:squarederror")
             self.assertEqual(model.predict(np.array([[0.2, 0.5]])).shape, (1,))
             self.assertEqual(json.loads(metadata_path.read_text())["dataset_version"], report["dataset_version"])
+            self.assertEqual(json.loads(metadata_path.read_text())["git_commit"], "a" * 40)
+            self.assertFalse((root / "models/reproducibility_snapshot.json").exists())
 
     def test_missing_data_or_mismatched_baselines_stop_without_model(self):
         with tempfile.TemporaryDirectory() as temp:
