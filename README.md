@@ -134,6 +134,8 @@ artifacts are not real results.
 
 ## Real satellite pipelines
 
+- [Data Card](docs/data_card.md): source provenance, QA, limitations, and explicit real-dataset placeholders.
+- [Model Card](docs/model_card.md): implemented XGBoost contract and spatial validation plan, with real performance pending.
 - [Real-data intake contract](docs/data_intake_contract.md): authoritative required/optional/future source inventory plus provenance, date, CRS, checksum, and local-file validation before processing.
 - [Landsat LST processing](docs/landsat_lst_pipeline.md): code for the measured March–May surface-temperature target on the PMC/PCMC 30 m analysis grid; municipal output is still blocked. The grid does not create native 30 m thermal resolution.
 - [Sentinel-2 NDVI/NDBI processing](docs/sentinel2_indices_pipeline.md): cloud-masked optical features aligned exactly to that LST grid. It requires the real LST raster, verified municipal boundary, and extracted L2A SAFE scenes.
